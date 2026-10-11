@@ -10,6 +10,8 @@
 
 **Spec:** [首版需求终稿 V1.0](../../电商AI创作平台-首版需求终稿-2026-10-09.md)，2026-10-09，唯一需求基线。当前无产品源码，以下文件、API 与表均拟新建。
 
+**实施前修订（2026-10-11）：** 用户确认技术栈并授权先评估、修正本计划后按任务渐进实施。当前界面必须先读取 [项目设计资料](../../product-design.md) 和 [V2 暖色视觉基准](../../design/high-fidelity-2026-10-11/visual-reference.md)：使用奶油米色＋陶土橙的共享 token，历史绿色原型仅提供交互参考。执行安排与评审结论见 [分阶段执行说明](../../development/2026-10-11-execution.md)。保留 T01～T25 编号，下面已补齐基础写入者归属、鉴权依赖、个人资料和后台积分契约，并将生命周期浏览器验收移到用户页面实现后。
+
 ## Global Constraints
 
 - 开放账号密码注册，不增加手机号、邮箱验证等前置步骤。
@@ -56,7 +58,7 @@ backend/app/results/{models,manifest,persistence,publisher}.py
 backend/app/investigations/{models,service,schemas,routes}.py
 backend/app/events/{models,service,routes}.py
 backend/app/assist/{models,service,schemas,routes}.py
-backend/app/works/{service,schemas,routes,lifecycle}.py
+backend/app/works/{models,service,schemas,routes,lifecycle}.py
 backend/app/admin/{permissions,content_access,statistics,routes}.py
 backend/app/site/{models,service,schemas,routes}.py
 backend/app/audit/{models,service}.py
@@ -121,13 +123,15 @@ infra/runbooks/{deploy,rollback,recovery,incident}.md
 - `TaskView(task_id:UUID,state:TaskState,state_version:int,settlement_state:SettlementState,quote:Quote,work_ids:list[UUID],investigation_reason:str|None)`；未授权诊断不含 input，不返回内部路径/秘密。
 - `AdmissionResult(task:TaskView,replayed:bool)`：新受理201、重放200，同task_id；改变内容409 IDEMPOTENCY_CONFLICT。
 - 409 QUOTE_STALE 附当前可用报价，不自动受理；422 INPUT_INVALID/SPEC_DISABLED；402 INSUFFICIENT_CREDITS；409 CAPACITY_INSUFFICIENT；403 FEATURE_NOT_ENABLED；429 RATE_LIMITED。错误含trace_id、安全说明，不泄露别人资源或秘密。
+- 已确认报价因调价、规格改版或下架失效时统一409 QUOTE_STALE，并返回当前有效报价/规格（无替代时为空集合）；422 SPEC_DISABLED仅用于没有已确认有效旧报价的新请求。各客户端按此区分补资料与重新确认。
+- 本人 TaskDetail/ConversationView/WorkSource 提供不可变来源输入/素材版本/原报价以支持详情和重新生成；管理员普通诊断仍不返回这些用户正文。路由创建时即完成资源所有权保护，T16只统一登记与回归，不延期鉴权。
 - 无登录401；跨账户统一404；后台缺内容授权403。
 
 以下前缀均 `/api/v1`，全部拟新建。
 
 | 路由 | 服务行为 |
 | --- | --- |
-| POST /auth/register,/auth/login,/auth/logout；GET /me | RegisterRequest(account,password,request_key)，安全cookie会话，退出 revoke_session；无手机邮箱验证 |
+| POST /auth/register,/auth/login,/auth/logout；GET/PATCH /me | RegisterRequest(account,password,request_key)，安全cookie会话，退出 revoke_session；本人资料 ProfileUpdate 仅可更新昵称（1～80字，可空表示未设置）及非必填简介（最多500字），不能修改角色、账号、余额；无手机邮箱验证 |
 | GET /account,/account/ledger | 本人三余额、累计入账、冻结去向流水与原因 |
 | GET /agents,/agents/{id}/specs；POST /quotes | 只返回启用/支持字段，quote_generation 服务端独立核价 |
 | POST/GET /conversations；GET /conversations/{id}；POST /products/versions | 本人历史与持久任务/消息、不可变资料版本；不默认提供会话删除 |
@@ -140,6 +144,8 @@ infra/runbooks/{deploy,rollback,recovery,incident}.md
 | GET/PATCH /admin/site/content | 管理员读取当前草稿/批准版；SiteContentUpdate(expected_version,content,policy_version)经update_site_content写新版本及脱敏审计；D-11未确认仅保存草稿，不能公开 |
 | POST /agent-callbacks/{agent_id}/{version} | D-01签名/凭据/时间/nonce/eventID及绑定验证；不接受任意user |
 | GET /admin/users；PATCH /admin/users/{id}/status；POST /admin/credit-grants | 停用D-09；发放key/amount/reason必填、幂等 |
+| GET /admin/users/{id}/account,/admin/users/{id}/ledger | 管理员查看指定用户的积分余额与分页流水；只返回账本必要信息，不包含用户素材、作品或消息正文 |
+| GET/PATCH /admin/registration-credit-config | 注册赠送整数配置及不可变版本；更新包含 expected_version、amount、D-05 policy_version、reason，CAS冲突409；生产D-05未确认不可启用，修改只影响后续注册，不追补旧用户；变更有审计 |
 | GET/POST /admin/agents,/admin/specs,/admin/prices | 新版本、脱敏secret、变更审计，不覆盖历史 |
 | GET /admin/tasks,/admin/tasks/{id}/diagnostics | 默认仅必要阶段/错误/耗时/用量，不返回正文 |
 | POST /admin/tasks/{id}/investigations,/admin/tasks/{id}/resolutions | action=resume_original/confirm_failure/manual_close，决策版本+证据+原因；不绕过交付/账本 |
@@ -204,8 +210,10 @@ T01 --> T03
 T02 --> T04
 T01 --> T05
 T02 --> T05
+T04 --> T05
 T02 --> T06
 T03 --> T06
+T04 --> T06
 T04 --> T07
 T05 --> T07
 T06 --> T07
@@ -220,6 +228,9 @@ T02 --> T14
 T12 --> T14
 T03 --> T15
 T02 --> T15
+T04 --> T15
+T05 --> T15
+T06 --> T15
 T02 --> T16
 T05 --> T16
 T12 --> T16
@@ -228,16 +239,20 @@ T06 --> T17
 T14 --> T18
 T15 --> T18
 T16 --> T18
+T17 --> T18
 T04 --> T19
 T05 --> T19
 T13 --> T19
 T17 --> T19
+T18 --> T19
 T03 --> T20
 T19 --> T20
 T18 --> T21
 T20 --> T21
 T10 --> T22
 T12 --> T22
+T13 --> T22
+T20 --> T22
 T22 --> T23
 T22 --> T24
 T21 --> T25
@@ -268,6 +283,8 @@ T01建立测试运行环境。仓库根执行 `uv sync --project backend --locke
 - [ ] 写 `test_production_rejects_test_only`、`test_readiness_requires_persistent_root`：生产测试值拒启，缺持久根ready=false。
 - [ ] `uv run --project backend pytest backend/tests/unit/test_bootstrap.py -q` 确认RED。
 - [ ] 建启动/配置/DB与mock容器，锁依赖兼容版本；记录Streams/Celery选择与OpenAPI生成规则。
+- [ ] 建 Vitest/Playwright 配置与独立测试库约定，明确 webServer/baseURL、健康等待、端口与清理；测试 seed/reset 和故障控制只在 TEST_ONLY 模式使用，不提供生产控制路由。业务页尚未实现时不把缺页或环境错误计为行为 RED。
+- [ ] 交付pytest conftest、真实MySQL独立测试库/迁移初始化及隔离清理fixture，后续模块扩展实际表约束；T01无业务迁移时先验证基础连接/事务及迁移环境，不用SQLite代替。
 - [ ] 重跑预期PASS；`pnpm --dir frontend typecheck` 退出0，GET live200，mock显式标识。
 - [ ] 评审无秘密/生产默认政策，提交锁文件与启动说明。
 
@@ -286,20 +303,22 @@ T01建立测试运行环境。仓库根执行 `uv sync --project backend --locke
 - [ ] 写 `test_mock_response_loss_preserves_intent`、`test_not_found_differs_proven_absent`：同externalID单有效意图。
 - [ ] `uv run --project backend pytest backend/tests/contract/test_mock_agents.py -q` 确认RED。
 - [ ] 实现lost_response/repeated/out_of_order/query_unavailable/not_found/partial/expired_link场景；协议未知保持draft。
+- [ ] 明确按 external_submission_id 指定故障场景及读取调用计数的 TEST_ONLY 控制协议，供后台/浏览器测试驱动真实任务 API；模拟服务须可独立进程启动，T01 容器先用健康启动骨架，T03 接替完整故障服务。
 - [ ] 重跑PASS；故障稳定复现并导出调用计数，不称真实服务支持。
 - [ ] 评审mock标识与协议边界，提交。
 
 ### T04 账户、会话撤销与原子赠送
 **负责人/前置：** 后端；T02。**Files:** auth五文件、ledger/{models,service}.py、audit两文件、迁移0002_auth_credit_base.py；`backend/tests/integration/test_registration.py`、`test_auth_access.py`。
-**Interfaces:** `register_account(account,password,request_key,policy_version)->AuthResult`、`authenticate(account,password)->AuthResult`、`require_active_principal(cookie)->Principal`、`revoke_session(id)`；grant_credits签名第4.1节。
+**Interfaces:** `register_account(account,password,request_key,policy_version)->AuthResult`、`authenticate(account,password)->AuthResult`、`require_active_principal(cookie)->Principal`、`revoke_session(id)`；grant_credits、freeze_credits签名第4.1节；`get_profile/update_profile(principal,dto)->ProfileView`，GET/PATCH /me 采用第3节最小可选资料字段。
 - [ ] 写 `test_registration_grant_exactly_once`（并发/重试只有user及signup流水各1）、`test_registration_interrupt_rolls_back`、`test_logout_revokes_current_credential`。
 - [ ] `uv run --project backend pytest backend/tests/integration/test_registration.py backend/tests/integration/test_auth_access.py -q` 确认RED。
 - [ ] 实现账号规范/唯一索引、建议Argon2id、HttpOnly/Secure/SameSite cookie与CSRF、DB会话、限流、原子赠送，不加验证步骤。
+- [ ] 同阶段建立 credit_reservations 模型、唯一约束和 freeze_credits 事务写入者；服务不自行 commit，T07消费冻结能力，T12补完整交付结算/释放。建立版本化注册赠送配置持久层和读取服务，T19提供后台修改入口；注册绑定其版本。本人资料保存/刷新持久、拒绝超长或敏感字段，有鉴权和字段校验测试。
 - [ ] 重跑PASS；响应无密码/hash，退出cookie受保护访问401，D-05未确认生产注册关闭。
 - [ ] 评审D-07恢复只留门槛，提交。
 
 ### T05 Agent、规格、价格版本与报价
-**负责人/前置：** 后端+Agent接口；T01,T02。**Files:** catalog四文件、0003_catalog.py；`backend/tests/integration/test_catalog_quotes.py`。
+**负责人/前置：** 后端+Agent接口；T01,T02,T04。**Files:** catalog四文件、0003_catalog.py；`backend/tests/integration/test_catalog_quotes.py`。
 **Interfaces:** `publish_agent_version(actor,draft)->AgentVersion`、`publish_spec_version(actor,draft)->SpecVersion`、`set_price_version(actor,spec,credits)->PriceVersion`、`quote_generation(principal,input,spec_id)->Quote`、`validate_confirmed_quote(quote,input)->ValidatedQuote`。
 - [ ] 写 `test_quote_stale_after_reprice_delist`、`test_multi_result_requires_d04`、`test_secret_redacted`。
 - [ ] `uv run --project backend pytest backend/tests/integration/test_catalog_quotes.py -q` 确认RED。
@@ -308,7 +327,7 @@ T01建立测试运行环境。仓库根执行 `uv sync --project backend --locke
 - [ ] 评审无硬编码生产价格/参数档位，提交。
 
 ### T06 上传、本地存储与容量事务
-**负责人/前置：** 后端+运维；T02,T03。**Files:** storage/{models,capacity,local_store,validation,routes}.py、0004_storage.py；`backend/tests/integration/test_capacity.py`、`backend/tests/unit/test_upload_validation.py`。
+**负责人/前置：** 后端+运维；T02,T03,T04。**Files:** storage/{models,capacity,local_store,validation,routes}.py、0004_storage.py；`backend/tests/integration/test_capacity.py`、`backend/tests/unit/test_upload_validation.py`。
 **Interfaces:** `reserve_capacity(session,user_id,intent_id,estimated_bytes,policy_version)->CapacityReservation`、`finalize_capacity(session,id,actual_bytes)`、`release_capacity(session,id)`、`upload_file(principal,stream,display_name)->FileVersionRef`、LocalStore.stage/commit/read。
 - [ ] 写 `test_concurrent_capacity_reservation`、`test_rollback_idempotent_reclaim`、`test_magic_mime_path_size`：容量不重配、路径名不影响保存、实际格式限值判定。
 - [ ] `uv run --project backend pytest backend/tests/integration/test_capacity.py backend/tests/unit/test_upload_validation.py -q` 确认RED。
@@ -322,6 +341,7 @@ T01建立测试运行环境。仓库根执行 `uv sync --project backend --locke
 - [ ] 写 `test_same_key_same_body_one_task`、`test_same_key_changed_body_conflict`、`test_replay_after_reprice_returns_original`、`test_insufficient_interrupt_no_side_effect`、`test_snapshot_immutable_after_edit`，断言余额和任务/outbox/流水/预留/引用计数。
 - [ ] `uv run --project backend pytest backend/tests/integration/test_task_admission.py -q` 确认RED。
 - [ ] 按第4.1节先查幂等再新受理校验，同事务固定资料/素材/指令/参数/Agent/价格快照、冻结/预留/outbox；不传历史全文。
+- [ ] 本任务同时建立 enqueue_outbox 事务写入者（dispatch/outbox.py）和 durable_events 模型/迁移及 append_durable_event（events/models.py、events/service.py）；它们接受同一 Session、不自行 commit，确保受理和后续T12发布可原子写记录。T08补消费/恢复，T14补鉴权流与补偿，不推迟基础表和写入服务。
 - [ ] 重跑PASS；同键只一冻，异体409；旧价409无任务/冻结；提交前upstream调用0；新键重生成留旧作。
 - [ ] 评审每写点失败注入、唯一索引/锁顺序，提交。
 
@@ -356,13 +376,14 @@ T01建立测试运行环境。仓库根执行 `uv sync --project backend --locke
 **负责人/前置：** 后端+存储测试；T06,T10。**Files:** results/{models,manifest,persistence}.py、storage/download.py、0009_results.py；`backend/tests/faults/test_result_persistence.py`、`backend/tests/unit/test_download_ssrf.py`。
 **Interfaces:** `prepare_manifest(task_id,outcome)->ResultManifest`、`persist_original_result(task_id,manifest_id)->DurableDelivery`、`validate_result_url(url,source_policy,dns)->ApprovedTarget`。
 - [ ] 写 `test_partial_temporary_not_complete`、`test_disk_complete_db_commit_failure`、`test_save_failure_expired_link_never_regenerates`、`test_dns_ipv6_redirect_metadata`。
+- [ ] 本任务的DB失败点为文件rename后保存记录提交失败：从稳定文件标识恢复DurableDelivery，不调用未来publisher；T12另注入真实作品/消息/账本发布事务失败并验证原文件恢复发布，两个阶段均不增加submit。
 - [ ] `uv run --project backend pytest backend/tests/faults/test_result_persistence.py backend/tests/unit/test_download_ssrf.py -q` 确认RED。
 - [ ] 实现第4.4节落盘/save job恢复、完整性D-01/04、下载D-10限制与SSRF防护；本地完整只恢复DB发布。
 - [ ] 重跑PASS；上游通知/片段不成功，保存异常不扣；原结果恢复前后submit计数不变，失效不能恢复转核查。
 - [ ] 评审durable证据/孤立文件保护，提交。
 
 ### T12 发布、结算释放互斥与对账
-**负责人/前置：** 后端+DB测试；T11。**Files:** results/publisher.py、ledger/{service,reconcile,schemas,routes}.py、0010_publication_settlement.py；`backend/tests/integration/test_settlement.py`、`backend/tests/faults/test_publish_atomicity.py`。
+**负责人/前置：** 后端+DB测试；T11。**Files:** results/publisher.py、works/models.py（works/work_items及task/conversation/user关联）、ledger/{service,reconcile,schemas,routes}.py、0010_publication_settlement.py；`backend/tests/integration/test_settlement.py`、`backend/tests/faults/test_publish_atomicity.py`。
 **Interfaces:** publish_and_settle、settle_credits/release_credits第4.1节；`reconcile_accounts(session)->ReconciliationReport`只报告不擅改账。
 - [ ] 写 `test_complete_publication_once`、`test_concurrent_settle_release_exclusive`、`test_each_publish_write_interruption`、`test_all_operations_conserve_ledger`。
 - [ ] `uv run --project backend pytest backend/tests/integration/test_settlement.py backend/tests/faults/test_publish_atomicity.py -q` 确认RED。
@@ -380,7 +401,7 @@ T01建立测试运行环境。仓库根执行 `uv sync --project backend --locke
 - [ ] 评审无人负责冻结防护，提交操作手册。
 
 ### T14 受保护SSE和断线补偿
-**负责人/前置：** 后端+前端；T02,T12。**Files:** events三文件、0012_events.py；`backend/tests/integration/test_sse_access.py`。
+**负责人/前置：** 后端+前端；T02,T12。**Files:** events三文件、0012_events.py（仅补流式补偿所需增量，基础表/写入者复用T07）；`backend/tests/integration/test_sse_access.py`。
 **Interfaces:** `append_durable_event(session,user_id,task_id,kind,payload)->EventSeq`、`stream_events(principal,after)->AsyncIterator[SSEEvent]`；transient_fragment独立于正式成果。
 - [ ] 写 `test_sse_cross_user_and_revoked_session`、`test_reconnect_durable_cursor`、`test_fragment_disconnect_no_settle_cancel`、`test_expired_cursor_reset_get_not_post`。
 - [ ] `uv run --project backend pytest backend/tests/integration/test_sse_access.py -q` 确认RED。
@@ -389,11 +410,12 @@ T01建立测试运行环境。仓库根执行 `uv sync --project backend --locke
 - [ ] 评审事件保留/脱敏，无token放URL，提交。
 
 ### T15 指令辅助与未决额度策略
-**负责人/前置：** 后端+产品；T02,T03。**Files:** assist四文件、0013_assist.py；`backend/tests/integration/test_prompt_assist.py`。
+**负责人/前置：** 后端+产品；T02,T03,T04,T05,T06。**Files:** assist四文件及provider.py（PromptAssistProvider请求/响应契约、mock与真实适配边界）、0013_assist.py；`backend/tests/integration/test_prompt_assist.py`。
 **Interfaces:** `prepare_prompt(principal,request,policy_version)->AssistProposal(original,proposed,missing_facts,policy_version)`；D-05确认方案后才实现具体额度。
 - [ ] 写 `test_assist_no_generation_task`、`test_original_restore_edit_reoptimize`、`test_no_invented_facts`、`test_d05_unconfirmed_blocks_live`；仅选择独立免费时加幂等扣次/并发/重置测试。
 - [ ] `uv run --project backend pytest backend/tests/integration/test_prompt_assist.py -q` 确认RED。
 - [ ] 草案保原文可撤回，按当前Agent整理，缺事实提示，不补材质/功效/价格/优惠，不新增脚本产品；基础限流。
+- [ ] 辅助provider显式配置、超时/错误/限流及素材归属校验；mock固定样本只用于确定性测试，不能作为真实AI接入。真实供应方/协议/额度未确认时live关闭，T23补辅助真实联调与缺事实样本证据，不擅定服务商。
 - [ ] 重跑PASS；正式生成须用户另点并确认报价，辅助不建任务，未决生产403。
 - [ ] 评审未代定免费/收费额度，提交。
 
@@ -409,7 +431,7 @@ T01建立测试运行环境。仓库根执行 `uv sync --project backend --locke
 ### T17 生命周期、在途保护和停用
 **负责人/前置：** 后端+产品+运维；T06,T16。**Files:** works/lifecycle.py、storage/models.py、auth/service.py；`backend/tests/integration/test_lifecycle.py`。
 **Interfaces:** `delete_work/delete_material(principal,id,policy_version)`、`collect_unreferenced_file(id,policy_version)`、`set_account_status(actor,user_id,status,policy_version)`；会话删除只D-09确认后补契约。
-- [ ] 前端 `frontend/tests/e2e/material-lifecycle.spec.ts` 写 regenerate_missing_material：作品来源输入带回；原素材404/不可用时提示重传，提交不能创建任务/冻结；补齐后确认当前报价创建一新任务，原成果仍可查。执行 `pnpm --dir frontend exec playwright test tests/e2e/material-lifecycle.spec.ts`，先RED后PASS；D-03输入schema和D-09素材政策仍按确认版，不自行代定。
+- [ ] 本阶段先完成后端缺素材拒绝/补传恢复的行为验证；跨页面 material-lifecycle.spec.ts 的实现与浏览器 RED/PASS 归属T18，不等待尚未实现的用户页面。
 - [ ] 写 `test_inflight_material_protected`、`test_kept_ref_no_physical_cleanup`、`test_deleted_history_links_by_policy`、`test_missing_material_reupload`、`test_disable_revokes_preserves_task_ledger`。
 - [ ] `uv run --project backend pytest backend/tests/integration/test_lifecycle.py -q` 确认RED。
 - [ ] 按D-09逻辑删除/物理清理分离；停用即禁登录/新受理/受保护访问，保留数据，仅确认政策处理在途，不假定支持取消。
@@ -417,9 +439,11 @@ T01建立测试运行环境。仓库根执行 `uv sync --project backend --locke
 - [ ] 评审与D-08异常衔接、账户恢复，提交。
 
 ### T18 用户前端完整流程
-**负责人/前置：** 前端+设计+测试；T14,T15,T16。**Files:** main/router/types及api/{client,auth,catalog,tasks,files,works,account,assist}.ts；第1节六components；auth/{LoginView,RegisterView}.vue；workspace/{WorkspaceView,ConversationList,PromptEditor}.vue与useTaskStream.ts；works/WorksView.vue；account/{AccountView,RechargeInfoView}.vue；`frontend/tests/e2e/user-flow.spec.ts`、`frontend/tests/unit/task-stream.spec.ts`。
+**负责人/前置：** 前端+设计+测试；T14,T15,T16,T17。**Files:** main/router/types及api/{client,auth,catalog,tasks,files,works,account,assist}.ts；第1节六components及共享AppDialog/AppDrawer、语义tokens；auth/{LoginView,RegisterView}.vue；workspace/{WorkspaceView,ConversationList,PromptEditor}.vue与useTaskStream.ts；works/WorksView.vue；account/{AccountView,RechargeInfoView}.vue；`frontend/tests/e2e/user-flow.spec.ts`、`material-lifecycle.spec.ts`、`frontend/tests/unit/task-stream.spec.ts`。
 **Interfaces:** `useTaskStream(conversationId):{tasks,connectionState,reconnect}`、`submitTask(key,request):Promise<AdmissionResult>`；路由/login,/register,/workspace/:conversationId?,/works,/account,/recharge。
 - [ ] 写register_generate_history_recharge、stale_quote_reconfirm、refresh_disconnect_original、assist_restore_draft浏览器用例。增加以下F01～08回归，消费实际API返回ID/快照/流水，不读取编辑器猜测旧任务。
+- [ ] 按T18a共享视觉/弹层基础、T18b认证/资料/账户、T18c创作/作品、T18d跨页验收分步实现；共享router/client/生成types保持单一写入者。使用V2 tokens和设计入口的弹层语义：编辑/详情抽屉、居中作品预览/收费删除确认、取消初焦、Escape/Tab隔离、关闭恢复焦点、手机全屏抽屉。AccountView资料抽屉保存后刷新仍存在，取消/Escape不PATCH。
+- [ ] `frontend/tests/e2e/material-lifecycle.spec.ts` 写 regenerate_missing_material：作品来源输入带回；原素材404/不可用时提示重传，提交不能创建任务/冻结；补齐后确认当前报价创建一新任务，原成果仍可查。执行 `pnpm --dir frontend exec playwright test tests/e2e/material-lifecycle.spec.ts`，先RED后PASS；D-03输入schema和D-09素材政策仍按确认版，不自行代定。
 - [ ] conversation_isolation_inflight：桌面/390px新建空会话无旧卡；至少两历史可切回，原任务ID/执行状态/快照不变，全账户冻结不因导航变动（F01）。
 - [ ] immutable_task_snapshot：提交自定义资料/指令/素材版本及参数后逐字段相等；切Agent、编辑草稿、新增任务后旧卡按原task_id读取，原Agent/Quote不变（F02）。
 - [ ] assist_preserves_parameters：文案语气、图片用途、视频横竖屏/字幕经预览编辑/取消/采用/撤回保持；确认与快照显示真值。空/非空原指令均可撤回和再次优化，无任务/冻结副作用（F03/F06）。
@@ -432,10 +456,12 @@ T01建立测试运行环境。仓库根执行 `uv sync --project backend --locke
 - [ ] 评审桌面/手机和门槛文案，提交截图与接口证据。
 
 ### T19 后台与内容单独授权
-**负责人/前置：** 后端+前端+安全测试；T04,T05,T13,T17。**Files:** admin/{permissions,content_access,statistics,routes}.py、audit/service.py、0014_content_grants.py；frontend/src/api/admin.ts；frontend/src/features/admin/{UsersView,AgentsView,PricesView,TasksView,AuditView}.vue；`backend/tests/integration/test_admin_access.py`、`frontend/tests/e2e/admin-flow.spec.ts`。
+**负责人/前置：** 后端+前端+安全测试；T04,T05,T13,T17,T18（共享鉴权/router/client/弹层）。**Files:** admin/{permissions,content_access,statistics,routes}.py、audit/service.py、0014_content_grants.py；frontend/src/api/admin.ts；frontend/src/features/admin/{UsersView,AgentsView,PricesView,TasksView,AuditView}.vue；`backend/tests/integration/test_admin_access.py`、`frontend/tests/e2e/admin-flow.spec.ts`。
 **Interfaces:** `grant_content_access(approver,actor,scope,reason,expires_at)`、`read_user_content(actor,resource,reason)->AuditedContent`；授予权限单独记录，不能自己无条件给自己；`get_statistics()`未知成本unavailable。
 积分配置/发放/账本入口集成在既有 `UsersView.vue` 的积分面板；用量统计集成在既有 `TasksView.vue` 的统计面板，调用api/admin.ts的GET /admin/statistics，未知实际成本显示unavailable；不另扩CMS或组件库。
+规格管理集成在 `AgentsView.vue` 的规格面板，调用既有 /admin/specs API，包含字段/约束/启用门槛和版本审计；后台编辑/详情复用T18弹层。UsersView调用第3节目标用户积分/流水及注册赠送配置API，不用本人流水或审计替代目标账本。
 - [ ] 写 `test_diagnostics_no_body_without_content_grant`、`test_content_audit_reason_revocation`、`test_admin_grant_same_key_once`、`test_secret_not_response_snapshot_logs`。
+- [ ] 补目标用户余额/流水、非管理员拒绝、赠送配置CAS冲突/D-05门槛及修改只影响新注册的测试；admin-flow浏览器用例覆盖指定用户查账/幂等发放、赠送配置冲突保留草稿、规格编辑/未决禁止发布、普通诊断与独立内容授权分离。
 - [ ] `uv run --project backend pytest backend/tests/integration/test_admin_access.py -q` 与 `pnpm --dir frontend exec playwright test tests/e2e/admin-flow.spec.ts` 确认RED。
 - [ ] 普通后台/内容权限分离；积分理由/幂等/流水、配置版本脱敏审计、原任务核查、安全处置；统计赠送/发放非收入。
 - [ ] 重跑PASS；授权过期/撤销立即拒绝，内容访问记录对象/原因/人/时间，无来源成本不伪造。
@@ -456,14 +482,16 @@ T01建立测试运行环境。仓库根执行 `uv sync --project backend --locke
 **负责人/前置：** 前端+测试；T18,T20。**Files:** `frontend/tests/e2e/responsive.spec.ts`、`accessibility.spec.ts`，仅按失败修改上述具体Vue文件。
 **Interfaces:** 既有路由/API；建议测试1440×900、390×844、768×1024样本，不冒充确认设备下限。
 - [ ] 写登录/工作台输入规格任务/作品/账户充值/后台导航的溢出、触控、焦点和标签断言。
+- [ ] 专项复核V2暖色、正文对比度、44px控件、窄屏表单先于结果及真实区域宽度、合法长名称、弹层快速关闭重开、辅助与导航焦点连续性、长表格横滑提示；复用原型评审发现作为回归输入。配置desktop/mobile Playwright projects，显式复跑user-flow/material-lifecycle/admin-flow/site-content及本阶段两spec，确保F01～08覆盖两种视口。
 - [ ] 在1440px与390px复跑T18的conversation_isolation_inflight、immutable_task_snapshot、assist_preserves_parameters、task_ledger_three_agents、stale_quote_reconfirm、generated_work_and_regenerate；手机新建/至少两历史切换入口可见可操作、旧任务/冻结保持，完整成果进库/来源/重生成可达，账户/充值与任务固定费用一致。模态取消/Escape后无任务或冻结副作用，焦点回触发按钮（F01～08）。
 - [ ] `pnpm --dir frontend exec playwright test tests/e2e/responsive.spec.ts tests/e2e/accessibility.spec.ts` 记录失败交互。
+- [ ] 完整双端回归命令：`pnpm --dir frontend exec playwright test tests/e2e/user-flow.spec.ts tests/e2e/material-lifecycle.spec.ts tests/e2e/admin-flow.spec.ts tests/e2e/site-content.spec.ts tests/e2e/responsive.spec.ts tests/e2e/accessibility.spec.ts --project=desktop --project=mobile`，记录各project实际运行数量及结果。
 - [ ] 修复布局/焦点，桌面主布局、手机基本操作、侧栏可收起，媒体不遮主要操作。
 - [ ] 重跑PASS，关键操作可达、无横向遮挡、有可访问名称/可见焦点。
 - [ ] 评审中文页面入口/门槛文案，提交。
 
 ### T22 持久部署、监控和备份工具
-**负责人/前置：** 运维+后端；T10,T12。**Files:** infra/compose.staging.yaml、nginx.conf、五scripts和四runbooks；`backend/tests/integration/test_operations.py`。
+**负责人/前置：** 运维+后端；T10,T12,T13,T20。**Files:** infra/compose.staging.yaml、nginx.conf、五scripts和四runbooks；`backend/tests/integration/test_operations.py`。
 **Interfaces:** `backup.ps1 -Destination <path> -Manifest <path>`→DB快照/文件hash清单/cutoff/版本；`restore.ps1 -Manifest <path> -Target <isolated-env>`；reconcile只核对不改账；RPO/RTO/路径/频率由D-12确认。
 - [ ] 写 `test_metrics_outbox_investigation_capacity`、`test_backup_detects_missing_file`、`test_deploy_keeps_storage_root`。
 - [ ] `uv run --project backend pytest backend/tests/integration/test_operations.py -q` 确认RED。
@@ -475,6 +503,7 @@ T01建立测试运行环境。仓库根执行 `uv sync --project backend --locke
 **负责人/前置：** Agent接口+后端+测试；T22及对应D-01～05/08/09/10。**Files:** 三adapter、确认版三v1.yaml；`backend/tests/contract/test_live_agents.py`、`docs/verification/agents/{copy,image,video}.md`（实施阶段建）。
 **Interfaces:** 保持T03统一接口；unsupported有核查方案，完整成果必须可判定。
 - [ ] 按文案→图片→视频写合法输入/完整结果、参数错误、响应丢失/查单中断、同externalID、保存恢复、回调来源乱序验证步骤，先在预发布复现失败。
+- [ ] 本任务注册pytest --agent/--live 参数，默认测试不调用真实服务；同时验证T15真实辅助provider的配置/缺事实/错误与超时，单独留证。T25注册--case/--environment/--evidence-dir，不能以未知参数或缺环境算行为RED。
 - [ ] `uv run --project backend pytest backend/tests/contract/test_live_agents.py --agent=copy --live -q`，再image/video；跳过不能当通过。
 - [ ] 实现真实字段/鉴权/错误/用量映射；仅可靠能力安全恢复原任务，缺能力验证核查，不默认重试。
 - [ ] 各命令PASS，记录实际ID/版本/完整hash/余额；不可注入故障明示限制与mock补充，不宣称真实全覆盖。
