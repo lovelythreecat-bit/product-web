@@ -1,0 +1,14 @@
+{
+  "decision_id": "D-07",
+  "version": "production-draft-v1",
+  "mode": "production",
+  "test_only": false,
+  "status": "draft",
+  "payload": {
+    "recovery": null,
+    "login_help": null
+  },
+  "confirmed_by": null,
+  "confirmed_at": null,
+  "evidence_refs": []
+}

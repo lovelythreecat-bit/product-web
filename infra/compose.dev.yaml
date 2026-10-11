@@ -3,6 +3,8 @@ name: ecommerce-ai-dev
 services:
   mysql:
     image: mysql:8.4.8@sha256:2952e3be7807f06fc18de50b3ea1a632d5c70d63482ff7d7376fe3aa8999babf
+    # Allows scoped schema owners to create immutable-history triggers with binary logging.
+    command: ["mysqld", "--log-bin-trust-function-creators=ON"]
     ports:
       - "${DEV_BIND_ADDRESS:-127.0.0.1}:13306:3306"
     environment:

@@ -92,6 +92,8 @@ $env:TEST_REDIS_URL = 'redis://127.0.0.1:16379/15'
 
 session 级 fixture 在 MySQL 命名锁保护下执行 Alembic `upgrade head`。T01 只有空的 `0001_bootstrap` 基线，不提前建业务表。每个 `db_session` 使用外部事务加 savepoint，即使应用 commit 也不会泄漏到其它连接，结束后 rollback。T01 探针表按 UUID 单独建表、最终仅 drop 自己的表；MySQL DDL 隐式提交，所以不放在回滚事务中。后续模块扩展 Alembic 迁移和真实约束测试。Redis 仅允许数据库 15，测试只清理自己的随机 key 前缀，禁止 FLUSHALL/全库 reset。
 
+T02 追加：政策历史由数据库触发器保护。开发 Compose 的 MySQL 实例显式启用 `log_bin_trust_function_creators=ON`，允许仅有本库 schema 权限的迁移用户创建触发器；没有给应用或测试用户授予 SUPER。开启 binary logging 的其他部署环境须提前安排该实例配置或有资格的独立迁移账户，再执行迁移。MySQL DDL 失败不自动回滚；只可在核验表为空、revision 及对象归属后按失败迁移记录处理，不自动删表或清库。
+
 Linux 一致测试入口（与 Windows 共用源码、uv.lock）：
 
 ```powershell

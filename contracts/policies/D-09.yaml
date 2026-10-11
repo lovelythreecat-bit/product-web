@@ -1,0 +1,15 @@
+{
+  "decision_id": "D-09",
+  "version": "production-draft-v1",
+  "mode": "production",
+  "test_only": false,
+  "status": "draft",
+  "payload": {
+    "generation": null,
+    "delete": null,
+    "account_disable": null
+  },
+  "confirmed_by": null,
+  "confirmed_at": null,
+  "evidence_refs": []
+}

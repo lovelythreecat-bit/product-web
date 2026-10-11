@@ -1,0 +1,24 @@
+{
+  "TEST_ONLY": true,
+  "description": "Simulated registration only; no human confirmation claimed.",
+  "decisions": [
+    {
+      "decision_id": "D-05",
+      "version": "TEST_ONLY-mock-v1",
+      "mode": "mock",
+      "test_only": true,
+      "status": "draft",
+      "payload": {
+        "registration": {
+          "credits": 12
+        },
+        "assist": {
+          "scheme": "UNDECIDED"
+        }
+      },
+      "confirmed_by": null,
+      "confirmed_at": null,
+      "evidence_refs": []
+    }
+  ]
+}

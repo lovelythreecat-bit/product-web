@@ -1,0 +1,21 @@
+{
+  "decision_id": "D-05",
+  "version": "production-draft-v1",
+  "mode": "production",
+  "test_only": false,
+  "status": "draft",
+  "payload": {
+    "registration": null,
+    "prices": {},
+    "generation": null,
+    "assist": {
+      "scheme": "UNDECIDED",
+      "policy_ref": null,
+      "implementation_ref": null,
+      "quota": null
+    }
+  },
+  "confirmed_by": null,
+  "confirmed_at": null,
+  "evidence_refs": []
+}
