@@ -47,7 +47,7 @@ def compose_worker(factory, redis, stream, group, worker_id, *, registry, task_i
             "investigate",
         )
     }
-    # T10/T11 own result reduction/save_original; no completion or settlement here.
+    # T10 reduces callbacks and polls through service.handle. T11 owns save_original.
     return Worker(
         OutboxDispatcher(factory, redis, stream, task_ids=task_ids),
         RecoveryScheduler(factory, task_ids=task_ids),

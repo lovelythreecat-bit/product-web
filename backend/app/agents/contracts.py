@@ -146,7 +146,7 @@ class VerifiedEvent(Contract):
     event_id: str | None = None
     external_submission_id: str | None = None
     upstream_task_id: str | None = None
-    sequence: int | None = None
+    sequence: int | None = Field(default=None, strict=True)
     state: Literal["RUNNING", "RESULT_READY", "FAILED"] | None = None
     timestamp: float | None = None
     result: ResultManifest | None = None

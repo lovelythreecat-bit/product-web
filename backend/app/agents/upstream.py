@@ -512,12 +512,27 @@ class UpstreamService:
             session.flush()
             return self._safe_retry(session, task, "SUBMITTING", row.id).safe_retry
 
+    def poll_original_task(self, task_id, *, lease=None):
+        from app.agents.callbacks import CallbackService
+
+        return CallbackService(self).poll_original_task(task_id, lease=lease)
+
+    def original_result(self, task_id):
+        from app.agents.callbacks import CallbackService
+
+        return CallbackService(self).original_result(task_id)
+
+    def pending_failure(self, task_id):
+        from app.agents.callbacks import CallbackService
+
+        return CallbackService(self).pending_failure(task_id)
+
     def handle(self, context):
         try:
             if context.action == "prepare_submission":
                 self.submit_original_task(context.task_id, context.lease)
             else:
-                self.recover_original_task(context.task_id, lease=context.lease)
+                self.poll_original_task(context.task_id, lease=context.lease)
         except LookupError:
             with self.factory() as session, session.begin():
                 task = locked_execution(session, context.task_id, context.lease)

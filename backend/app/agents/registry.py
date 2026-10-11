@@ -39,8 +39,12 @@ class AgentRegistry:
         snapshot = session.get(TaskSnapshot, task.id)
         if record is None or snapshot is None or snapshot.agent_snapshot != record.snapshot:
             raise LookupError("Agent binding unavailable")
+        return self.bind_version(record)
+
+    def bind_version(self, record):
+        """Resolve a callback path only through the immutable catalog record."""
         version = AgentVersion.model_validate(record.snapshot)
-        if (str(version.agent_id), version.version) != (task.agent_id, task.agent_version):
+        if (str(version.agent_id), version.version) != (record.agent_id, record.version):
             raise LookupError("Agent binding identity mismatch")
         if (
             self.mode != "mock"
@@ -57,8 +61,8 @@ class AgentRegistry:
             test_only=self.test_only,
         )
         return AgentBinding(
-            task.agent_id,
-            task.agent_version,
+            record.agent_id,
+            record.version,
             version.kind,
             version.protocol_version,
             content_digest(record.endpoint),

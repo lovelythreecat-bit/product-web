@@ -54,6 +54,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/agent-callbacks/{agent_id}/{version}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Receive Callback */
+        post: operations["receive_agent_callback"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/agents": {
         parameters: {
             query?: never;
@@ -517,6 +534,13 @@ export interface components {
              * Format: uuid
              */
             trace_id: string;
+        };
+        /** EventReceipt */
+        EventReceipt: {
+            /** Reference */
+            reference?: string | null;
+            /** Status */
+            status: string;
         };
         /** FileVersionRef */
         FileVersionRef: {
@@ -1401,6 +1425,76 @@ export interface operations {
                 content: {
                     "application/json": components["schemas"]["ErrorResponse"];
                 };
+            };
+            /** @description Unprocessable Entity */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Internal Server Error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    receive_agent_callback: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description TEST_ONLY mock-v1 raw-body HMAC-SHA256 */
+                "X-Mock-Signature": string;
+            };
+            path: {
+                agent_id: string;
+                version: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                /** @description Exact signed mock-v1 event bytes; no caller-verified DTO */
+                "application/json": string;
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            202: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["EventReceipt"];
+                };
+            };
+            /** @description Unverified or disabled protocol */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Identity or replay conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Callback too large */
+            413: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
             };
             /** @description Unprocessable Entity */
             422: {

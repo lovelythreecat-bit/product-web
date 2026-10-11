@@ -287,7 +287,9 @@ def test_real_worker_routes_platform_uuid_to_pinned_wire_kind(upstream, kind):
     assert report[2].handled >= 1 and report[2].failed == 0
     with factory() as s:
         row = s.get(GenerationTask, task)
-        assert row.state == "RUNNING" and row.upstream_id
+        # A tick may also consume an already-due recovery wake-up after submission.
+        # T10's worker test separately requires original-result reduction to SAVING.
+        assert row.state in {"RUNNING", "SAVING"} and row.upstream_id
         assert row.settlement_state == "FROZEN"
     assert calls(upstream, task)["generation_intents"] == 1
 

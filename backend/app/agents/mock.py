@@ -180,17 +180,33 @@ class MockAgentAdapter:
             signature = {key.lower(): value for key, value in headers.items()}.get(
                 "x-mock-signature", ""
             )
-            if not hmac.compare_digest(hmac.new(CALLBACK_KEY, raw, hashlib.sha256).hexdigest(),
-                                       signature):
+            if not hmac.compare_digest(
+                hmac.new(CALLBACK_KEY, raw, hashlib.sha256).hexdigest(), signature
+            ):
                 raise ValueError("Invalid TEST_ONLY signature")
             payload = json.loads(raw)
             self._validate_wire(payload)
+            if "status" in payload:
+                raise ValueError("Wire payload cannot assert verification")
             event = VerifiedEvent.model_validate(dict(payload, status="VERIFIED"))
             now = time.time()
-            if (event.agent_id != self.agent_id or event.timestamp is None
-                    or abs(now - event.timestamp) > 300 or not event.event_id
-                    or not event.upstream_task_id or not event.external_submission_id
-                    or event.sequence is None or event.sequence < 1 or event.state is None):
+            if (
+                event.agent_id != self.agent_id
+                or event.timestamp is None
+                or abs(now - event.timestamp) > 300
+                or not event.event_id
+                or not event.upstream_task_id
+                or not event.external_submission_id
+                or type(event.sequence) is not int
+                or event.sequence not in (1, 2)
+                or len(event.event_id) > 128
+                or event.event_id != f"{event.upstream_task_id}:{event.sequence}"
+                or not ID.fullmatch(event.upstream_task_id)
+                or not ID.fullmatch(event.external_submission_id)
+                or event.state
+                not in ({"RUNNING"} if event.sequence == 1 else {"RESULT_READY", "FAILED"})
+                or (event.state != "RESULT_READY" and event.result is not None)
+            ):
                 raise ValueError("Invalid event identity or timestamp")
             with self._lock:
                 self._seen = {key: value for key, value in self._seen.items() if now - value <= 300}

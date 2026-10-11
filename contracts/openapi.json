@@ -489,6 +489,30 @@
         "title": "ErrorResponse",
         "type": "object"
       },
+      "EventReceipt": {
+        "properties": {
+          "reference": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Reference"
+          },
+          "status": {
+            "title": "Status",
+            "type": "string"
+          }
+        },
+        "required": [
+          "status"
+        ],
+        "title": "EventReceipt",
+        "type": "object"
+      },
       "FileVersionRef": {
         "additionalProperties": false,
         "properties": {
@@ -2250,6 +2274,98 @@
           }
         },
         "summary": "Publish Spec"
+      }
+    },
+    "/api/v1/agent-callbacks/{agent_id}/{version}": {
+      "post": {
+        "operationId": "receive_agent_callback",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "agent_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Agent Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "version",
+            "required": true,
+            "schema": {
+              "title": "Version",
+              "type": "string"
+            }
+          },
+          {
+            "description": "TEST_ONLY mock-v1 raw-body HMAC-SHA256",
+            "in": "header",
+            "name": "X-Mock-Signature",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "description": "Exact signed mock-v1 event bytes; no caller-verified DTO",
+              "schema": {
+                "format": "binary",
+                "type": "string"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "202": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EventReceipt"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "403": {
+            "description": "Unverified or disabled protocol"
+          },
+          "409": {
+            "description": "Identity or replay conflict"
+          },
+          "413": {
+            "description": "Callback too large"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Unprocessable Entity"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Internal Server Error"
+          }
+        },
+        "summary": "Receive Callback",
+        "tags": [
+          "agent-callbacks"
+        ]
       }
     },
     "/api/v1/agents": {
