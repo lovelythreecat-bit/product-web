@@ -1,24 +1,10 @@
-import { defineConfig, devices } from '@playwright/test'
-
+import { defineConfig } from '@playwright/test'
+import { resolve } from 'node:path'
+import { randomUUID } from 'node:crypto'
+process.env.BROWSER_RUNTIME_DIR ??= resolve('.cache/browser/TEST_ONLY-'+randomUUID())
 export default defineConfig({
-  testDir: './tests/e2e',
-  fullyParallel: true,
-  forbidOnly: !!process.env.CI,
-  retries: process.env.CI ? 1 : 0,
-  reporter: 'list',
-  use: {
-    baseURL: 'http://127.0.0.1:15173',
-    trace: 'retain-on-failure',
-    channel: process.env.PLAYWRIGHT_CHANNEL,
-  },
-  webServer: {
-    command: 'node node_modules/vite/bin/vite.js --host 127.0.0.1 --port 15173 --strictPort',
-    url: 'http://127.0.0.1:15173',
-    reuseExistingServer: false,
-    timeout: 30_000,
-  },
-  projects: [
-    { name: 'desktop', use: { ...devices['Desktop Chrome'] } },
-    { name: 'mobile', use: { ...devices['Pixel 7'] } },
-  ],
+ testDir:'./tests/e2e', fullyParallel:false, workers:1, forbidOnly:!!process.env.CI,
+ retries:0, reporter:'list', timeout:60000, globalSetup:'./tests/e2e/setup.ts',
+ use:{baseURL:'https://127.0.0.1:15173',ignoreHTTPSErrors:true,trace:'retain-on-failure',channel:process.env.PLAYWRIGHT_CHANNEL},
+ projects:[{name:'desktop',use:{viewport:{width:1440,height:1000}}},{name:'mobile',use:{viewport:{width:390,height:844},isMobile:true,hasTouch:true}}]
 })
