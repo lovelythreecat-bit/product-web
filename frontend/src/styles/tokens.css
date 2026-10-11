@@ -1,0 +1,32 @@
+/* Source: docs/design/high-fidelity-2026-10-11/visual-reference.md */
+:root {
+  color-scheme: light;
+  --color-background: #f8f3ed;
+  --color-panel: #fffdfa;
+  --color-text: #322823;
+  --color-muted: #706259;
+  --color-border: #e7d9ca;
+  --color-primary: #a94e32;
+  font-family: "Microsoft YaHei UI", "PingFang SC", "Noto Sans SC", sans-serif;
+  color: var(--color-text);
+  background: var(--color-background);
+  font-size: 16px;
+  line-height: 1.6;
+}
+
+* { box-sizing: border-box; }
+body { margin: 0; }
+.bootstrap {
+  max-width: 640px;
+  margin: 12vh auto;
+  padding: 32px;
+  background: var(--color-panel);
+  border: 1px solid var(--color-border);
+  border-radius: 14px;
+}
+h1 { font-size: clamp(24px, 4vw, 30px); line-height: 1.35; }
+p { color: var(--color-muted); overflow-wrap: anywhere; }
+.environment { color: var(--color-primary); font-size: 14px; }
+@media (max-width: 688px) {
+  .bootstrap { margin: 48px 24px; padding: 24px; }
+}

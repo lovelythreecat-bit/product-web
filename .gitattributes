@@ -1,0 +1,2 @@
+# Keep source, generated contracts and WSL scripts stable on every checkout.
+* text=auto eol=lf

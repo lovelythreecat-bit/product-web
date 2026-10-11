@@ -1,0 +1,579 @@
+{
+  "components": {
+    "schemas": {
+      "AdmissionResult": {
+        "additionalProperties": false,
+        "properties": {
+          "replayed": {
+            "title": "Replayed",
+            "type": "boolean"
+          },
+          "task": {
+            "$ref": "#/components/schemas/TaskView"
+          }
+        },
+        "required": [
+          "task",
+          "replayed"
+        ],
+        "title": "AdmissionResult",
+        "type": "object"
+      },
+      "CursorPage_TaskView_": {
+        "additionalProperties": false,
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/TaskView"
+            },
+            "title": "Items",
+            "type": "array"
+          },
+          "next_cursor": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Next Cursor"
+          }
+        },
+        "required": [
+          "items",
+          "next_cursor"
+        ],
+        "title": "CursorPage[TaskView]",
+        "type": "object"
+      },
+      "ErrorCode": {
+        "enum": [
+          "INPUT_INVALID",
+          "SPEC_DISABLED",
+          "QUOTE_STALE",
+          "IDEMPOTENCY_CONFLICT",
+          "INSUFFICIENT_CREDITS",
+          "CAPACITY_INSUFFICIENT",
+          "FEATURE_NOT_ENABLED",
+          "RATE_LIMITED",
+          "UNAUTHENTICATED",
+          "FORBIDDEN",
+          "NOT_FOUND",
+          "METHOD_NOT_ALLOWED",
+          "INTERNAL_ERROR"
+        ],
+        "title": "ErrorCode",
+        "type": "string"
+      },
+      "ErrorDetail": {
+        "additionalProperties": false,
+        "properties": {
+          "code": {
+            "$ref": "#/components/schemas/ErrorCode"
+          },
+          "current_quotes": {
+            "anyOf": [
+              {
+                "items": {
+                  "$ref": "#/components/schemas/Quote"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Current Quotes"
+          },
+          "message": {
+            "title": "Message",
+            "type": "string"
+          }
+        },
+        "required": [
+          "code",
+          "message"
+        ],
+        "title": "ErrorDetail",
+        "type": "object"
+      },
+      "ErrorResponse": {
+        "additionalProperties": false,
+        "properties": {
+          "error": {
+            "$ref": "#/components/schemas/ErrorDetail"
+          },
+          "trace_id": {
+            "format": "uuid",
+            "title": "Trace Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "error",
+          "trace_id"
+        ],
+        "title": "ErrorResponse",
+        "type": "object"
+      },
+      "FileVersionRef": {
+        "additionalProperties": false,
+        "properties": {
+          "file_id": {
+            "format": "uuid",
+            "title": "File Id",
+            "type": "string"
+          },
+          "version": {
+            "title": "Version",
+            "type": "string"
+          }
+        },
+        "required": [
+          "file_id",
+          "version"
+        ],
+        "title": "FileVersionRef",
+        "type": "object"
+      },
+      "InputSnapshot": {
+        "additionalProperties": false,
+        "properties": {
+          "instruction": {
+            "title": "Instruction",
+            "type": "string"
+          },
+          "material_versions": {
+            "items": {
+              "$ref": "#/components/schemas/FileVersionRef"
+            },
+            "title": "Material Versions",
+            "type": "array"
+          },
+          "parameters": {
+            "additionalProperties": true,
+            "title": "Parameters",
+            "type": "object"
+          },
+          "product": {
+            "additionalProperties": true,
+            "title": "Product",
+            "type": "object"
+          },
+          "product_version": {
+            "title": "Product Version",
+            "type": "string"
+          }
+        },
+        "required": [
+          "product_version",
+          "product",
+          "instruction",
+          "material_versions",
+          "parameters"
+        ],
+        "title": "InputSnapshot",
+        "type": "object"
+      },
+      "LiveResponse": {
+        "additionalProperties": false,
+        "properties": {
+          "live": {
+            "title": "Live",
+            "type": "boolean"
+          },
+          "mode": {
+            "enum": [
+              "mock",
+              "staging",
+              "production"
+            ],
+            "title": "Mode",
+            "type": "string"
+          },
+          "test_only": {
+            "title": "Test Only",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "live",
+          "mode",
+          "test_only"
+        ],
+        "title": "LiveResponse",
+        "type": "object"
+      },
+      "PageQuery": {
+        "additionalProperties": false,
+        "properties": {
+          "cursor": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Cursor"
+          },
+          "limit": {
+            "default": 20,
+            "maximum": 100,
+            "minimum": 1,
+            "title": "Limit",
+            "type": "integer"
+          }
+        },
+        "title": "PageQuery",
+        "type": "object"
+      },
+      "Principal": {
+        "additionalProperties": false,
+        "properties": {
+          "auth_version": {
+            "minimum": 0,
+            "title": "Auth Version",
+            "type": "integer"
+          },
+          "role": {
+            "$ref": "#/components/schemas/UserRole"
+          },
+          "session_id": {
+            "format": "uuid",
+            "title": "Session Id",
+            "type": "string"
+          },
+          "user_id": {
+            "format": "uuid",
+            "title": "User Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "user_id",
+          "role",
+          "session_id",
+          "auth_version"
+        ],
+        "title": "Principal",
+        "type": "object"
+      },
+      "Quote": {
+        "additionalProperties": false,
+        "properties": {
+          "agent_version": {
+            "title": "Agent Version",
+            "type": "string"
+          },
+          "credits": {
+            "minimum": 0,
+            "title": "Credits",
+            "type": "integer"
+          },
+          "input_digest": {
+            "title": "Input Digest",
+            "type": "string"
+          },
+          "policy_versions": {
+            "additionalProperties": {
+              "type": "string"
+            },
+            "title": "Policy Versions",
+            "type": "object"
+          },
+          "price_version": {
+            "title": "Price Version",
+            "type": "string"
+          },
+          "spec_id": {
+            "format": "uuid",
+            "title": "Spec Id",
+            "type": "string"
+          },
+          "spec_version": {
+            "title": "Spec Version",
+            "type": "string"
+          }
+        },
+        "required": [
+          "spec_id",
+          "spec_version",
+          "price_version",
+          "agent_version",
+          "policy_versions",
+          "credits",
+          "input_digest"
+        ],
+        "title": "Quote",
+        "type": "object"
+      },
+      "ReadyChecks": {
+        "additionalProperties": false,
+        "properties": {
+          "database": {
+            "title": "Database",
+            "type": "boolean"
+          },
+          "storage": {
+            "title": "Storage",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "storage",
+          "database"
+        ],
+        "title": "ReadyChecks",
+        "type": "object"
+      },
+      "ReadyResponse": {
+        "additionalProperties": false,
+        "properties": {
+          "checks": {
+            "$ref": "#/components/schemas/ReadyChecks"
+          },
+          "mode": {
+            "enum": [
+              "mock",
+              "staging",
+              "production"
+            ],
+            "title": "Mode",
+            "type": "string"
+          },
+          "ready": {
+            "title": "Ready",
+            "type": "boolean"
+          },
+          "test_only": {
+            "title": "Test Only",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "ready",
+          "checks",
+          "mode",
+          "test_only"
+        ],
+        "title": "ReadyResponse",
+        "type": "object"
+      },
+      "SettlementState": {
+        "enum": [
+          "FROZEN",
+          "CONSUMED",
+          "RELEASED"
+        ],
+        "title": "SettlementState",
+        "type": "string"
+      },
+      "SubmitTaskRequest": {
+        "additionalProperties": false,
+        "properties": {
+          "agent_id": {
+            "format": "uuid",
+            "title": "Agent Id",
+            "type": "string"
+          },
+          "confirmed_quote": {
+            "$ref": "#/components/schemas/Quote"
+          },
+          "conversation_id": {
+            "format": "uuid",
+            "title": "Conversation Id",
+            "type": "string"
+          },
+          "input": {
+            "$ref": "#/components/schemas/InputSnapshot"
+          }
+        },
+        "required": [
+          "conversation_id",
+          "agent_id",
+          "input",
+          "confirmed_quote"
+        ],
+        "title": "SubmitTaskRequest",
+        "type": "object"
+      },
+      "TaskState": {
+        "enum": [
+          "SUBMITTED",
+          "QUEUED",
+          "SUBMITTING",
+          "RUNNING",
+          "INVESTIGATING",
+          "SAVING",
+          "SAVE_RECOVERY",
+          "SUCCEEDED",
+          "FAILED",
+          "MANUALLY_CLOSED"
+        ],
+        "title": "TaskState",
+        "type": "string"
+      },
+      "TaskView": {
+        "additionalProperties": false,
+        "properties": {
+          "investigation_reason": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Investigation Reason"
+          },
+          "quote": {
+            "$ref": "#/components/schemas/Quote"
+          },
+          "settlement_state": {
+            "$ref": "#/components/schemas/SettlementState"
+          },
+          "state": {
+            "$ref": "#/components/schemas/TaskState"
+          },
+          "state_version": {
+            "minimum": 1,
+            "title": "State Version",
+            "type": "integer"
+          },
+          "task_id": {
+            "format": "uuid",
+            "title": "Task Id",
+            "type": "string"
+          },
+          "work_ids": {
+            "items": {
+              "format": "uuid",
+              "type": "string"
+            },
+            "title": "Work Ids",
+            "type": "array"
+          }
+        },
+        "required": [
+          "task_id",
+          "state",
+          "state_version",
+          "settlement_state",
+          "quote",
+          "work_ids",
+          "investigation_reason"
+        ],
+        "title": "TaskView",
+        "type": "object"
+      },
+      "UserRole": {
+        "enum": [
+          "user",
+          "admin"
+        ],
+        "title": "UserRole",
+        "type": "string"
+      }
+    }
+  },
+  "info": {
+    "title": "Ecommerce AI Platform",
+    "version": "0.1.0"
+  },
+  "openapi": "3.1.0",
+  "paths": {
+    "/api/v1/health/live": {
+      "get": {
+        "operationId": "health_live",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LiveResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Unprocessable Entity"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Internal Server Error"
+          }
+        },
+        "summary": "Live"
+      }
+    },
+    "/api/v1/health/ready": {
+      "get": {
+        "operationId": "health_ready",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ReadyResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Unprocessable Entity"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Internal Server Error"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ReadyResponse"
+                }
+              }
+            },
+            "description": "Service Unavailable"
+          }
+        },
+        "summary": "Ready"
+      }
+    }
+  }
+}

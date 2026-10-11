@@ -1,0 +1,83 @@
+name: ecommerce-ai-dev
+
+services:
+  mysql:
+    image: mysql:8.4.8@sha256:2952e3be7807f06fc18de50b3ea1a632d5c70d63482ff7d7376fe3aa8999babf
+    ports:
+      - "${DEV_BIND_ADDRESS:-127.0.0.1}:13306:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: TEST_ONLY_root_local
+      MYSQL_DATABASE: ecommerce_ai_dev
+      MYSQL_USER: ecommerce_dev
+      MYSQL_PASSWORD: TEST_ONLY_dev_local
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./mysql/01-test-database.sql:/docker-entrypoint-initdb.d/01-test-database.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "MYSQL_PWD=$$MYSQL_ROOT_PASSWORD mysql -uroot -e 'SELECT 1' >/dev/null 2>&1"]
+      interval: 3s
+      timeout: 3s
+      retries: 40
+      start_period: 20s
+    stop_grace_period: 30s
+
+  redis:
+    image: public.ecr.aws/docker/library/redis:7.4.8-alpine@sha256:7aec734b2bb298a1d769fd8729f13b8514a41bf90fcdd1f38ec52267fbaa8ee6
+    command: ["redis-server", "--appendonly", "yes"]
+    ports:
+      - "${DEV_BIND_ADDRESS:-127.0.0.1}:16379:6379"
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 3s
+      timeout: 3s
+      retries: 20
+
+  mock-agent:
+    image: python:3.12.14-slim@sha256:f77ac9e44ae96ef2c90b8053ea08c31f8be030f824196b0ae4db6d462c84e51f
+    command: ["python", "/mock/server.py"]
+    environment:
+      APP_MODE: mock
+      APP_TEST_ONLY: "true"
+    ports:
+      - "${DEV_BIND_ADDRESS:-127.0.0.1}:18081:8081"
+    volumes:
+      - ../backend/app/agents/mock_server.py:/mock/server.py:ro
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8081/health/live', timeout=2)"]
+      interval: 3s
+      timeout: 3s
+      retries: 20
+
+  backend-test:
+    profiles: ["test"]
+    image: python:3.12.14-slim@sha256:f77ac9e44ae96ef2c90b8053ea08c31f8be030f824196b0ae4db6d462c84e51f
+    working_dir: /workspace/backend
+    entrypoint: ["sh", "/workspace/infra/scripts/test-backend.sh"]
+    environment:
+      APP_MODE: mock
+      TEST_ONLY: "true"
+      TEST_DATABASE_URL: mysql+pymysql://ecommerce_test:TEST_ONLY_test_local@mysql:3306/ecommerce_ai_test?charset=utf8mb4
+      TEST_REDIS_URL: redis://redis:6379/15
+      PYTHONDONTWRITEBYTECODE: "1"
+      UV_PROJECT_ENVIRONMENT: /runtime/venv
+      UV_CACHE_DIR: /runtime/cache
+      UV_LINK_MODE: copy
+      UV_PYTHON_DOWNLOADS: never
+      UV_HTTP_TIMEOUT: "30"
+      UV_HTTP_RETRIES: "1"
+    volumes:
+      - ../backend:/workspace/backend:ro
+      - ./scripts/test-backend.sh:/workspace/infra/scripts/test-backend.sh:ro
+      - test_runtime:/runtime
+    depends_on:
+      mysql:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+
+volumes:
+  mysql_data:
+  redis_data:
+  test_runtime:

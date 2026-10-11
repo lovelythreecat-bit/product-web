@@ -1,0 +1,35 @@
+[project]
+name = "ecommerce-ai-backend"
+version = "0.1.0"
+requires-python = ">=3.12,<3.13"
+dependencies = [
+  "fastapi==0.143.0",
+  "pydantic==2.14.0",
+  "pydantic-settings==2.15.0",
+  "sqlalchemy==2.1.4",
+  "alembic==1.20.0",
+  "pymysql==1.2.3",
+  "cryptography==50.0.2",
+  "redis==8.1.0",
+  "uvicorn==0.54.0",
+]
+
+[dependency-groups]
+dev = [
+    "pytest==8.3.5",
+    "httpx==0.28.1",
+    "ruff==0.11.12",
+    "httpx2==2.13.1",
+]
+
+[tool.pytest.ini_options]
+pythonpath = ["."]
+testpaths = ["tests"]
+markers = ["integration: requires isolated MySQL 8.4 and Redis 7.4 services"]
+
+[tool.ruff]
+target-version = "py312"
+line-length = 100
+
+[tool.ruff.lint]
+select = ["E", "F", "I"]
