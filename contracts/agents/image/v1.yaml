@@ -1,0 +1,60 @@
+schema_version: 1
+agent: image
+protocol_version: v1
+status: draft
+production_enabled: false
+decisions: {D-01: unconfirmed, D-02: unconfirmed, D-03: unconfirmed, D-04: unconfirmed}
+observed_on: '2026-10-11'
+source_root: 'F:/Work/电商/imageAgent'
+observation_scope: README; src/image_agent public exports, pipeline, contracts and model entry declarations
+network_service: unknown
+network_note: README describes a Python API and local checkpoints; no public HTTP route found in inspected src.
+capabilities:
+  sync: unknown
+  async: unknown
+  stream: unknown
+  final_text: unknown
+  idempotent_submit: unknown
+  query_external: unknown
+  query_id: unknown
+  callback: unknown
+  original_result_recovery: unknown
+library_observations:
+  - capability: coroutine_call
+    observed: supported
+    evidence: 'src/image_agent/pipeline.py:403'
+    detail: create_images returns creation results with optional on_progress; no submitted-job wire contract.
+  - capability: result_bundle
+    observed: supported
+    evidence: 'src/image_agent/contracts.py:149'
+    detail: ResultBundle contains CreationResultDTO plus blobs keyed by blob ID.
+  - capability: partial_results
+    observed: supported
+    evidence: 'src/image_agent/contracts.py:124'
+    detail: DTO status includes partial; assets have individual status/blob metadata. D-04 delivery unconfirmed.
+  - capability: request_input_constraints
+    observed: supported
+    evidence: 'src/image_agent/contracts.py:44'
+    detail: DTO materials count 1..8; aspect_ratio/image_size/model enums are source observations, not approved specs.
+  - capability: local_resume
+    observed: supported
+    evidence: 'src/image_agent/pipeline.py:420'
+    detail: resume_images(run_dir) exists; it is not proof of immutable network result retrieval.
+  - capability: idempotent_submit
+    observed: unknown
+    evidence: 'README.md:539'
+    detail: request_id can name an output directory; existing directory rejection is not a platform replay contract.
+  - capability: public_network_callback
+    observed: unknown
+    evidence: 'src/image_agent/pipeline.py:403'
+    detail: on_progress is a local callable; do not claim a signed HTTP callback protocol.
+proposed_boundary:
+  request: map approved snapshot and owned material references to CreationRequestDTO only after D-02/D-03
+  response: manifest with stable item keys, expected count, individual status and recoverable original locators
+  auth: unconfirmed
+  errors: ErrorDTO exists; network status mapping and definitive failures unconfirmed
+  usage: dictionary exists; actual cost fields and D-06 provenance unconfirmed
+  safe_retry: unavailable until D-01 proves idempotency or consistent non-acceptance coverage
+  multi_result_billing: blocked until D-04 confirmation; partial status never implies complete platform success
+fallback: Preserve IDs and call evidence; query or investigate; resume original saved artifacts only when verified.
+acceptance: Source inspection only; no real generation, network integration or D-01 approval performed.

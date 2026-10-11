@@ -1,0 +1,60 @@
+schema_version: 1
+agent: video
+protocol_version: v1
+status: draft
+production_enabled: false
+decisions: {D-01: unconfirmed, D-02: unconfirmed, D-03: unconfirmed, D-04: unconfirmed}
+observed_on: '2026-10-11'
+source_root: 'F:/Work/电商/videoAgent'
+observation_scope: video_agent/service.py public methods and models.py; package route-name search
+network_service: unknown
+network_note: Located callable service and desktop app; no public HTTP route found in inspected package.
+capabilities:
+  sync: unknown
+  async: unknown
+  stream: unknown
+  final_text: unknown
+  idempotent_submit: unknown
+  query_external: unknown
+  query_id: unknown
+  callback: unknown
+  original_result_recovery: unknown
+library_observations:
+  - capability: task_submission
+    observed: supported
+    evidence: 'video_agent/service.py:128'
+    detail: create_task(CreateTaskRequest, idempotency_key) stores a task and returns TaskView.
+  - capability: idempotent_create_task
+    observed: supported
+    evidence: 'video_agent/service.py:134'
+    detail: Calls lookup_replay inside a local transaction; production network scope/retention guarantees unknown.
+  - capability: query_id
+    observed: supported
+    evidence: 'video_agent/service.py:195'
+    detail: get_task(task_id) reads local task view; HTTP errors and deployment identity unconfirmed.
+  - capability: query_external
+    observed: unknown
+    evidence: 'video_agent/models.py:37'
+    detail: external_request_id is stored, but no by-external public query entry observed; not an absence proof.
+  - capability: original_artifact_access
+    observed: supported
+    evidence: 'video_agent/service.py:261'
+    detail: list_artifacts and artifact_path (line 286) expose local records/files, not verified network recovery.
+  - capability: planning_confirmation
+    observed: supported
+    evidence: 'video_agent/service.py:603'
+    detail: confirm(task_id, plan_version, idempotency_key) is a separate step; platform automatic mapping unconfirmed.
+  - capability: input_schema
+    observed: supported
+    evidence: 'video_agent/models.py:29'
+    detail: ProductInfo, image IDs and user_prompt plus video/audio options; empty images lead to awaiting_input.
+proposed_boundary:
+  request: map immutable snapshot to CreateTaskRequest after D-02/D-03 and confirm task/planning workflow
+  response: stable job IDs, expected original artifact manifest and full delivery proof
+  auth: unconfirmed
+  errors: local typed errors exist; network status mapping and uncertainty classification unconfirmed
+  callback: unconfirmed
+  safe_retry: library idempotency is observation only; require D-01 network scope and retention evidence
+  original_result_recovery: confirm original artifact identity, download authorization, expiry and persistence
+fallback: Preserve platform external ID and any task ID; investigate ambiguity without creating another generation.
+acceptance: Source inspection only; no real generation, network integration or D-01 approval performed.

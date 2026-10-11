@@ -1,0 +1,113 @@
+schema_version: 1
+protocol_version: mock-v1-TEST_ONLY
+status: TEST_ONLY
+production_allowed: false
+purpose: Deterministic upstream boundary and recovery testing, never confirmation of real Agent capabilities.
+startup:
+  script: backend/app/agents/mock_server.py
+  dependencies: Python standard library only; Compose mounts this file alone
+  required_env: {APP_MODE: mock, APP_TEST_ONLY: 'true'}
+  optional_env: {MOCK_HOST: '0.0.0.0', MOCK_PORT: '8081'}
+  ephemeral_test: Set MOCK_HOST=127.0.0.1 and MOCK_PORT=0; stdout announces the actual port as JSON.
+  lifetime: In-memory process lifetime only; restart clears scenarios, intents, counts and proofs.
+  shutdown: SIGTERM or KeyboardInterrupt closes listening server; test harness must stop its own process.
+limits:
+  json_request_bytes: 65536
+  json_response_bytes_client: 65536
+  socket_timeout_seconds: 3
+  server_parallel_requests: 16
+  records_per_process: 1000
+  on_capacity: 503 SIMULATOR_CAPACITY; never evict an accepted intent to allow a second generation
+  identifier: '[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}'
+  agents: [copy, image, video]
+  note: TEST_ONLY operational limits; not production D-10 policy.
+security:
+  gate: Service refuses startup unless both required env values match; embedded handler checks every request.
+  exposure: Use isolated development network; no platform production route is registered.
+  auth: No production authentication. Bind published ports to loopback; control endpoints are test harness only.
+  callback: HMAC-SHA256 raw body using public TEST_ONLY fixture key; not a production secret or D-01 protocol.
+  replay: Client rejects outside 300-second window and detects duplicate event IDs in memory.
+  binding: VerifiedEvent only verifies origin/shape; consumer must bind agent and upstream/external ID to persisted task.
+  task_updates: Consumer must persist deduplication and reject state regressions; simulator never updates platform tasks.
+  downloads: Mock adapter accepts only its agent's relative result locator; rejects URLs and redirects.
+endpoints:
+  - method: GET
+    path: /health/live
+    response: live, mode, test_only, protocol_version, instance_id
+  - method: PUT
+    path: /__test__/agents/{agent}/scenarios/{external_submission_id}
+    body: {scenario: lost_response}
+    response: scenario, external_submission_id, test_only, protocol_version
+    behavior: Select scenario before first submit; after any submit returns 409 SCENARIO_LOCKED.
+  - method: GET
+    path: /__test__/agents/{agent}/calls/{external_submission_id}
+    response: submit, query_external, query_id, retrieve_original, generation_intents, test_only, protocol_version
+    behavior: Reading counts does not increment counts or create an intent; unobserved external ID returns zeros.
+  - method: GET
+    path: /__test__/agents/{agent}/events/{external_submission_id}
+    response: events array containing raw JSON string and X-Mock-Signature headers
+    behavior: Pull fixture notifications and deliver to the later platform callback endpoint; no arbitrary URL push.
+  - method: POST
+    path: /v1/{agent}/submissions
+    body:
+      external_submission_id: test-001
+      snapshot: {prompt: TEST_ONLY fixture}
+    response: typed SubmitOutcome
+    behavior: Agent-scoped external ID binds canonical snapshot digest; differing replay returns 409 SNAPSHOT_CONFLICT.
+  - method: GET
+    path: /v1/{agent}/submissions/{external_submission_id}
+    response: typed QueryOutcome
+  - method: GET
+    path: /v1/{agent}/tasks/{upstream_task_id}
+    response: typed QueryOutcome
+  - method: GET
+    path: /v1/{agent}/results/{upstream_task_id}
+    response: ResultSource wire form with content_base64 instead of bytes content
+    behavior: Retrieves original fixture only, never submits generation.
+scenarios:
+  normal:
+    submit: ACCEPTED
+    query: FOUND with RESULT_READY and complete manifest
+  lost_response:
+    submit: First call creates intent then returns HTTP 504 UNKNOWN without task ID; replay ACCEPTED with same ID.
+    query: FOUND for original task
+  repeated:
+    events: [RUNNING, RESULT_READY, RESULT_READY]
+    sequence: [1, 2, 2]
+    behavior: Last two raw events/signatures/event IDs are identical.
+  out_of_order:
+    events: [RESULT_READY, RUNNING]
+    sequence: [2, 1]
+  query_unavailable:
+    query: HTTP 503 UNAVAILABLE for either query method
+    proof: none
+  not_found:
+    query: NOT_FOUND even after accepted submission; absence_proof=null
+    proof: none
+  unsupported:
+    query: UNSUPPORTED for either query method; absence_proof=null
+  partial:
+    query: FOUND with complete=false, expected_items=2 and one item
+    retrieval: Original partial fixture, complete=false
+  expired_link:
+    query: FOUND with result locator
+    retrieval: HTTP 410 EXPIRED with no content; repeated recovery never generates
+  proven_not_accepted:
+    submit: PROVEN_NOT_ACCEPTED with zero generation intents
+    query: PROVEN_NOT_ACCEPTED
+    proof: TEST_ONLY.atomic_simulator, atomic_simulator_lifetime, instance reference and coverage interval
+    restriction: Valid only for configured rejected ID in this live simulator; not SafeRetryEvidence or production proof.
+result_fixtures:
+  copy: Deterministic TEST_ONLY UTF-8 text
+  image: Fixed 32x32 TEST_ONLY synthetic PNG, image/png, 138 bytes
+  video: Fixed 32x32 one-second silent TEST_ONLY synthetic H.264 MP4, video/mp4, 1486 bytes
+  metadata: Each manifest item and available ResultSource includes SHA-256 and byte_length.
+  embedded: The two fixtures are embedded in mock_server.py so the standalone server needs no extra mounts.
+  limitation: Synthetic solid-color samples exercise preview/playback and original retrieval; not real Agent outputs or public cases.
+consuming_rules:
+  - Treat ACCEPTED/RESULT_READY as upstream observations, not published platform success.
+  - UNKNOWN/NOT_FOUND/UNAVAILABLE/UNSUPPORTED never authorize retry, release or settlement.
+  - Never turn ordinary HTTP 404, empty results or timeouts into PROVEN_NOT_ACCEPTED.
+  - TEST_ONLY guarantees apply only within one simulator process, not across simulator restart.
+  - Snapshot body is hashed for deduplication and is not retained or logged.
+  - Fault configuration locks at first submit; use a fresh external ID or fresh isolated process for a new scenario.

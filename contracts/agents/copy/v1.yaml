@@ -1,0 +1,57 @@
+schema_version: 1
+agent: copy
+protocol_version: v1
+status: draft
+production_enabled: false
+decisions: {D-01: unconfirmed, D-02: unconfirmed, D-03: unconfirmed, D-04: unconfirmed}
+observed_on: '2026-10-11'
+source_root: 'F:/Work/电商/textAgent'
+observation_scope: Python library public entry and schema; README; src route-name search
+network_service: unknown
+network_note: No public HTTP route found in the inspected scope; this does not prove none exists.
+# These are platform-facing network capabilities; coroutine APIs alone do not confirm async jobs.
+capabilities:
+  sync: unknown
+  async: unknown
+  stream: unknown
+  final_text: unknown
+  idempotent_submit: unknown
+  query_external: unknown
+  query_id: unknown
+  callback: unknown
+  original_result_recovery: unknown
+library_observations:
+  - capability: synchronous_call
+    observed: supported
+    evidence: 'src/ecommerce_copy_agent/agent.py:31'
+    detail: CopywritingAgent.generate(CopyRequest) returns CopyResult outside an event loop.
+  - capability: coroutine_call
+    observed: supported
+    evidence: 'src/ecommerce_copy_agent/agent.py:21'
+    detail: agenerate awaits the complete workflow; not a submitted job ID protocol.
+  - capability: final_text
+    observed: supported
+    evidence: 'src/ecommerce_copy_agent/schemas.py:71'
+    detail: CopyResult.text is nonblank; usage is nullable; completeness wire semantics unconfirmed.
+  - capability: streaming_public_entry
+    observed: unsupported
+    evidence: 'src/ecommerce_copy_agent/agent.py:21'
+    detail: The inspected public methods return a final result, not a stream; other adapters unknown.
+  - capability: optional_images_in_schema
+    observed: supported
+    evidence: 'src/ecommerce_copy_agent/schemas.py:59'
+    detail: images defaults to empty; actual provider image support and limits require D-03.
+  - capability: idempotent_submit_and_external_query
+    observed: unknown
+    evidence: 'src/ecommerce_copy_agent/agent.py:21'
+    detail: No external ID parameter or query API in the inspected public class.
+proposed_boundary:
+  request: immutable platform snapshot; product, materials, instruction and parameters mapped after D-02
+  response: full CopyResult.text; reject fragments as final delivery; nullable usage stays unavailable
+  auth: unconfirmed
+  errors: unconfirmed network mapping
+  callback: unconfirmed authentication, replay, identity binding and state order
+  safe_retry: unavailable until D-01 proves idempotency or consistent non-acceptance coverage
+  original_result_recovery: unconfirmed
+fallback: Preserve original IDs and call evidence; investigate uncertain acceptance; never blindly resubmit.
+acceptance: Source inspection only; no real generation, network integration or D-01 approval performed.
