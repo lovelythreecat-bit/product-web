@@ -1,0 +1,145 @@
+{
+  "phase": "fixed",
+  "passed": 8,
+  "failed": 0,
+  "results": [
+    {
+      "name": "R-06 1440px 原生 close→立即 open：旧事件不清空新弹窗或提交动作 / 焦点",
+      "pass": true,
+      "evidence": {
+        "after": {
+          "open": true,
+          "title": "第二份确认",
+          "focus": "modal-cancel"
+        },
+        "submitted": "new"
+      }
+    },
+    {
+      "name": "R-06 1440px 收费取消→立即再确认：取消不受理，新确认只冻结一次",
+      "pass": true,
+      "evidence": {
+        "before": {
+          "tasks": 3,
+          "available": 112,
+          "frozen": 0,
+          "consumed": 88,
+          "credited": 200
+        },
+        "reopened": {
+          "open": true,
+          "confirm": true,
+          "focus": "modal-cancel",
+          "tasks": 3,
+          "available": 112,
+          "frozen": 0,
+          "consumed": 88,
+          "credited": 200
+        },
+        "accepted": {
+          "tasks": 4,
+          "available": 104,
+          "frozen": 8,
+          "consumed": 88,
+          "credited": 200
+        }
+      }
+    },
+    {
+      "name": "R-06 1440px 两次取消→同轮再开：连续旧 close 均不干扰最终确认",
+      "pass": true,
+      "evidence": {
+        "open": true,
+        "confirm": true,
+        "focus": "modal-cancel",
+        "tasks": 3,
+        "frozen": 0
+      }
+    },
+    {
+      "name": "R-06 1440px 已有旧 close 排队时，详情→编辑只切换一次且可保存",
+      "pass": true,
+      "evidence": {
+        "evidence": {
+          "open": true,
+          "title": "编辑用户 · 演示",
+          "editable": true
+        },
+        "saved": {
+          "nickname": "连续弹窗回归",
+          "logs": 3,
+          "open": false
+        }
+      }
+    },
+    {
+      "name": "R-06 390px 原生 close→立即 open：旧事件不清空新弹窗或提交动作 / 焦点",
+      "pass": true,
+      "evidence": {
+        "after": {
+          "open": true,
+          "title": "第二份确认",
+          "focus": "modal-cancel"
+        },
+        "submitted": "new"
+      }
+    },
+    {
+      "name": "R-06 390px 收费取消→立即再确认：取消不受理，新确认只冻结一次",
+      "pass": true,
+      "evidence": {
+        "before": {
+          "tasks": 3,
+          "available": 112,
+          "frozen": 0,
+          "consumed": 88,
+          "credited": 200
+        },
+        "reopened": {
+          "open": true,
+          "confirm": true,
+          "focus": "modal-cancel",
+          "tasks": 3,
+          "available": 112,
+          "frozen": 0,
+          "consumed": 88,
+          "credited": 200
+        },
+        "accepted": {
+          "tasks": 4,
+          "available": 104,
+          "frozen": 8,
+          "consumed": 88,
+          "credited": 200
+        }
+      }
+    },
+    {
+      "name": "R-06 390px 两次取消→同轮再开：连续旧 close 均不干扰最终确认",
+      "pass": true,
+      "evidence": {
+        "open": true,
+        "confirm": true,
+        "focus": "modal-cancel",
+        "tasks": 3,
+        "frozen": 0
+      }
+    },
+    {
+      "name": "R-06 390px 已有旧 close 排队时，详情→编辑只切换一次且可保存",
+      "pass": true,
+      "evidence": {
+        "evidence": {
+          "open": true,
+          "title": "编辑用户 · 演示",
+          "editable": true
+        },
+        "saved": {
+          "nickname": "连续弹窗回归",
+          "logs": 3,
+          "open": false
+        }
+      }
+    }
+  ]
+}

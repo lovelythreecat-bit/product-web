@@ -1,0 +1,47 @@
+{
+  "phase": "before",
+  "passed": 0,
+  "failed": 8,
+  "results": [
+    {
+      "name": "R-06 1440px 原生 close→立即 open：旧事件不清空新弹窗或提交动作 / 焦点",
+      "pass": false,
+      "error": "{\"after\":{\"open\":true,\"focus\":\"\"},\"submitted\":\"\"}"
+    },
+    {
+      "name": "R-06 1440px 收费取消→立即再确认：取消不受理，新确认只冻结一次",
+      "pass": false,
+      "error": "{\"before\":{\"tasks\":3,\"available\":112,\"frozen\":0,\"consumed\":88,\"credited\":200},\"reopened\":{\"open\":true,\"confirm\":false,\"focus\":\"\",\"tasks\":3,\"available\":112,\"frozen\":0,\"consumed\":88,\"credited\":200},\"accepted\":{\"tasks\":3,\"available\":112,\"frozen\":0,\"consumed\":88,\"credited\":200}}"
+    },
+    {
+      "name": "R-06 1440px 两次取消→同轮再开：连续旧 close 均不干扰最终确认",
+      "pass": false,
+      "error": "{\"open\":true,\"confirm\":false,\"focus\":\"\",\"tasks\":3,\"frozen\":0}"
+    },
+    {
+      "name": "R-06 1440px 已有旧 close 排队时，详情→编辑只切换一次且可保存",
+      "pass": false,
+      "error": "{\"open\":false,\"editable\":false}"
+    },
+    {
+      "name": "R-06 390px 原生 close→立即 open：旧事件不清空新弹窗或提交动作 / 焦点",
+      "pass": false,
+      "error": "{\"after\":{\"open\":true,\"focus\":\"\"},\"submitted\":\"\"}"
+    },
+    {
+      "name": "R-06 390px 收费取消→立即再确认：取消不受理，新确认只冻结一次",
+      "pass": false,
+      "error": "{\"before\":{\"tasks\":3,\"available\":112,\"frozen\":0,\"consumed\":88,\"credited\":200},\"reopened\":{\"open\":true,\"confirm\":false,\"focus\":\"\",\"tasks\":3,\"available\":112,\"frozen\":0,\"consumed\":88,\"credited\":200},\"accepted\":{\"tasks\":3,\"available\":112,\"frozen\":0,\"consumed\":88,\"credited\":200}}"
+    },
+    {
+      "name": "R-06 390px 两次取消→同轮再开：连续旧 close 均不干扰最终确认",
+      "pass": false,
+      "error": "{\"open\":true,\"confirm\":false,\"focus\":\"\",\"tasks\":3,\"frozen\":0}"
+    },
+    {
+      "name": "R-06 390px 已有旧 close 排队时，详情→编辑只切换一次且可保存",
+      "pass": false,
+      "error": "{\"open\":false,\"editable\":false}"
+    }
+  ]
+}

@@ -1,0 +1,169 @@
+{
+  "phase": "before",
+  "passed": 6,
+  "failed": 16,
+  "results": [
+    {
+      "name": "A-01 1440px: 输入与记录采用适用列宽和顺序",
+      "pass": true,
+      "evidence": {
+        ".workspace": {
+          "left": 233,
+          "right": 1412,
+          "top": 235.890625,
+          "bottom": 1540.875,
+          "width": 1179
+        },
+        ".composer": {
+          "left": 1022,
+          "right": 1412,
+          "top": 235.890625,
+          "bottom": 1155.125,
+          "width": 390
+        },
+        ".feed": {
+          "left": 233,
+          "right": 998,
+          "top": 235.890625,
+          "bottom": 1540.875,
+          "width": 765
+        }
+      }
+    },
+    {
+      "name": "A-02 1440px: 键盘展开辅助后直接编辑建议",
+      "pass": false,
+      "error": "辅助展开后没有聚焦可编辑建议"
+    },
+    {
+      "name": "A-02 1440px: 会话切换与新建保留操作焦点",
+      "pass": false,
+      "error": "桌面会话切换丢失焦点"
+    },
+    {
+      "name": "A-02 1440px: 后台模块键盘切换保持当前按钮焦点",
+      "pass": false,
+      "error": "后台模块切换丢失焦点"
+    },
+    {
+      "name": "A-03 1440px account: 仅溢出的表格提供可见提示和键盘滚动",
+      "pass": true,
+      "evidence": {
+        "overflow": false,
+        "tabindex": null,
+        "name": null,
+        "hint": null
+      }
+    },
+    {
+      "name": "A-03 1440px admin: 仅溢出的表格提供可见提示和键盘滚动",
+      "pass": true,
+      "evidence": {
+        "overflow": false,
+        "tabindex": null,
+        "name": null,
+        "hint": null
+      }
+    },
+    {
+      "name": "B-2 1440px: 合法长商品名、会话与详情不导致整页溢出",
+      "pass": false,
+      "error": "{\"width\":1440,\"scrollWidth\":2581}"
+    },
+    {
+      "name": "B-4 1440px: 失败重试文案真实且冻结释放不变",
+      "pass": false,
+      "error": "失败任务承诺保留不存在的成果"
+    },
+    {
+      "name": "B-4 1440px: 有成果的重新生成明示保留与新费用",
+      "pass": true
+    },
+    {
+      "name": "B-4 1440px: 已删除成果的来源不承诺保留成果",
+      "pass": false,
+      "error": "重新生成 · 再次收费\n关闭\n\n青瓷马克杯 · 文案\n\n本次将冻结\n8 积分 · 演示\n\n通用短文 · 演示能力 / 简洁自然\n\n保留原成果，创建新任务并再次收费。\n查看完整提交内容\n取消\n确认并冻结积分"
+    },
+    {
+      "name": "A-01 390px: 输入与记录采用适用列宽和顺序",
+      "pass": false,
+      "error": "{\".workspace\":{\"left\":14,\"right\":376,\"top\":427.578125,\"bottom\":6526.703125,\"width\":362},\".composer\":{\"left\":121.65625,\"right\":376,\"top\":427.578125,\"bottom\":1338.8125,\"width\":254.34375},\".feed\":{\"left\":14,\"right\":103.65625,\"top\":427.578125,\"bottom\":6526.703125,\"width\":89.65625}}"
+    },
+    {
+      "name": "A-02 390px: 键盘展开辅助后直接编辑建议",
+      "pass": false,
+      "error": "辅助展开后没有聚焦可编辑建议"
+    },
+    {
+      "name": "A-02 390px: 会话切换与新建保留操作焦点",
+      "pass": false,
+      "error": "手机会话切换丢失焦点"
+    },
+    {
+      "name": "A-02 390px: 后台模块键盘切换保持当前按钮焦点",
+      "pass": false,
+      "error": "后台模块切换丢失焦点"
+    },
+    {
+      "name": "A-03 390px account: 仅溢出的表格提供可见提示和键盘滚动",
+      "pass": false,
+      "error": "{\"overflow\":true,\"tabindex\":null,\"name\":null,\"hint\":null}"
+    },
+    {
+      "name": "A-03 390px admin: 仅溢出的表格提供可见提示和键盘滚动",
+      "pass": false,
+      "error": "{\"overflow\":true,\"tabindex\":null,\"name\":null,\"hint\":null}"
+    },
+    {
+      "name": "B-2 390px: 合法长商品名、会话与详情不导致整页溢出",
+      "pass": false,
+      "error": "{\"width\":390,\"scrollWidth\":1587}"
+    },
+    {
+      "name": "B-4 390px: 失败重试文案真实且冻结释放不变",
+      "pass": false,
+      "error": "失败任务承诺保留不存在的成果"
+    },
+    {
+      "name": "B-4 390px: 有成果的重新生成明示保留与新费用",
+      "pass": true
+    },
+    {
+      "name": "B-4 390px: 已删除成果的来源不承诺保留成果",
+      "pass": false,
+      "error": "重新生成 · 再次收费\n关闭\n\n青瓷马克杯 · 文案\n\n本次将冻结\n8 积分 · 演示\n\n通用短文 · 演示能力 / 简洁自然\n\n保留原成果，创建新任务并再次收费。\n查看完整提交内容\n取消\n确认并冻结积分"
+    },
+    {
+      "name": "A-01 850px: 输入与记录采用适用列宽和顺序",
+      "pass": false,
+      "error": "{\".workspace\":{\"left\":20,\"right\":830,\"top\":358.421875,\"bottom\":1663.40625,\"width\":810},\".composer\":{\"left\":575.65625,\"right\":830,\"top\":358.421875,\"bottom\":1269.65625,\"width\":254.34375},\".feed\":{\"left\":20,\"right\":557.65625,\"top\":358.421875,\"bottom\":1663.40625,\"width\":537.65625}}"
+    },
+    {
+      "name": "A-01 851px: 输入与记录采用适用列宽和顺序",
+      "pass": true,
+      "evidence": {
+        ".workspace": {
+          "left": 204,
+          "right": 827,
+          "top": 231.890625,
+          "bottom": 1941.125,
+          "width": 623
+        },
+        ".composer": {
+          "left": 487,
+          "right": 827,
+          "top": 231.890625,
+          "bottom": 1143.125,
+          "width": 340
+        },
+        ".feed": {
+          "left": 204,
+          "right": 469,
+          "top": 231.890625,
+          "bottom": 1941.125,
+          "width": 265
+        }
+      }
+    }
+  ]
+}

@@ -1,0 +1,279 @@
+{
+  "phase": "fixed",
+  "passed": 22,
+  "failed": 0,
+  "results": [
+    {
+      "name": "A-01 1440px: 输入与记录采用适用列宽和顺序",
+      "pass": true,
+      "evidence": {
+        ".workspace": {
+          "left": 233,
+          "right": 1412,
+          "top": 235.890625,
+          "bottom": 1952.875,
+          "width": 1179
+        },
+        ".composer": {
+          "left": 1022,
+          "right": 1412,
+          "top": 235.890625,
+          "bottom": 1155.125,
+          "width": 390
+        },
+        ".feed": {
+          "left": 233,
+          "right": 998,
+          "top": 235.890625,
+          "bottom": 1952.875,
+          "width": 765
+        }
+      }
+    },
+    {
+      "name": "A-02 1440px: 键盘展开辅助后直接编辑建议",
+      "pass": true
+    },
+    {
+      "name": "A-02 1440px: 会话切换与新建保留操作焦点",
+      "pass": true
+    },
+    {
+      "name": "A-02 1440px: 后台模块键盘切换保持当前按钮焦点",
+      "pass": true
+    },
+    {
+      "name": "A-03 1440px account: 仅溢出的表格提供可见提示和键盘滚动",
+      "pass": true,
+      "evidence": {
+        "overflow": false,
+        "tabindex": null,
+        "name": "个人中心数据表：类型 / 时间、数量",
+        "hint": {
+          "visible": false,
+          "text": "左右滑动或使用方向键查看全部列"
+        }
+      }
+    },
+    {
+      "name": "A-03 1440px admin: 仅溢出的表格提供可见提示和键盘滚动",
+      "pass": true,
+      "evidence": {
+        "overflow": false,
+        "tabindex": null,
+        "name": "管理后台数据表：账号 / 用户 ID、昵称 / 店铺",
+        "hint": {
+          "visible": false,
+          "text": "左右滑动或使用方向键查看全部列"
+        }
+      }
+    },
+    {
+      "name": "B-2 1440px: 合法长商品名、会话与详情不导致整页溢出",
+      "pass": true,
+      "evidence": {
+        "width": 1440,
+        "scrollWidth": 1440
+      }
+    },
+    {
+      "name": "B-4 1440px: 失败重试文案真实且冻结释放不变",
+      "pass": true,
+      "evidence": {
+        "released": {
+          "account": {
+            "available": 112,
+            "frozen": 0,
+            "consumed": 88,
+            "credited": 200
+          },
+          "task": {
+            "status": "failed",
+            "settlement": "released"
+          },
+          "count": 4
+        },
+        "after": {
+          "account": {
+            "available": 104,
+            "frozen": 8,
+            "consumed": 88,
+            "credited": 200
+          },
+          "count": 5
+        }
+      }
+    },
+    {
+      "name": "B-4 1440px: 有成果的重新生成明示保留与新费用",
+      "pass": true
+    },
+    {
+      "name": "B-4 1440px: 已删除成果的来源不承诺保留成果",
+      "pass": true
+    },
+    {
+      "name": "A-01 390px: 输入与记录采用适用列宽和顺序",
+      "pass": true,
+      "evidence": {
+        ".workspace": {
+          "left": 14,
+          "right": 376,
+          "top": 427.578125,
+          "bottom": 3026.03125,
+          "width": 362
+        },
+        ".composer": {
+          "left": 14,
+          "right": 376,
+          "top": 427.578125,
+          "bottom": 1338.8125,
+          "width": 362
+        },
+        ".feed": {
+          "left": 14,
+          "right": 376,
+          "top": 1356.8125,
+          "bottom": 3026.03125,
+          "width": 362
+        }
+      }
+    },
+    {
+      "name": "A-02 390px: 键盘展开辅助后直接编辑建议",
+      "pass": true
+    },
+    {
+      "name": "A-02 390px: 会话切换与新建保留操作焦点",
+      "pass": true
+    },
+    {
+      "name": "A-02 390px: 后台模块键盘切换保持当前按钮焦点",
+      "pass": true
+    },
+    {
+      "name": "A-03 390px account: 仅溢出的表格提供可见提示和键盘滚动",
+      "pass": true,
+      "evidence": {
+        "overflow": true,
+        "tabindex": "0",
+        "name": "个人中心数据表：类型 / 时间、数量",
+        "hint": {
+          "visible": true,
+          "text": "左右滑动或使用方向键查看全部列"
+        }
+      }
+    },
+    {
+      "name": "A-03 390px admin: 仅溢出的表格提供可见提示和键盘滚动",
+      "pass": true,
+      "evidence": {
+        "overflow": true,
+        "tabindex": "0",
+        "name": "管理后台数据表：账号 / 用户 ID、昵称 / 店铺",
+        "hint": {
+          "visible": true,
+          "text": "左右滑动或使用方向键查看全部列"
+        }
+      }
+    },
+    {
+      "name": "B-2 390px: 合法长商品名、会话与详情不导致整页溢出",
+      "pass": true,
+      "evidence": {
+        "width": 390,
+        "scrollWidth": 390
+      }
+    },
+    {
+      "name": "B-4 390px: 失败重试文案真实且冻结释放不变",
+      "pass": true,
+      "evidence": {
+        "released": {
+          "account": {
+            "available": 112,
+            "frozen": 0,
+            "consumed": 88,
+            "credited": 200
+          },
+          "task": {
+            "status": "failed",
+            "settlement": "released"
+          },
+          "count": 4
+        },
+        "after": {
+          "account": {
+            "available": 104,
+            "frozen": 8,
+            "consumed": 88,
+            "credited": 200
+          },
+          "count": 5
+        }
+      }
+    },
+    {
+      "name": "B-4 390px: 有成果的重新生成明示保留与新费用",
+      "pass": true
+    },
+    {
+      "name": "B-4 390px: 已删除成果的来源不承诺保留成果",
+      "pass": true
+    },
+    {
+      "name": "A-01 850px: 输入与记录采用适用列宽和顺序",
+      "pass": true,
+      "evidence": {
+        ".workspace": {
+          "left": 20,
+          "right": 830,
+          "top": 358.421875,
+          "bottom": 3004.640625,
+          "width": 810
+        },
+        ".composer": {
+          "left": 20,
+          "right": 830,
+          "top": 358.421875,
+          "bottom": 1269.65625,
+          "width": 810
+        },
+        ".feed": {
+          "left": 20,
+          "right": 830,
+          "top": 1287.65625,
+          "bottom": 3004.640625,
+          "width": 810
+        }
+      }
+    },
+    {
+      "name": "A-01 851px: 输入与记录采用适用列宽和顺序",
+      "pass": true,
+      "evidence": {
+        ".workspace": {
+          "left": 204,
+          "right": 827,
+          "top": 231.890625,
+          "bottom": 2026.21875,
+          "width": 623
+        },
+        ".composer": {
+          "left": 487,
+          "right": 827,
+          "top": 231.890625,
+          "bottom": 1143.125,
+          "width": 340
+        },
+        ".feed": {
+          "left": 204,
+          "right": 469,
+          "top": 231.890625,
+          "bottom": 2026.21875,
+          "width": 265
+        }
+      }
+    }
+  ]
+}

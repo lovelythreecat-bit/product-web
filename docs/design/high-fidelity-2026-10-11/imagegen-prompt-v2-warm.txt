@@ -1,0 +1,21 @@
+Use case: ui-mockup / style-transfer edit.
+Edit the provided high-fidelity Chinese desktop application screenshot into a WARM CREAM AND TERRACOTTA colorway. The user dislikes the green theme and explicitly requests warmer colors. This should be a complete harmonious visual recoloring, instantly warm and clearly distinct from the green version.
+
+Preserve the screenshot's exact overall composition, three-column structure, sizes, panel outlines, spacing, Chinese typography, controls, task information, action placements, and polished product UI quality. Maintain the same landscape 1536x1024 aspect ratio. Keep every control and footer visible. No new features, no rearranging, no device mockup or browser frame.
+
+Replace the ENTIRE UI palette:
+- Main canvas: warm creamy off-white #F8F3ED.
+- Sidebar: pale oat/beige #F1E7DA, no green tint.
+- White content panels: warm porcelain #FFFDFA.
+- Brand mark, primary buttons, selected navigation underline, active agent icon/outline, fee number and other interactive accents: restrained deep terracotta #A94E32. White button text.
+- Pale selected session and active tabs: soft peach/clay #F2DFCF.
+- User message bubble: light peach cream #F7E9DB.
+- Main headings, body text and icons: dark warm espresso #322823, not green-black.
+- Secondary text: readable warm taupe #75685F.
+- Borders: pale warm sand #E7D9CA.
+- Success badge: subtle oatmeal background #F0E9DF, dark warm brown text/check #66503B. Show "成功 · 已消费". No green success pill.
+- Secondary outlined buttons and "AI 帮我完善": terracotta outlines or neutral warm outlines. No green anywhere in the interface.
+Use warm terracotta sparingly for actions, selected items and accents. Large surfaces remain airy light cream, not orange. No pink, purple, mint, teal, blue tint, neon gradients, shiny glass, or heavy brown background. Timeless clean creative studio suitable for merchants working all day.
+
+Also harmonize the sample product photo and its thumbnails: keep the exact ceramic mug geometry, lid, handle and desk composition, but make the ceramic glaze warm ivory/cream instead of celadon green. Change green leafy foliage into subtle beige dried botanical branches. Preserve realistic soft golden morning sunlight, pale oak/ivory desktop, cream notebook, realistic natural product photography. Change ONLY the sample product name everywhere from "青瓷马克杯" to "陶瓷马克杯", in the selected left conversation, central conversation heading and right product summary. All other text stays unchanged and legible, including "商品创作台", "暂定名称", "创作工作台", "我的作品", "个人中心", "准备本次创作", "文案", "图片", "视频", "新建会话", "112", "20", "确认费用并生成", and all lower action buttons.
+The output must be a crisp coherent high-fidelity full-screen UI design, with a noticeable warm cream and elegant earthy terracotta identity.

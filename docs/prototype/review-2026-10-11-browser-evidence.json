@@ -1,0 +1,288 @@
+{
+  "method": "Independent Assessment B via fresh Codex IAB tab",
+  "routesAndModules": [
+    {
+      "view": "desktop-admin-任务与异常",
+      "duplicates": [],
+      "scroll": 1425,
+      "unlabelled": [],
+      "width": 1440
+    },
+    {
+      "view": "desktop-admin-用户管理",
+      "duplicates": [],
+      "scroll": 1425,
+      "unlabelled": [],
+      "width": 1440
+    },
+    {
+      "view": "desktop-admin-积分管理",
+      "duplicates": [],
+      "scroll": 1425,
+      "unlabelled": [],
+      "width": 1440
+    },
+    {
+      "view": "desktop-admin-Agent 配置",
+      "duplicates": [],
+      "scroll": 1440,
+      "unlabelled": [],
+      "width": 1440
+    },
+    {
+      "view": "desktop-admin-规格与价格",
+      "duplicates": [],
+      "scroll": 1425,
+      "unlabelled": [],
+      "width": 1440
+    },
+    {
+      "view": "desktop-admin-用量统计",
+      "duplicates": [],
+      "scroll": 1440,
+      "unlabelled": [],
+      "width": 1440
+    },
+    {
+      "view": "desktop-admin-官网内容",
+      "duplicates": [],
+      "scroll": 1440,
+      "unlabelled": [],
+      "width": 1440
+    },
+    {
+      "view": "desktop-admin-操作日志",
+      "duplicates": [],
+      "scroll": 1440,
+      "unlabelled": [],
+      "width": 1440
+    },
+    {
+      "view": "1440-home",
+      "duplicates": [],
+      "scroll": 1425,
+      "unlabelled": [],
+      "width": 1440
+    },
+    {
+      "view": "1440-login",
+      "duplicates": [],
+      "scroll": 1440,
+      "unlabelled": [],
+      "width": 1440
+    },
+    {
+      "view": "1440-register",
+      "duplicates": [],
+      "scroll": 1440,
+      "unlabelled": [],
+      "width": 1440
+    },
+    {
+      "view": "1440-workspace",
+      "duplicates": [],
+      "scroll": 1425,
+      "unlabelled": [],
+      "width": 1440
+    },
+    {
+      "view": "1440-works",
+      "duplicates": [],
+      "scroll": 1440,
+      "unlabelled": [],
+      "width": 1440
+    },
+    {
+      "view": "1440-account",
+      "duplicates": [],
+      "scroll": 1425,
+      "unlabelled": [],
+      "width": 1440
+    },
+    {
+      "view": "1440-recharge",
+      "duplicates": [],
+      "scroll": 1440,
+      "unlabelled": [],
+      "width": 1440
+    },
+    {
+      "view": "1440-admin",
+      "duplicates": [],
+      "scroll": 1440,
+      "unlabelled": [],
+      "width": 1440
+    },
+    {
+      "view": "390-home",
+      "duplicates": [],
+      "scroll": 375,
+      "unlabelled": [],
+      "width": 390
+    },
+    {
+      "view": "390-login",
+      "duplicates": [],
+      "scroll": 390,
+      "unlabelled": [],
+      "width": 390
+    },
+    {
+      "view": "390-register",
+      "duplicates": [],
+      "scroll": 390,
+      "unlabelled": [],
+      "width": 390
+    },
+    {
+      "view": "390-workspace",
+      "duplicates": [],
+      "scroll": 375,
+      "unlabelled": [],
+      "width": 390
+    },
+    {
+      "view": "390-works",
+      "duplicates": [],
+      "scroll": 375,
+      "unlabelled": [],
+      "width": 390
+    },
+    {
+      "view": "390-account",
+      "duplicates": [],
+      "scroll": 375,
+      "unlabelled": [],
+      "width": 390
+    },
+    {
+      "view": "390-recharge",
+      "duplicates": [],
+      "scroll": 390,
+      "unlabelled": [],
+      "width": 390
+    },
+    {
+      "view": "390-admin",
+      "duplicates": [],
+      "scroll": 375,
+      "unlabelled": [],
+      "width": 390
+    },
+    {
+      "view": "mobile-admin-任务与异常",
+      "scroll": 375,
+      "unlabelled": [],
+      "width": 390
+    },
+    {
+      "view": "mobile-admin-用户管理",
+      "scroll": 375,
+      "unlabelled": [],
+      "width": 390
+    },
+    {
+      "view": "mobile-admin-积分管理",
+      "scroll": 375,
+      "unlabelled": [],
+      "width": 390
+    },
+    {
+      "view": "mobile-admin-Agent 配置",
+      "scroll": 375,
+      "unlabelled": [],
+      "width": 390
+    },
+    {
+      "view": "mobile-admin-规格与价格",
+      "scroll": 375,
+      "unlabelled": [],
+      "width": 390
+    },
+    {
+      "view": "mobile-admin-用量统计",
+      "scroll": 375,
+      "unlabelled": [],
+      "width": 390
+    },
+    {
+      "view": "mobile-admin-官网内容",
+      "scroll": 375,
+      "unlabelled": [],
+      "width": 390
+    },
+    {
+      "view": "mobile-admin-操作日志",
+      "scroll": 375,
+      "unlabelled": [],
+      "width": 390
+    }
+  ],
+  "observations": {
+    "mobileDefault": {
+      "viewport": [
+        390,
+        844
+      ],
+      "documentScrollWidth": 375,
+      "feed": {
+        "width": 0,
+        "x": 14
+      },
+      "composer": {
+        "width": 329,
+        "x": 32
+      },
+      "gridWidth": 347
+    },
+    "longName": {
+      "input": "A repeated 120 times",
+      "desktop": {
+        "viewportWidth": 1440,
+        "documentScrollWidth": 2566
+      },
+      "mobile": {
+        "viewportWidth": 390,
+        "documentScrollWidth": 1587
+      }
+    },
+    "focus": {
+      "assistAfterEnter": "BODY",
+      "assistNextTab": "可用 112 · 充值积分",
+      "adminUserModuleAfterEnter": "BODY",
+      "adminNextTab": "任务与异常"
+    },
+    "feeException": {
+      "initial": {
+        "available": 112,
+        "frozen": 0,
+        "consumed": 88
+      },
+      "admitted": {
+        "available": 104,
+        "frozen": 8,
+        "consumed": 88
+      },
+      "pending": {
+        "available": 104,
+        "frozen": 8,
+        "consumed": 88
+      },
+      "saving": {
+        "available": 104,
+        "frozen": 8,
+        "consumed": 88
+      },
+      "failed": {
+        "available": 112,
+        "frozen": 0,
+        "consumed": 88
+      }
+    },
+    "mobileDrawerFooter": {
+      "top": 767,
+      "bottom": 844,
+      "viewportHeight": 844
+    }
+  }
+}

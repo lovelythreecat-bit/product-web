@@ -1,0 +1,662 @@
+{
+  "date": "2026-10-11",
+  "method": "independent local Edge/Playwright reviewer regression",
+  "passed": 31,
+  "failed": 0,
+  "results": [
+    {
+      "name": "desktop previous close cannot erase new confirmation",
+      "pass": true
+    },
+    {
+      "name": "desktop existing interaction regression",
+      "pass": true,
+      "evidence": {
+        "passed": 38,
+        "failed": 0,
+        "results": [
+          {
+            "name": "默认工作台仅显示商品摘要",
+            "pass": true
+          },
+          {
+            "name": "生成设置默认收起",
+            "pass": true
+          },
+          {
+            "name": "编辑商品资料打开统一抽屉",
+            "pass": true
+          },
+          {
+            "name": "取消商品编辑保留原资料",
+            "pass": true
+          },
+          {
+            "name": "取消后焦点回到编辑按钮",
+            "pass": true
+          },
+          {
+            "name": "保存商品资料更新摘要",
+            "pass": true
+          },
+          {
+            "name": "编辑不改变历史任务快照",
+            "pass": true
+          },
+          {
+            "name": "点击辅助才出现可编辑建议",
+            "pass": true
+          },
+          {
+            "name": "采用建议写入指令且不创建任务",
+            "pass": true
+          },
+          {
+            "name": "撤回建议恢复原指令",
+            "pass": true
+          },
+          {
+            "name": "生成先打开收费确认且默认焦点在取消",
+            "pass": true
+          },
+          {
+            "name": "取消收费不创建任务不冻结积分",
+            "pass": true
+          },
+          {
+            "name": "确认后只创建一个任务并冻结固定费用",
+            "pass": true
+          },
+          {
+            "name": "待核查保持冻结且不创建成果",
+            "pass": true
+          },
+          {
+            "name": "完整成功只消费一次并保留成果",
+            "pass": true
+          },
+          {
+            "name": "任务详情抽屉包含状态与按需展开快照",
+            "pass": true
+          },
+          {
+            "name": "只读预览没有取消或保存按钮",
+            "pass": true
+          },
+          {
+            "name": "删除收在更多菜单",
+            "pass": true
+          },
+          {
+            "name": "删除打开明确危险确认",
+            "pass": true
+          },
+          {
+            "name": "取消删除保留成果",
+            "pass": true
+          },
+          {
+            "name": "删除作品后保留任务并显示明确提示",
+            "pass": true
+          },
+          {
+            "name": "个人中心默认展示资料而非编辑表单",
+            "pass": true
+          },
+          {
+            "name": "取消个人资料编辑不保存",
+            "pass": true
+          },
+          {
+            "name": "保存个人资料更新页面",
+            "pass": true
+          },
+          {
+            "name": "流水详情展示变更前后余额",
+            "pass": true
+          },
+          {
+            "name": "后台查看用户使用同一只读抽屉",
+            "pass": true
+          },
+          {
+            "name": "详情内编辑按钮切换到编辑抽屉",
+            "pass": true
+          },
+          {
+            "name": "后台新增使用共享表单且字段无重复ID",
+            "pass": true
+          },
+          {
+            "name": "后台发放与配置表单默认隐藏",
+            "pass": true
+          },
+          {
+            "name": "积分发放更新指定后台余额并记录原因",
+            "pass": true
+          },
+          {
+            "name": "赠送配置保存后更新摘要",
+            "pass": true
+          },
+          {
+            "name": "官网介绍默认只读",
+            "pass": true
+          },
+          {
+            "name": "官网介绍保存后更新预览",
+            "pass": true
+          },
+          {
+            "name": "Agent配置共用抽屉且凭据不暴露",
+            "pass": true
+          },
+          {
+            "name": "发布价格更新版本而不修改旧任务",
+            "pass": true
+          },
+          {
+            "name": "不同Agent显示自身参数",
+            "pass": true
+          },
+          {
+            "name": "视频设置按点击展开",
+            "pass": true
+          },
+          {
+            "name": "缺商品资料时打开编辑抽屉且不受理",
+            "pass": true
+          }
+        ]
+      }
+    },
+    {
+      "name": "desktop workspace readable geometry",
+      "pass": true,
+      "evidence": {
+        "composer": {
+          "x": 1022,
+          "y": 52.890625,
+          "width": 390,
+          "height": 919.234375,
+          "top": 52.890625,
+          "right": 1412,
+          "bottom": 972.125,
+          "left": 1022
+        },
+        "feed": {
+          "x": 233,
+          "y": 52.890625,
+          "width": 765,
+          "height": 1716.984375,
+          "top": 52.890625,
+          "right": 998,
+          "bottom": 1769.875,
+          "left": 233
+        },
+        "workspace": {
+          "x": 233,
+          "y": 52.890625,
+          "width": 1179,
+          "height": 1716.984375,
+          "top": 52.890625,
+          "right": 1412,
+          "bottom": 1769.875,
+          "left": 233
+        },
+        "scroll": 1440,
+        "viewport": 1440
+      }
+    },
+    {
+      "name": "desktop assist keyboard continuity",
+      "pass": true
+    },
+    {
+      "name": "desktop legal long name fits",
+      "pass": true,
+      "evidence": {
+        "scroll": 1440,
+        "viewport": 1440,
+        "name": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
+      }
+    },
+    {
+      "name": "desktop long name confirmation fits",
+      "pass": true
+    },
+    {
+      "name": "desktop module keyboard continuity",
+      "pass": true
+    },
+    {
+      "name": "desktop fitting table has no unnecessary prompt",
+      "pass": true,
+      "evidence": {
+        "overflow": false,
+        "tabindex": null,
+        "name": "个人中心数据表：类型 / 时间、数量",
+        "text": "个人中心\n\n管理个人资料与积分。\n\n青\n青瓷小店\n\ndemo-shop\n\n正常\n个人与店铺资料\n店铺\n青瓷小店\n主营类目\n家居日用\n联系邮箱\n未填写\n联系电话\n未填写\n\n还未填写个人简介\n\n编辑资料\n账号详情\n退出登录\n积分账户\n充值积分\n可用\n112\n冻结\n0\n累计消费\n88\n积分流水\n类型 / 时间\t数量\t关联任务\t操作\n注册赠送\n16:56:52\t200\t注册 / 演示入账\t查看详情\n任务冻结\n16:56:52\t8\tT-1041\t查看详情\n成功结算\n16:56:52\t8\tT-1041\t查看详情\n任务冻结\n16:56:52\t20\tT-1042\t查看详情\n成功结算\n16:56:52\t20\tT-1042\t查看详情\n任务冻结\n16:56:52\t60\tT-1043\t查看详情\n成功结算\n16:56:52\t60\tT-1043\t查看详情\n积分与演示说明"
+      }
+    },
+    {
+      "name": "desktop failed retry truthful copy",
+      "pass": true,
+      "evidence": "确认重新提交\n关闭\n\nAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA · 文案\n\n本次将冻结\n8 积分 · 演示\n\n通用短文 · 演示能力 / 简洁自然\n\n原任务失败，积分已释放；沿用原输入，按当前报价创建新任务。\n完整成果保存后消费；确定失败释放。\n查看完整提交内容\n取消\n确认并冻结积分"
+    },
+    {
+      "name": "desktop failed original releases credits",
+      "pass": true,
+      "evidence": {
+        "id": "T-1044",
+        "settlement": "released",
+        "account": {
+          "available": 112,
+          "frozen": 0,
+          "consumed": 88,
+          "credited": 200
+        }
+      }
+    },
+    {
+      "name": "desktop retry creates new frozen task",
+      "pass": true,
+      "evidence": {
+        "source": "T-1044",
+        "status": "running",
+        "settlement": "frozen",
+        "cost": 8,
+        "available": 104,
+        "frozen": 8
+      }
+    },
+    {
+      "name": "desktop successful regeneration keeps fee warning",
+      "pass": true
+    },
+    {
+      "name": "desktop removed result never promised retained",
+      "pass": true
+    },
+    {
+      "name": "mobile previous close cannot erase new confirmation",
+      "pass": true
+    },
+    {
+      "name": "mobile existing interaction regression",
+      "pass": true,
+      "evidence": {
+        "passed": 38,
+        "failed": 0,
+        "results": [
+          {
+            "name": "默认工作台仅显示商品摘要",
+            "pass": true
+          },
+          {
+            "name": "生成设置默认收起",
+            "pass": true
+          },
+          {
+            "name": "编辑商品资料打开统一抽屉",
+            "pass": true
+          },
+          {
+            "name": "取消商品编辑保留原资料",
+            "pass": true
+          },
+          {
+            "name": "取消后焦点回到编辑按钮",
+            "pass": true
+          },
+          {
+            "name": "保存商品资料更新摘要",
+            "pass": true
+          },
+          {
+            "name": "编辑不改变历史任务快照",
+            "pass": true
+          },
+          {
+            "name": "点击辅助才出现可编辑建议",
+            "pass": true
+          },
+          {
+            "name": "采用建议写入指令且不创建任务",
+            "pass": true
+          },
+          {
+            "name": "撤回建议恢复原指令",
+            "pass": true
+          },
+          {
+            "name": "生成先打开收费确认且默认焦点在取消",
+            "pass": true
+          },
+          {
+            "name": "取消收费不创建任务不冻结积分",
+            "pass": true
+          },
+          {
+            "name": "确认后只创建一个任务并冻结固定费用",
+            "pass": true
+          },
+          {
+            "name": "待核查保持冻结且不创建成果",
+            "pass": true
+          },
+          {
+            "name": "完整成功只消费一次并保留成果",
+            "pass": true
+          },
+          {
+            "name": "任务详情抽屉包含状态与按需展开快照",
+            "pass": true
+          },
+          {
+            "name": "只读预览没有取消或保存按钮",
+            "pass": true
+          },
+          {
+            "name": "删除收在更多菜单",
+            "pass": true
+          },
+          {
+            "name": "删除打开明确危险确认",
+            "pass": true
+          },
+          {
+            "name": "取消删除保留成果",
+            "pass": true
+          },
+          {
+            "name": "删除作品后保留任务并显示明确提示",
+            "pass": true
+          },
+          {
+            "name": "个人中心默认展示资料而非编辑表单",
+            "pass": true
+          },
+          {
+            "name": "取消个人资料编辑不保存",
+            "pass": true
+          },
+          {
+            "name": "保存个人资料更新页面",
+            "pass": true
+          },
+          {
+            "name": "流水详情展示变更前后余额",
+            "pass": true
+          },
+          {
+            "name": "后台查看用户使用同一只读抽屉",
+            "pass": true
+          },
+          {
+            "name": "详情内编辑按钮切换到编辑抽屉",
+            "pass": true
+          },
+          {
+            "name": "后台新增使用共享表单且字段无重复ID",
+            "pass": true
+          },
+          {
+            "name": "后台发放与配置表单默认隐藏",
+            "pass": true
+          },
+          {
+            "name": "积分发放更新指定后台余额并记录原因",
+            "pass": true
+          },
+          {
+            "name": "赠送配置保存后更新摘要",
+            "pass": true
+          },
+          {
+            "name": "官网介绍默认只读",
+            "pass": true
+          },
+          {
+            "name": "官网介绍保存后更新预览",
+            "pass": true
+          },
+          {
+            "name": "Agent配置共用抽屉且凭据不暴露",
+            "pass": true
+          },
+          {
+            "name": "发布价格更新版本而不修改旧任务",
+            "pass": true
+          },
+          {
+            "name": "不同Agent显示自身参数",
+            "pass": true
+          },
+          {
+            "name": "视频设置按点击展开",
+            "pass": true
+          },
+          {
+            "name": "缺商品资料时打开编辑抽屉且不受理",
+            "pass": true
+          }
+        ]
+      }
+    },
+    {
+      "name": "mobile workspace readable geometry",
+      "pass": true,
+      "evidence": {
+        "composer": {
+          "x": 14,
+          "y": -261.421875,
+          "width": 362,
+          "height": 911.234375,
+          "top": -261.421875,
+          "right": 376,
+          "bottom": 649.8125,
+          "left": 14
+        },
+        "feed": {
+          "x": 14,
+          "y": 667.8125,
+          "width": 362,
+          "height": 1669.21875,
+          "top": 667.8125,
+          "right": 376,
+          "bottom": 2337.03125,
+          "left": 14
+        },
+        "workspace": {
+          "x": 14,
+          "y": -261.421875,
+          "width": 362,
+          "height": 2598.453125,
+          "top": -261.421875,
+          "right": 376,
+          "bottom": 2337.03125,
+          "left": 14
+        },
+        "scroll": 390,
+        "viewport": 390
+      }
+    },
+    {
+      "name": "mobile assist keyboard continuity",
+      "pass": true
+    },
+    {
+      "name": "mobile legal long name fits",
+      "pass": true,
+      "evidence": {
+        "scroll": 390,
+        "viewport": 390,
+        "name": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
+      }
+    },
+    {
+      "name": "mobile long name confirmation fits",
+      "pass": true
+    },
+    {
+      "name": "mobile module keyboard continuity",
+      "pass": true
+    },
+    {
+      "name": "mobile overflowing table discoverable",
+      "pass": true,
+      "evidence": {
+        "overflow": true,
+        "tabindex": "0",
+        "name": "个人中心数据表：类型 / 时间、数量",
+        "text": "个人中心\n\n管理个人资料与积分。\n\n青\n青瓷小店\n\ndemo-shop\n\n正常\n个人与店铺资料\n店铺\n青瓷小店\n主营类目\n家居日用\n联系邮箱\n未填写\n联系电话\n未填写\n\n还未填写个人简介\n\n编辑资料\n账号详情\n退出登录\n积分账户\n充值积分\n可用\n112\n冻结\n0\n累计消费\n88\n积分流水\n\n左右滑动或使用方向键查看全部列\n\n类型 / 时间\t数量\t关联任务\t操作\n注册赠送\n16:56:57\t200\t注册 / 演示入账\t查看详情\n任务冻结\n16:56:57\t8\tT-1041\t查看详情\n成功结算\n16:56:57\t8\tT-1041\t查看详情\n任务冻结\n16:56:57\t20\tT-1042\t查看详情\n成功结算\n16:56:57\t20\tT-1042\t查看详情\n任务冻结\n16:56:57\t60\tT-1043\t查看详情\n成功结算\n16:56:57\t60\tT-1043\t查看详情\n积分与演示说明"
+      }
+    },
+    {
+      "name": "mobile table keyboard scroll",
+      "pass": true,
+      "evidence": {
+        "before": 0,
+        "after": 40
+      }
+    },
+    {
+      "name": "mobile failed retry truthful copy",
+      "pass": true,
+      "evidence": "确认重新提交\n关闭\n\nAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA · 文案\n\n本次将冻结\n8 积分 · 演示\n\n通用短文 · 演示能力 / 简洁自然\n\n原任务失败，积分已释放；沿用原输入，按当前报价创建新任务。\n完整成果保存后消费；确定失败释放。\n查看完整提交内容\n取消\n确认并冻结积分"
+    },
+    {
+      "name": "mobile failed original releases credits",
+      "pass": true,
+      "evidence": {
+        "id": "T-1044",
+        "settlement": "released",
+        "account": {
+          "available": 112,
+          "frozen": 0,
+          "consumed": 88,
+          "credited": 200
+        }
+      }
+    },
+    {
+      "name": "mobile retry creates new frozen task",
+      "pass": true,
+      "evidence": {
+        "source": "T-1044",
+        "status": "running",
+        "settlement": "frozen",
+        "cost": 8,
+        "available": 104,
+        "frozen": 8
+      }
+    },
+    {
+      "name": "mobile successful regeneration keeps fee warning",
+      "pass": true
+    },
+    {
+      "name": "mobile removed result never promised retained",
+      "pass": true
+    },
+    {
+      "name": "breakpoint 320",
+      "pass": true,
+      "evidence": {
+        "c": {
+          "x": 14,
+          "y": 462.265625,
+          "width": 292,
+          "height": 911.234375,
+          "top": 462.265625,
+          "right": 306,
+          "bottom": 1373.5,
+          "left": 14
+        },
+        "f": {
+          "x": 14,
+          "y": 1391.5,
+          "width": 292,
+          "height": 1798.328125,
+          "top": 1391.5,
+          "right": 306,
+          "bottom": 3189.828125,
+          "left": 14
+        },
+        "scroll": 320,
+        "viewport": 320
+      }
+    },
+    {
+      "name": "breakpoint 850",
+      "pass": true,
+      "evidence": {
+        "c": {
+          "x": 20,
+          "y": 358.421875,
+          "width": 810,
+          "height": 911.234375,
+          "top": 358.421875,
+          "right": 830,
+          "bottom": 1269.65625,
+          "left": 20
+        },
+        "f": {
+          "x": 20,
+          "y": 1287.65625,
+          "width": 810,
+          "height": 1716.984375,
+          "top": 1287.65625,
+          "right": 830,
+          "bottom": 3004.640625,
+          "left": 20
+        },
+        "scroll": 850,
+        "viewport": 850
+      }
+    },
+    {
+      "name": "breakpoint 851",
+      "pass": true,
+      "evidence": {
+        "c": {
+          "x": 487,
+          "y": 231.890625,
+          "width": 340,
+          "height": 911.234375,
+          "top": 231.890625,
+          "right": 827,
+          "bottom": 1143.125,
+          "left": 487
+        },
+        "f": {
+          "x": 204,
+          "y": 231.890625,
+          "width": 265,
+          "height": 1794.328125,
+          "top": 231.890625,
+          "right": 469,
+          "bottom": 2026.21875,
+          "left": 204
+        },
+        "scroll": 851,
+        "viewport": 851
+      }
+    },
+    {
+      "name": "browser errors and warnings",
+      "pass": true,
+      "evidence": []
+    }
+  ],
+  "logs": [],
+  "sourceHashes": {
+    "app.js": "5e69bd12becc27e35122dbc8ec794ab5e2fc587fee8401e175b30c4ad91aaa42",
+    "admin.js": "e508e878b519b23952c1079bd6b6bbace761c8169e3d95c371513b5602b13759",
+    "model.js": "99744bf6cb76c7d517906fcade1bf49a4cb46925914dd8bcef383f01acb023ca",
+    "views.js": "b0e65eb6266890c8469dc409b484cd1e3aa8de7afd6fa767fc9a7475b9669b35",
+    "style.css": "a4004d320608c85a76ee281ed0c35c5aaa67a3f03a4b816925f9a4a7b2799408",
+    "index.html": "5ad82b3ca84ecebf0418499768f596e3457ff6c8bab6a87c74f82fd89daf278d"
+  }
+}
