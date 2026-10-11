@@ -3,7 +3,7 @@
 from pathlib import Path
 from typing import Literal
 
-from pydantic import SecretStr, model_validator
+from pydantic import Field, SecretStr, model_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 from app.tasks.schemas import GenerationEstimate
@@ -22,6 +22,7 @@ class Settings(BaseSettings):
     generation_capacity_estimates: dict[str, GenerationEstimate] = {}
     database_url: SecretStr | None = None
     redis_url: SecretStr | None = None
+    event_retention_seconds: int = Field(default=7 * 86400, ge=1, le=365 * 86400)
 
     @model_validator(mode="after")
     def reject_test_configuration(self) -> "Settings":

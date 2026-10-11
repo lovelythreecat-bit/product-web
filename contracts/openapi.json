@@ -555,6 +555,31 @@
         "title": "CursorPage[TaskView]",
         "type": "object"
       },
+      "DurableEventView": {
+        "additionalProperties": false,
+        "properties": {
+          "created_at": {
+            "format": "date-time",
+            "title": "Created At",
+            "type": "string"
+          },
+          "event_seq": {
+            "minimum": 1,
+            "title": "Event Seq",
+            "type": "integer"
+          },
+          "payload": {
+            "$ref": "#/components/schemas/TaskEventPayload"
+          }
+        },
+        "required": [
+          "event_seq",
+          "payload",
+          "created_at"
+        ],
+        "title": "DurableEventView",
+        "type": "object"
+      },
       "ErrorCode": {
         "enum": [
           "INPUT_INVALID",
@@ -1628,6 +1653,37 @@
         "title": "RegisterRequest",
         "type": "object"
       },
+      "ResetEvent": {
+        "additionalProperties": false,
+        "properties": {
+          "instruction": {
+            "default": "GET original persisted resources; never resubmit a task on reconnect.",
+            "title": "Instruction",
+            "type": "string"
+          },
+          "reason": {
+            "const": "cursor_unavailable",
+            "default": "cursor_unavailable",
+            "title": "Reason",
+            "type": "string"
+          },
+          "recovery_method": {
+            "const": "GET",
+            "default": "GET",
+            "title": "Recovery Method",
+            "type": "string"
+          },
+          "recovery_resources": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Recovery Resources",
+            "type": "array"
+          }
+        },
+        "title": "ResetEvent",
+        "type": "object"
+      },
       "ResolutionReceipt": {
         "additionalProperties": false,
         "properties": {
@@ -1966,6 +2022,31 @@
         "title": "TaskDetail",
         "type": "object"
       },
+      "TaskEventPayload": {
+        "additionalProperties": false,
+        "properties": {
+          "state": {
+            "$ref": "#/components/schemas/TaskState"
+          },
+          "state_version": {
+            "minimum": 1,
+            "title": "State Version",
+            "type": "integer"
+          },
+          "task_id": {
+            "format": "uuid",
+            "title": "Task Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "task_id",
+          "state",
+          "state_version"
+        ],
+        "title": "TaskEventPayload",
+        "type": "object"
+      },
       "TaskState": {
         "enum": [
           "SUBMITTED",
@@ -2034,6 +2115,39 @@
           "investigation_reason"
         ],
         "title": "TaskView",
+        "type": "object"
+      },
+      "TransientFragment": {
+        "additionalProperties": false,
+        "properties": {
+          "replayable": {
+            "const": false,
+            "default": false,
+            "title": "Replayable",
+            "type": "boolean"
+          },
+          "task_id": {
+            "format": "uuid",
+            "title": "Task Id",
+            "type": "string"
+          },
+          "test_only": {
+            "const": true,
+            "default": true,
+            "title": "Test Only",
+            "type": "boolean"
+          },
+          "text": {
+            "maxLength": 4096,
+            "title": "Text",
+            "type": "string"
+          }
+        },
+        "required": [
+          "task_id",
+          "text"
+        ],
+        "title": "TransientFragment",
         "type": "object"
       },
       "UserRole": {
@@ -4490,6 +4604,119 @@
           }
         },
         "summary": "Get Conversation"
+      }
+    },
+    "/api/v1/events": {
+      "get": {
+        "description": "Same-origin Secure HttpOnly cookie EventSource. Origin may be absent when Sec-Fetch-Site is same-origin; no custom CSRF or X-Requested-With header. Cursor is the opaque SSE id (user UUID:sequence); Last-Event-ID takes precedence over after. Invalid, foreign, ahead or expired cursors receive a generic reset with this user's current cursor and the stream closes. GET original persisted resources after reset; never POST a replacement task. Default transport retention is 7 days; permanent sequence and deduplication receipts are retained. Unstored fragments have no id and cannot be replayed. Real upstream streaming is disabled pending D-01. Redis is unnecessary for correctness.",
+        "operationId": "events_stream",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "after",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "maxLength": 128,
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "After"
+            }
+          },
+          {
+            "in": "header",
+            "name": "Last-Event-ID",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "maxLength": 128,
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Last-Event-Id"
+            }
+          },
+          {
+            "in": "cookie",
+            "name": "session",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "text/event-stream": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "description": "Native SSE: task.updated, reset, TEST_ONLY transient_fragment."
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Unauthorized"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Forbidden"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Unprocessable Entity"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Internal Server Error"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Service Unavailable"
+          }
+        },
+        "summary": "Events"
       }
     },
     "/api/v1/files": {

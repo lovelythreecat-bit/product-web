@@ -19,6 +19,8 @@ from app.common.openapi import install_openapi
 from app.config import Settings
 from app.conversations.routes import router as conversations_router
 from app.db import create_db_engine
+from app.events.fragments import TestFragmentHub
+from app.events.routes import router as events_router
 from app.investigations.routes import router as investigations_router
 from app.ledger.service import LedgerError
 from app.policies.service import PolicyGateError
@@ -56,6 +58,9 @@ def create_app(settings: Settings) -> FastAPI:
         else None
     )
     application.state.auth_rate_prefix = "auth-rate:"
+    application.state.event_fragments = (
+        TestFragmentHub() if settings.mode == "mock" and settings.test_only else None
+    )
     application.include_router(callbacks_router)
     application.include_router(auth_router)
     application.include_router(catalog_router)
@@ -63,6 +68,7 @@ def create_app(settings: Settings) -> FastAPI:
     application.include_router(conversations_router)
     application.include_router(tasks_router)
     application.include_router(investigations_router)
+    application.include_router(events_router)
     register_error_handlers(application)
 
     @application.exception_handler(FileValidationError)

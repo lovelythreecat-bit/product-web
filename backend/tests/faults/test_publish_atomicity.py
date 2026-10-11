@@ -31,6 +31,8 @@ WRITE_POINTS = [
     "UPDATE generation_tasks CAS",
     "INSERT INTO task_state_events",
     "INSERT INTO durable_events",
+    "UPDATE event_heads",
+    "INSERT INTO event_receipts",
 ]
 
 

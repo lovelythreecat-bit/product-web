@@ -293,6 +293,26 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/events": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Events
+         * @description Same-origin Secure HttpOnly cookie EventSource. Origin may be absent when Sec-Fetch-Site is same-origin; no custom CSRF or X-Requested-With header. Cursor is the opaque SSE id (user UUID:sequence); Last-Event-ID takes precedence over after. Invalid, foreign, ahead or expired cursors receive a generic reset with this user's current cursor and the stream closes. GET original persisted resources after reset; never POST a replacement task. Default transport retention is 7 days; permanent sequence and deduplication receipts are retained. Unstored fragments have no id and cannot be replayed. Real upstream streaming is disabled pending D-01. Redis is unnecessary for correctness.
+         */
+        get: operations["events_stream"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/files": {
         parameters: {
             query?: never;
@@ -676,6 +696,17 @@ export interface components {
             items: components["schemas"]["TaskView"][];
             /** Next Cursor */
             next_cursor: string | null;
+        };
+        /** DurableEventView */
+        DurableEventView: {
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            /** Event Seq */
+            event_seq: number;
+            payload: components["schemas"]["TaskEventPayload"];
         };
         /**
          * ErrorCode
@@ -1092,6 +1123,28 @@ export interface components {
             /** Request Key */
             request_key: string;
         };
+        /** ResetEvent */
+        ResetEvent: {
+            /**
+             * Instruction
+             * @default GET original persisted resources; never resubmit a task on reconnect.
+             */
+            instruction: string;
+            /**
+             * Reason
+             * @default cursor_unavailable
+             * @constant
+             */
+            reason: "cursor_unavailable";
+            /**
+             * Recovery Method
+             * @default GET
+             * @constant
+             */
+            recovery_method: "GET";
+            /** Recovery Resources */
+            recovery_resources?: string[];
+        };
         /** ResolutionReceipt */
         ResolutionReceipt: {
             /**
@@ -1236,6 +1289,17 @@ export interface components {
             };
             task: components["schemas"]["TaskView"];
         };
+        /** TaskEventPayload */
+        TaskEventPayload: {
+            state: components["schemas"]["TaskState"];
+            /** State Version */
+            state_version: number;
+            /**
+             * Task Id
+             * Format: uuid
+             */
+            task_id: string;
+        };
         /**
          * TaskState
          * @enum {string}
@@ -1257,6 +1321,28 @@ export interface components {
             task_id: string;
             /** Work Ids */
             work_ids: string[];
+        };
+        /** TransientFragment */
+        TransientFragment: {
+            /**
+             * Replayable
+             * @default false
+             * @constant
+             */
+            replayable: false;
+            /**
+             * Task Id
+             * Format: uuid
+             */
+            task_id: string;
+            /**
+             * Test Only
+             * @default true
+             * @constant
+             */
+            test_only: true;
+            /** Text */
+            text: string;
         };
         /**
          * UserRole
@@ -2973,6 +3059,77 @@ export interface operations {
             };
             /** @description Internal Server Error */
             500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    events_stream: {
+        parameters: {
+            query?: {
+                after?: string | null;
+            };
+            header?: {
+                "Last-Event-ID"?: string | null;
+            };
+            path?: never;
+            cookie: {
+                session: string;
+            };
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Native SSE: task.updated, reset, TEST_ONLY transient_fragment. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "text/event-stream": string;
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unprocessable Entity */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Internal Server Error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Service Unavailable */
+            503: {
                 headers: {
                     [name: string]: unknown;
                 };

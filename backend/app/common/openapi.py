@@ -14,6 +14,7 @@ from app.common.types import (
     SubmitTaskRequest,
     TaskView,
 )
+from app.events.schemas import DurableEventView, ResetEvent, TransientFragment
 
 CONTRACT_MODELS = [
     Principal,
@@ -26,6 +27,9 @@ CONTRACT_MODELS = [
     PageQuery,
     CursorPage[TaskView],
     ErrorResponse,
+    DurableEventView,
+    ResetEvent,
+    TransientFragment,
 ]
 
 
