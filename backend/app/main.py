@@ -23,6 +23,7 @@ from app.db import create_db_engine
 from app.events.fragments import TestFragmentHub
 from app.events.routes import router as events_router
 from app.investigations.routes import router as investigations_router
+from app.ledger.routes import router as ledger_router
 from app.ledger.service import LedgerError
 from app.policies.service import PolicyGateError
 from app.storage.capacity import StorageError
@@ -30,6 +31,7 @@ from app.storage.routes import router as storage_router
 from app.storage.validation import FileValidationError
 from app.tasks.routes import router as tasks_router
 from app.tasks.state_machine import TransitionError
+from app.works.routes import router as works_router
 
 
 def create_app(settings: Settings) -> FastAPI:
@@ -69,6 +71,8 @@ def create_app(settings: Settings) -> FastAPI:
     application.include_router(storage_router)
     application.include_router(conversations_router)
     application.include_router(tasks_router)
+    application.include_router(works_router)
+    application.include_router(ledger_router)
     application.include_router(investigations_router)
     application.include_router(events_router)
     register_error_handlers(application)

@@ -1,5 +1,39 @@
 // Generated from contracts/openapi.json. Do not edit.
 export interface paths {
+    "/api/v1/account": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get Account */
+        get: operations["get_account"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/account/ledger": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List Ledger */
+        get: operations["list_ledger"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/admin/agents": {
         parameters: {
             query?: never;
@@ -522,10 +556,55 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/works": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List Works */
+        get: operations["list_works"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/works/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get Work */
+        get: operations["get_work"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
     schemas: {
+        /** AccountView */
+        AccountView: {
+            /** Available */
+            available: number;
+            /** Consumed */
+            consumed: number;
+            /** Credited Total */
+            credited_total: number;
+            /** Frozen */
+            frozen: number;
+        };
         /** AdmissionResult */
         AdmissionResult: {
             /** Replayed */
@@ -757,6 +836,13 @@ export interface components {
             /** Next Cursor */
             next_cursor: string | null;
         };
+        /** CursorPage[LedgerEntryView] */
+        CursorPage_LedgerEntryView_: {
+            /** Items */
+            items: components["schemas"]["LedgerEntryView"][];
+            /** Next Cursor */
+            next_cursor: string | null;
+        };
         /** CursorPage[MessageView] */
         CursorPage_MessageView_: {
             /** Items */
@@ -768,6 +854,13 @@ export interface components {
         CursorPage_TaskView_: {
             /** Items */
             items: components["schemas"]["TaskView"][];
+            /** Next Cursor */
+            next_cursor: string | null;
+        };
+        /** CursorPage[WorkView] */
+        CursorPage_WorkView_: {
+            /** Items */
+            items: components["schemas"]["WorkView"][];
             /** Next Cursor */
             next_cursor: string | null;
         };
@@ -889,6 +982,42 @@ export interface components {
             user_reason: string | null;
             /** Version */
             version: number;
+        };
+        /** LedgerBalances */
+        LedgerBalances: {
+            /** Available */
+            available: number;
+            /** Consumed */
+            consumed: number;
+            /** Frozen */
+            frozen: number;
+        };
+        /** LedgerEntryView */
+        LedgerEntryView: {
+            /** Amount */
+            amount: number;
+            balances_after: components["schemas"]["LedgerBalances"];
+            balances_before: components["schemas"]["LedgerBalances"];
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            /** Grant Id */
+            grant_id: string | null;
+            /** Kind */
+            kind: string;
+            /**
+             * Ledger Id
+             * Format: uuid
+             */
+            ledger_id: string;
+            /** Reason */
+            reason: string;
+            /** Reservation Id */
+            reservation_id: string | null;
+            /** Task Id */
+            task_id: string | null;
         };
         /** LiveResponse */
         LiveResponse: {
@@ -1263,6 +1392,14 @@ export interface components {
          * @enum {string}
          */
         SettlementState: "FROZEN" | "CONSUMED" | "RELEASED";
+        /** SourceMaterial */
+        SourceMaterial: {
+            /** Action */
+            action: "upload_again" | null;
+            /** Available */
+            available: boolean;
+            file: components["schemas"]["FileVersionRef"];
+        };
         /** SpecDraft */
         SpecDraft: {
             /**
@@ -1423,6 +1560,134 @@ export interface components {
          * @enum {string}
          */
         UserRole: "user" | "admin";
+        /** WorkDetail */
+        WorkDetail: {
+            /**
+             * Conversation Id
+             * Format: uuid
+             */
+            conversation_id: string;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            /** Items */
+            items: components["schemas"]["WorkItemView"][];
+            /**
+             * Kind
+             * @enum {string}
+             */
+            kind: "copy" | "image" | "video";
+            /**
+             * Message Id
+             * Format: uuid
+             */
+            message_id: string;
+            source: components["schemas"]["WorkSource"];
+            /**
+             * Task Id
+             * Format: uuid
+             */
+            task_id: string;
+            /**
+             * Work Id
+             * Format: uuid
+             */
+            work_id: string;
+        };
+        /** WorkItemView */
+        WorkItemView: {
+            /** Actual Bytes */
+            actual_bytes: number;
+            /** Content Url */
+            content_url: string;
+            /**
+             * File Id
+             * Format: uuid
+             */
+            file_id: string;
+            /** File Version */
+            file_version: string;
+            /** Item Key */
+            item_key: string;
+            /** Media Type */
+            media_type: string;
+            /** Text */
+            text: string | null;
+        };
+        /**
+         * WorkSource
+         * @description Read-only original input. Reuse requires a new quote and a new intent key.
+         */
+        WorkSource: {
+            /**
+             * Agent Id
+             * Format: uuid
+             */
+            agent_id: string;
+            /**
+             * Conversation Id
+             * Format: uuid
+             */
+            conversation_id: string;
+            /**
+             * Credit Reservation Id
+             * Format: uuid
+             */
+            credit_reservation_id: string;
+            input: components["schemas"]["InputSnapshot"];
+            /** Ledger Ids */
+            ledger_ids: string[];
+            /** Materials */
+            materials: components["schemas"]["SourceMaterial"][];
+            /** Policy Versions */
+            policy_versions: {
+                [key: string]: string;
+            };
+            /**
+             * Requires New Quote
+             * @default true
+             * @constant
+             */
+            requires_new_quote: true;
+            task: components["schemas"]["TaskView"];
+        };
+        /** WorkView */
+        WorkView: {
+            /**
+             * Conversation Id
+             * Format: uuid
+             */
+            conversation_id: string;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            /** Items */
+            items: components["schemas"]["WorkItemView"][];
+            /**
+             * Kind
+             * @enum {string}
+             */
+            kind: "copy" | "image" | "video";
+            /**
+             * Message Id
+             * Format: uuid
+             */
+            message_id: string;
+            /**
+             * Task Id
+             * Format: uuid
+             */
+            task_id: string;
+            /**
+             * Work Id
+             * Format: uuid
+             */
+            work_id: string;
+        };
     };
     responses: never;
     parameters: never;
@@ -1432,6 +1697,127 @@ export interface components {
 }
 export type $defs = Record<string, never>;
 export interface operations {
+    get_account: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie: {
+                /** @description Required Secure HttpOnly session cookie; omission or invalid session returns 401. */
+                session: string;
+            };
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AccountView"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unprocessable Entity */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Internal Server Error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    list_ledger: {
+        parameters: {
+            query?: {
+                cursor?: string | null;
+                limit?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie: {
+                /** @description Required Secure HttpOnly session cookie; omission or invalid session returns 401. */
+                session: string;
+            };
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CursorPage_LedgerEntryView_"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unprocessable Entity */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Internal Server Error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
     admin_agents: {
         parameters: {
             query?: never;
@@ -4458,6 +4844,148 @@ export interface operations {
             };
             /** @description Conflict */
             409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unprocessable Entity */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Internal Server Error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    list_works: {
+        parameters: {
+            query?: {
+                kind?: ("copy" | "image" | "video") | null;
+                cursor?: string | null;
+                limit?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie: {
+                /** @description Required Secure HttpOnly session cookie; omission or invalid session returns 401. */
+                session: string;
+            };
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CursorPage_WorkView_"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unprocessable Entity */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Internal Server Error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    get_work: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie: {
+                /** @description Required Secure HttpOnly session cookie; omission or invalid session returns 401. */
+                session: string;
+            };
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["WorkDetail"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Not Found */
+            404: {
                 headers: {
                     [name: string]: unknown;
                 };

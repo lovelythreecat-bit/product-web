@@ -1,6 +1,39 @@
 {
   "components": {
     "schemas": {
+      "AccountView": {
+        "additionalProperties": false,
+        "properties": {
+          "available": {
+            "minimum": 0.0,
+            "title": "Available",
+            "type": "integer"
+          },
+          "consumed": {
+            "minimum": 0.0,
+            "title": "Consumed",
+            "type": "integer"
+          },
+          "credited_total": {
+            "minimum": 0.0,
+            "title": "Credited Total",
+            "type": "integer"
+          },
+          "frozen": {
+            "minimum": 0.0,
+            "title": "Frozen",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "available",
+          "frozen",
+          "consumed",
+          "credited_total"
+        ],
+        "title": "AccountView",
+        "type": "object"
+      },
       "AdmissionResult": {
         "additionalProperties": false,
         "properties": {
@@ -648,6 +681,35 @@
         "title": "CursorPage[InvestigationView]",
         "type": "object"
       },
+      "CursorPage_LedgerEntryView_": {
+        "additionalProperties": false,
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/LedgerEntryView"
+            },
+            "title": "Items",
+            "type": "array"
+          },
+          "next_cursor": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Next Cursor"
+          }
+        },
+        "required": [
+          "items",
+          "next_cursor"
+        ],
+        "title": "CursorPage[LedgerEntryView]",
+        "type": "object"
+      },
       "CursorPage_MessageView_": {
         "additionalProperties": false,
         "properties": {
@@ -704,6 +766,35 @@
           "next_cursor"
         ],
         "title": "CursorPage[TaskView]",
+        "type": "object"
+      },
+      "CursorPage_WorkView_": {
+        "additionalProperties": false,
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/WorkView"
+            },
+            "title": "Items",
+            "type": "array"
+          },
+          "next_cursor": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Next Cursor"
+          }
+        },
+        "required": [
+          "items",
+          "next_cursor"
+        ],
+        "title": "CursorPage[WorkView]",
         "type": "object"
       },
       "DurableEventView": {
@@ -1021,6 +1112,117 @@
           "user_reason"
         ],
         "title": "InvestigationView",
+        "type": "object"
+      },
+      "LedgerBalances": {
+        "additionalProperties": false,
+        "properties": {
+          "available": {
+            "minimum": 0.0,
+            "title": "Available",
+            "type": "integer"
+          },
+          "consumed": {
+            "minimum": 0.0,
+            "title": "Consumed",
+            "type": "integer"
+          },
+          "frozen": {
+            "minimum": 0.0,
+            "title": "Frozen",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "available",
+          "frozen",
+          "consumed"
+        ],
+        "title": "LedgerBalances",
+        "type": "object"
+      },
+      "LedgerEntryView": {
+        "additionalProperties": false,
+        "properties": {
+          "amount": {
+            "minimum": 0.0,
+            "title": "Amount",
+            "type": "integer"
+          },
+          "balances_after": {
+            "$ref": "#/components/schemas/LedgerBalances"
+          },
+          "balances_before": {
+            "$ref": "#/components/schemas/LedgerBalances"
+          },
+          "created_at": {
+            "format": "date-time",
+            "title": "Created At",
+            "type": "string"
+          },
+          "grant_id": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Grant Id"
+          },
+          "kind": {
+            "title": "Kind",
+            "type": "string"
+          },
+          "ledger_id": {
+            "format": "uuid",
+            "title": "Ledger Id",
+            "type": "string"
+          },
+          "reason": {
+            "title": "Reason",
+            "type": "string"
+          },
+          "reservation_id": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Reservation Id"
+          },
+          "task_id": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Task Id"
+          }
+        },
+        "required": [
+          "ledger_id",
+          "grant_id",
+          "reservation_id",
+          "task_id",
+          "kind",
+          "amount",
+          "balances_before",
+          "balances_after",
+          "reason",
+          "created_at"
+        ],
+        "title": "LedgerEntryView",
         "type": "object"
       },
       "LiveResponse": {
@@ -1935,6 +2137,37 @@
         "title": "SettlementState",
         "type": "string"
       },
+      "SourceMaterial": {
+        "additionalProperties": false,
+        "properties": {
+          "action": {
+            "anyOf": [
+              {
+                "const": "upload_again",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Action"
+          },
+          "available": {
+            "title": "Available",
+            "type": "boolean"
+          },
+          "file": {
+            "$ref": "#/components/schemas/FileVersionRef"
+          }
+        },
+        "required": [
+          "file",
+          "available",
+          "action"
+        ],
+        "title": "SourceMaterial",
+        "type": "object"
+      },
       "SpecDraft": {
         "additionalProperties": false,
         "properties": {
@@ -2308,6 +2541,244 @@
         ],
         "title": "UserRole",
         "type": "string"
+      },
+      "WorkDetail": {
+        "additionalProperties": false,
+        "properties": {
+          "conversation_id": {
+            "format": "uuid",
+            "title": "Conversation Id",
+            "type": "string"
+          },
+          "created_at": {
+            "format": "date-time",
+            "title": "Created At",
+            "type": "string"
+          },
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/WorkItemView"
+            },
+            "title": "Items",
+            "type": "array"
+          },
+          "kind": {
+            "enum": [
+              "copy",
+              "image",
+              "video"
+            ],
+            "title": "Kind",
+            "type": "string"
+          },
+          "message_id": {
+            "format": "uuid",
+            "title": "Message Id",
+            "type": "string"
+          },
+          "source": {
+            "$ref": "#/components/schemas/WorkSource"
+          },
+          "task_id": {
+            "format": "uuid",
+            "title": "Task Id",
+            "type": "string"
+          },
+          "work_id": {
+            "format": "uuid",
+            "title": "Work Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "work_id",
+          "kind",
+          "task_id",
+          "conversation_id",
+          "message_id",
+          "created_at",
+          "items",
+          "source"
+        ],
+        "title": "WorkDetail",
+        "type": "object"
+      },
+      "WorkItemView": {
+        "additionalProperties": false,
+        "properties": {
+          "actual_bytes": {
+            "minimum": 1.0,
+            "title": "Actual Bytes",
+            "type": "integer"
+          },
+          "content_url": {
+            "title": "Content Url",
+            "type": "string"
+          },
+          "file_id": {
+            "format": "uuid",
+            "title": "File Id",
+            "type": "string"
+          },
+          "file_version": {
+            "title": "File Version",
+            "type": "string"
+          },
+          "item_key": {
+            "title": "Item Key",
+            "type": "string"
+          },
+          "media_type": {
+            "title": "Media Type",
+            "type": "string"
+          },
+          "text": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Text"
+          }
+        },
+        "required": [
+          "item_key",
+          "file_id",
+          "file_version",
+          "media_type",
+          "actual_bytes",
+          "content_url",
+          "text"
+        ],
+        "title": "WorkItemView",
+        "type": "object"
+      },
+      "WorkSource": {
+        "additionalProperties": false,
+        "description": "Read-only original input. Reuse requires a new quote and a new intent key.",
+        "properties": {
+          "agent_id": {
+            "format": "uuid",
+            "title": "Agent Id",
+            "type": "string"
+          },
+          "conversation_id": {
+            "format": "uuid",
+            "title": "Conversation Id",
+            "type": "string"
+          },
+          "credit_reservation_id": {
+            "format": "uuid",
+            "title": "Credit Reservation Id",
+            "type": "string"
+          },
+          "input": {
+            "$ref": "#/components/schemas/InputSnapshot"
+          },
+          "ledger_ids": {
+            "items": {
+              "format": "uuid",
+              "type": "string"
+            },
+            "title": "Ledger Ids",
+            "type": "array"
+          },
+          "materials": {
+            "items": {
+              "$ref": "#/components/schemas/SourceMaterial"
+            },
+            "title": "Materials",
+            "type": "array"
+          },
+          "policy_versions": {
+            "additionalProperties": {
+              "type": "string"
+            },
+            "title": "Policy Versions",
+            "type": "object"
+          },
+          "requires_new_quote": {
+            "const": true,
+            "default": true,
+            "title": "Requires New Quote",
+            "type": "boolean"
+          },
+          "task": {
+            "$ref": "#/components/schemas/TaskView"
+          }
+        },
+        "required": [
+          "task",
+          "conversation_id",
+          "agent_id",
+          "input",
+          "policy_versions",
+          "materials",
+          "credit_reservation_id",
+          "ledger_ids"
+        ],
+        "title": "WorkSource",
+        "type": "object"
+      },
+      "WorkView": {
+        "additionalProperties": false,
+        "properties": {
+          "conversation_id": {
+            "format": "uuid",
+            "title": "Conversation Id",
+            "type": "string"
+          },
+          "created_at": {
+            "format": "date-time",
+            "title": "Created At",
+            "type": "string"
+          },
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/WorkItemView"
+            },
+            "title": "Items",
+            "type": "array"
+          },
+          "kind": {
+            "enum": [
+              "copy",
+              "image",
+              "video"
+            ],
+            "title": "Kind",
+            "type": "string"
+          },
+          "message_id": {
+            "format": "uuid",
+            "title": "Message Id",
+            "type": "string"
+          },
+          "task_id": {
+            "format": "uuid",
+            "title": "Task Id",
+            "type": "string"
+          },
+          "work_id": {
+            "format": "uuid",
+            "title": "Work Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "work_id",
+          "kind",
+          "task_id",
+          "conversation_id",
+          "message_id",
+          "created_at",
+          "items"
+        ],
+        "title": "WorkView",
+        "type": "object"
       }
     }
   },
@@ -2317,6 +2788,172 @@
   },
   "openapi": "3.1.0",
   "paths": {
+    "/api/v1/account": {
+      "get": {
+        "operationId": "get_account",
+        "parameters": [
+          {
+            "description": "Required Secure HttpOnly session cookie; omission or invalid session returns 401.",
+            "in": "cookie",
+            "name": "session",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AccountView"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Unauthorized"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Unprocessable Entity"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Internal Server Error"
+          }
+        },
+        "summary": "Get Account"
+      }
+    },
+    "/api/v1/account/ledger": {
+      "get": {
+        "operationId": "list_ledger",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "cursor",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Cursor"
+            }
+          },
+          {
+            "in": "query",
+            "name": "limit",
+            "required": false,
+            "schema": {
+              "default": 20,
+              "maximum": 100,
+              "minimum": 1,
+              "title": "Limit",
+              "type": "integer"
+            }
+          },
+          {
+            "description": "Required Secure HttpOnly session cookie; omission or invalid session returns 401.",
+            "in": "cookie",
+            "name": "session",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CursorPage_LedgerEntryView_"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Unauthorized"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Unprocessable Entity"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Internal Server Error"
+          }
+        },
+        "summary": "List Ledger"
+      }
+    },
     "/api/v1/admin/agents": {
       "get": {
         "operationId": "admin_agents",
@@ -6642,6 +7279,223 @@
           }
         },
         "summary": "Get Own Investigation"
+      }
+    },
+    "/api/v1/works": {
+      "get": {
+        "operationId": "list_works",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "kind",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "enum": [
+                    "copy",
+                    "image",
+                    "video"
+                  ],
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Kind"
+            }
+          },
+          {
+            "in": "query",
+            "name": "cursor",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Cursor"
+            }
+          },
+          {
+            "in": "query",
+            "name": "limit",
+            "required": false,
+            "schema": {
+              "default": 20,
+              "maximum": 100,
+              "minimum": 1,
+              "title": "Limit",
+              "type": "integer"
+            }
+          },
+          {
+            "description": "Required Secure HttpOnly session cookie; omission or invalid session returns 401.",
+            "in": "cookie",
+            "name": "session",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CursorPage_WorkView_"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Unauthorized"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Forbidden"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Unprocessable Entity"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Internal Server Error"
+          }
+        },
+        "summary": "List Works"
+      }
+    },
+    "/api/v1/works/{id}": {
+      "get": {
+        "operationId": "get_work",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Id",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Required Secure HttpOnly session cookie; omission or invalid session returns 401.",
+            "in": "cookie",
+            "name": "session",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WorkDetail"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Unauthorized"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Forbidden"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Unprocessable Entity"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Internal Server Error"
+          }
+        },
+        "summary": "Get Work"
       }
     }
   }
