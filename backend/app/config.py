@@ -6,6 +6,8 @@ from typing import Literal
 from pydantic import SecretStr, model_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
+from app.tasks.schemas import GenerationEstimate
+
 
 class Settings(BaseSettings):
     model_config = SettingsConfigDict(env_prefix="APP_", extra="forbid", hide_input_in_errors=True)
@@ -16,6 +18,8 @@ class Settings(BaseSettings):
     storage_root: Path | None = None
     storage_persistent: bool = False
     storage_policy_version: str | None = None
+    generation_policy_versions: dict[str, str] = {}
+    generation_capacity_estimates: dict[str, GenerationEstimate] = {}
     database_url: SecretStr | None = None
     redis_url: SecretStr | None = None
 

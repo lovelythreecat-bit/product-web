@@ -21,7 +21,9 @@ def test_migration_environment_is_initialized(mysql_engine):
             connection.execute(text("SELECT version_num FROM alembic_version")).scalar_one()
             == expected_head
         )
-        assert connection.execute(text("SELECT DATABASE()")).scalar_one() == "ecommerce_ai_test"
+        assert (
+            connection.execute(text("SELECT DATABASE()")).scalar_one() == mysql_engine.url.database
+        )
 
 
 def test_real_mysql_commit_and_rollback(mysql_engine, mysql_probe_table):

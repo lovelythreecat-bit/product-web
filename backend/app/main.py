@@ -16,12 +16,14 @@ from app.common.errors import ErrorCode, ErrorResponse, error_response, register
 from app.common.health import LiveResponse, ReadyResponse
 from app.common.openapi import install_openapi
 from app.config import Settings
+from app.conversations.routes import router as conversations_router
 from app.db import create_db_engine
 from app.ledger.service import LedgerError
 from app.policies.service import PolicyGateError
 from app.storage.capacity import StorageError
 from app.storage.routes import router as storage_router
 from app.storage.validation import FileValidationError
+from app.tasks.routes import router as tasks_router
 
 
 def create_app(settings: Settings) -> FastAPI:
@@ -54,6 +56,8 @@ def create_app(settings: Settings) -> FastAPI:
     application.include_router(auth_router)
     application.include_router(catalog_router)
     application.include_router(storage_router)
+    application.include_router(conversations_router)
+    application.include_router(tasks_router)
     register_error_handlers(application)
 
     @application.exception_handler(FileValidationError)

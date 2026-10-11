@@ -8,6 +8,7 @@ from sqlalchemy import (
     Boolean,
     CheckConstraint,
     ForeignKey,
+    ForeignKeyConstraint,
     String,
     UniqueConstraint,
 )
@@ -54,12 +55,16 @@ class CreditGrant(Base):
 class CreditReservation(Base):
     __tablename__ = "credit_reservations"
     __table_args__ = (
+        ForeignKeyConstraint(
+            ["task_id", "user_id"],
+            ["generation_tasks.id", "generation_tasks.user_id"],
+            name="fk_credit_reservation_task_owner",
+        ),
         CheckConstraint("amount >= 0 AND version >= 1", name="ck_reservation_amount"),
         CheckConstraint("state IN ('frozen','consumed','released')", name="ck_reservation_state"),
     )
     id: Mapped[str] = mapped_column(String(36), primary_key=True)
     user_id: Mapped[str] = mapped_column(ForeignKey("users.id"))
-    # generation_tasks is introduced by T07; its FK is attached by that migration.
     task_id: Mapped[str] = mapped_column(String(36), unique=True)
     amount: Mapped[int] = mapped_column(BigInteger)
     state: Mapped[str] = mapped_column(String(16), default="frozen")
@@ -69,7 +74,14 @@ class CreditReservation(Base):
 
 class CreditLedger(Base):
     __tablename__ = "credit_ledger"
-    __table_args__ = (CheckConstraint("amount >= 0", name="ck_ledger_amount"),)
+    __table_args__ = (
+        CheckConstraint("amount >= 0", name="ck_ledger_amount"),
+        ForeignKeyConstraint(
+            ["task_id", "user_id"],
+            ["generation_tasks.id", "generation_tasks.user_id"],
+            name="fk_credit_ledger_task_owner",
+        ),
+    )
     id: Mapped[str] = mapped_column(String(36), primary_key=True)
     operation_key: Mapped[str] = mapped_column(String(200), unique=True)
     user_id: Mapped[str] = mapped_column(ForeignKey("users.id"), index=True)

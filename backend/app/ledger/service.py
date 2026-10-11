@@ -134,9 +134,18 @@ def grant_credits(session, user_id, kind, business_key, amount, reason, actor):
 
 
 def freeze_credits(session, user_id, task_id, amount):
+    from app.tasks.models import GenerationTask
+
     amount_valid(amount)
     user_id, task_id = str(user_id), str(task_id)
     account = locked_account(session, user_id)
+    task = session.scalar(
+        select(GenerationTask)
+        .where(GenerationTask.id == task_id, GenerationTask.user_id == user_id)
+        .with_for_update()
+    )
+    if task is None:
+        raise HTTPException(404)
     reservation = session.scalar(
         select(CreditReservation).where(CreditReservation.task_id == task_id).with_for_update()
     )

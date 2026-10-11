@@ -32,7 +32,7 @@ def mysql_settings(tmp_path_factory):
     url = make_url(raw_url)
     if (
         url.drivername != "mysql+pymysql"
-        or url.database != "ecommerce_ai_test"
+        or url.database not in ("ecommerce_ai_test", "ecommerce_ai_test_t07_20261011")
         or url.username != "ecommerce_test"
     ):
         pytest.fail("Refusing any database except ecommerce_test / ecommerce_ai_test on MySQL")
@@ -165,3 +165,113 @@ def auth_client(mysql_engine, mysql_settings, redis_namespace):
     with TestClient(app, base_url="https://testserver") as client:
         client.headers.update({"Origin": "https://testserver", "X-Requested-With": "platform"})
         yield client
+
+
+@pytest.fixture
+def ledger_task():
+    """Real relational task fixture for T04's isolated ledger transaction tests.
+
+    It does not call admission, because these tests exercise the freeze itself.
+    Every required task/product/conversation/capacity row is in the caller transaction.
+    """
+
+    def create(session, user_id, task_id, amount=30):
+        from app.catalog.schemas import content_digest
+        from app.conversations.models import Conversation, Product, ProductVersion
+        from app.ledger.service import locked_account, now
+        from app.policies.schemas import DecisionVersion
+        from app.policies.service import PolicyService
+        from app.storage.capacity import reserve_capacity
+        from app.tasks.models import GenerationTask, TaskSnapshot
+
+        user_id, task_id = str(user_id), str(task_id)
+        locked_account(session, user_id)
+        policy = "TEST_ONLY_" + uuid4().hex
+        PolicyService(session).add_draft(
+            DecisionVersion(
+                decision_id="D-10",
+                version=policy,
+                mode="mock",
+                test_only=True,
+                payload={
+                    "generation": {
+                        "account_quota_bytes": 200,
+                        "server_budget_bytes": 100000000,
+                        "reservation_seconds": 120,
+                        "reclamation_ref": "TEST_ONLY_fixture",
+                        "alert_ref": "TEST_ONLY_fixture",
+                    }
+                },
+            )
+        )
+        capacity = reserve_capacity(
+            session, user_id, "generation:" + task_id, 1, policy, mode="mock"
+        )
+        conversation = Conversation(
+            id=str(uuid4()), user_id=user_id, title="TEST_ONLY ledger", created_at=now()
+        )
+        product = Product(id=str(uuid4()), user_id=user_id)
+        session.add_all([conversation, product])
+        session.flush()
+        product_version = ProductVersion(
+            version=str(uuid4()),
+            user_id=user_id,
+            product_id=product.id,
+            product={"name": "TEST_ONLY cup"},
+            created_at=now(),
+        )
+        session.add(product_version)
+        session.flush()
+        agent_id, spec_id = str(uuid4()), str(uuid4())
+        input = {
+            "product_version": product_version.version,
+            "product": product_version.product,
+            "instruction": "TEST_ONLY ledger fixture",
+            "parameters": {},
+            "material_versions": [],
+        }
+        quote = {
+            "spec_id": spec_id,
+            "spec_version": "TEST_ONLY_v1",
+            "price_version": "TEST_ONLY_v1",
+            "agent_version": "TEST_ONLY_v1",
+            "policy_versions": {},
+            "credits": amount,
+            "input_digest": content_digest(input),
+        }
+        task = GenerationTask(
+            id=task_id,
+            user_id=user_id,
+            conversation_id=conversation.id,
+            idempotency_key=uuid4().hex,
+            request_hash=content_digest(input),
+            agent_id=agent_id,
+            agent_version="TEST_ONLY_v1",
+            external_submission_id=str(uuid4()),
+            state="SUBMITTED",
+            state_version=1,
+            settlement_state="FROZEN",
+            capacity_reservation_id=capacity.id,
+            fencing_token=0,
+            created_at=now(),
+        )
+        session.add(task)
+        session.flush()
+        session.add(
+            TaskSnapshot(
+                task_id=task_id,
+                user_id=user_id,
+                product_version=product_version.version,
+                input_snapshot=input,
+                quote=quote,
+                agent_snapshot={"agent_id": agent_id, "version": "TEST_ONLY_v1"},
+                spec_snapshot={"spec_id": spec_id, "version": "TEST_ONLY_v1"},
+                price_snapshot={"spec_id": spec_id, "version": "TEST_ONLY_v1", "credits": amount},
+                policy_versions={"D-10": policy},
+                capacity_estimate={"total_bytes": 1, "estimation_ref": "TEST_ONLY_fixture"},
+            )
+        )
+        session.flush()
+        return task
+
+    return create

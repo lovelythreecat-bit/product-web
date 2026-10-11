@@ -97,7 +97,7 @@ def test_concurrent_first_registration(auth_client, mysql_engine):
         )
 
 
-def test_grant_freeze_idempotency_conservation_rollback(auth_client, mysql_engine):
+def test_grant_freeze_idempotency_conservation_rollback(auth_client, mysql_engine, ledger_task):
     from sqlalchemy import select
     from sqlalchemy.orm import Session
 
@@ -115,12 +115,15 @@ def test_grant_freeze_idempotency_conservation_rollback(auth_client, mysql_engin
         assert grant_credits(s, user, "admin", key, 20, "TEST_ONLY extra", principal).id == grant.id
         with pytest.raises(LedgerError):
             grant_credits(s, user, "admin", key, 21, "TEST_ONLY extra", principal)
+        ledger_task(s, user, task)
         reserved = freeze_credits(s, user, task, 30)
         assert freeze_credits(s, user, task, 30).id == reserved.id
         with pytest.raises(LedgerError):
             freeze_credits(s, user, task, 31)
+        insufficient_task = uuid4()
+        ledger_task(s, user, insufficient_task, 1000)
         with pytest.raises(LedgerError) as exc:
-            freeze_credits(s, user, uuid4(), 1000)
+            freeze_credits(s, user, insufficient_task, 1000)
         assert exc.value.code == "INSUFFICIENT_CREDITS"
         account = s.get(CreditAccount, user)
         assert (account.available, account.frozen, account.consumed, account.credited_total) == (
@@ -248,7 +251,7 @@ def test_same_key_different_account_never_creates_second_user(auth_client, mysql
         )
 
 
-def test_concurrent_grants_and_freezes_serialize(auth_client, mysql_engine):
+def test_concurrent_grants_and_freezes_serialize(auth_client, mysql_engine, ledger_task):
     from sqlalchemy.orm import Session
 
     from app.auth.service import AuthService
@@ -260,6 +263,8 @@ def test_concurrent_grants_and_freezes_serialize(auth_client, mysql_engine):
     with Session(mysql_engine) as s:
         actor = AuthService(s).require_active_principal(auth_client.cookies["session"])
     key, task = uuid4().hex, uuid4()
+    with Session(mysql_engine) as s, s.begin():
+        ledger_task(s, user, task)
 
     def apply(_):
         with Session(mysql_engine) as s, s.begin():
@@ -288,7 +293,7 @@ def test_concurrent_grants_and_freezes_serialize(auth_client, mysql_engine):
         )
 
 
-def test_freeze_interrupt_rolls_back_caller_transaction(auth_client, mysql_engine):
+def test_freeze_interrupt_rolls_back_caller_transaction(auth_client, mysql_engine, ledger_task):
     from sqlalchemy import event
     from sqlalchemy.orm import Session
 
@@ -307,6 +312,7 @@ def test_freeze_interrupt_rolls_back_caller_transaction(auth_client, mysql_engin
     try:
         with pytest.raises(RuntimeError):
             with Session(mysql_engine) as s, s.begin():
+                ledger_task(s, user, task)
                 freeze_credits(s, user, task, 30)
     finally:
         event.remove(mysql_engine, "before_cursor_execute", interrupt)
