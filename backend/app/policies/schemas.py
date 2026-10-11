@@ -214,3 +214,23 @@ class DeploymentPolicy(PolicyData):
     rto_seconds: PositiveInt
     monitoring_ref: Text
     public_terms_ref: Text
+
+
+class InvestigationPolicy(PolicyData):
+    schema_version: Literal["investigations-v1"]
+    deadline_seconds: PositiveInt
+    responsible_user_id: UUID
+    escalation_ref: Annotated[str, Field(pattern=r"^[A-Za-z0-9_.:/-]{1,128}$")]
+    authorized_actor_ids: Annotated[list[UUID], Field(min_length=1)]
+    actions: Annotated[
+        list[Literal["resume_original", "confirm_failure", "manual_close", "settle"]],
+        Field(min_length=1),
+    ]
+    manual_release_basis: Literal["operator_review"]
+    capacity_on_close: Literal["retain_all"]
+    late_delivery: Literal["quarantine"]
+    evidence_types: Annotated[
+        list[Literal["review", "upstream_failure", "durable_delivery"]], Field(min_length=1)
+    ]
+    deadline_is_failure: Literal[False]
+    requires_complete_delivery: Literal[True]

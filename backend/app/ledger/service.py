@@ -275,7 +275,7 @@ def lock_task_resources(session, task_id):
     return task, account, reservation
 
 
-def _settle(session, task_id, evidence, kind):
+def _settle(session, task_id, evidence, kind, *, manual_close=False):
     from app.dispatch.consumer import lease_matches
     from app.dispatch.recovery import database_now
     from app.ledger.schemas import SettlementReceipt
@@ -288,7 +288,11 @@ def _settle(session, task_id, evidence, kind):
     target, state, proof_kind = (
         ("SUCCEEDED", "consumed", "publication")
         if kind == "consume"
-        else ("FAILED", "released", "definite_failure")
+        else (
+            ("MANUALLY_CLOSED", "released", "manual_close")
+            if manual_close
+            else ("FAILED", "released", "definite_failure")
+        )
     )
     registry = session.info.get("transition_verifiers")
     if not isinstance(registry, TransitionVerifiers):
@@ -339,7 +343,7 @@ def _settle(session, task_id, evidence, kind):
         balances_after=balances(account),
         reason="complete original publication"
         if kind == "consume"
-        else "verified upstream failure",
+        else ("policy authorized manual close" if manual_close else "verified upstream failure"),
         created_at=database_now(session),
     )
     session.add(row)
@@ -352,15 +356,26 @@ def settle_credits(session, task_id, delivery_evidence):
     return _settle(session, task_id, delivery_evidence, "consume")
 
 
-def release_credits(session, task_id, failure_or_policy_evidence):
-    """T10 definite failure only; T13 manual policy is deliberately unsupported."""
-    from app.storage.capacity import release_capacity
+def release_credits(session, task_id, failure_or_policy_evidence, *, manual_close=False):
+    """Same unique settlement; manual close requires a transaction-bound D-08 verifier."""
+    from app.storage.capacity import release_capacity, retain_original_capacity
     from app.tasks.models import GenerationTask
     from app.tasks.state_machine import transition_task
 
-    receipt = _settle(session, task_id, failure_or_policy_evidence, "release")
+    receipt = _settle(
+        session, task_id, failure_or_policy_evidence, "release", manual_close=manual_close
+    )
     if receipt.changed:
         task = session.get(GenerationTask, str(task_id))
-        release_capacity(session, task.capacity_reservation_id)
-        transition_task(session, task.id, task.state_version, "FAILED", failure_or_policy_evidence)
+        if manual_close:
+            retain_original_capacity(session, task)
+        else:
+            release_capacity(session, task.capacity_reservation_id)
+        transition_task(
+            session,
+            task.id,
+            task.state_version,
+            "MANUALLY_CLOSED" if manual_close else "FAILED",
+            failure_or_policy_evidence,
+        )
     return receipt

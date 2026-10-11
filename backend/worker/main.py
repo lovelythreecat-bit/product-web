@@ -26,10 +26,13 @@ logger = logging.getLogger(__name__)
 
 
 class Worker:
-    def __init__(self, dispatcher, scheduler, consumer):
+    def __init__(self, dispatcher, scheduler, consumer, investigations=None):
         self.dispatcher, self.scheduler, self.consumer = dispatcher, scheduler, consumer
+        self.investigations = investigations
 
     def tick(self):
+        if self.investigations:
+            self.investigations.scan(self.scheduler.task_ids)
         recovery = self.scheduler.recover_due_tasks()
         dispatch = self.dispatcher.dispatch_pending()
         consume = self.consumer.consume_once()
@@ -49,6 +52,7 @@ def compose_worker(
             "investigate",
         )
     }
+    from app.investigations.service import InvestigationService
     from app.results.persistence import ResultPersistence
     from app.results.publisher import ResultPublisher
 
@@ -62,6 +66,7 @@ def compose_worker(
         OutboxDispatcher(factory, redis, stream, task_ids=task_ids),
         RecoveryScheduler(factory, task_ids=task_ids),
         TaskConsumer(factory, redis, stream, group, worker_id, handlers=handlers),
+        InvestigationService(factory, upstream=service, mode=registry.mode),
     )
 
 

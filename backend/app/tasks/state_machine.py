@@ -254,6 +254,10 @@ def transition_task(session, task_id, expected_version, event, evidence):
         {"task_id": task.id, "state": task.state, "state_version": task.state_version},
         event_key=f"task:{task.id}:state:{task.state_version}",
     )
+    if event in TERMINAL_STATES:
+        from app.investigations.service import complete_from_task
+
+        complete_from_task(session, task, evidence)
     if event not in TERMINAL_STATES:
         enqueue_outbox(
             session, task.id, "save" if event in {"SAVING", "SAVE_RECOVERY"} else "recover"

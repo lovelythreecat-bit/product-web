@@ -19,12 +19,14 @@ from app.common.openapi import install_openapi
 from app.config import Settings
 from app.conversations.routes import router as conversations_router
 from app.db import create_db_engine
+from app.investigations.routes import router as investigations_router
 from app.ledger.service import LedgerError
 from app.policies.service import PolicyGateError
 from app.storage.capacity import StorageError
 from app.storage.routes import router as storage_router
 from app.storage.validation import FileValidationError
 from app.tasks.routes import router as tasks_router
+from app.tasks.state_machine import TransitionError
 
 
 def create_app(settings: Settings) -> FastAPI:
@@ -60,6 +62,7 @@ def create_app(settings: Settings) -> FastAPI:
     application.include_router(storage_router)
     application.include_router(conversations_router)
     application.include_router(tasks_router)
+    application.include_router(investigations_router)
     register_error_handlers(application)
 
     @application.exception_handler(FileValidationError)
@@ -87,6 +90,10 @@ def create_app(settings: Settings) -> FastAPI:
     @application.exception_handler(PolicyGateError)
     async def policy_error(request, exc):
         return error_response(403, ErrorCode.FEATURE_NOT_ENABLED, "当前功能尚未启用。")
+
+    @application.exception_handler(TransitionError)
+    async def transition_error(request, exc):
+        return error_response(409, ErrorCode.IDEMPOTENCY_CONFLICT, "当前状态或证据不允许此操作。")
 
     install_openapi(application)
 

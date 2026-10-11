@@ -172,3 +172,56 @@ def release_capacity(session, reservation_id):
         reservation.state = "released"
         session.flush()
     return reservation
+
+
+def retain_original_capacity(session, task):
+    """Protect every fixed original save identity, including journal/in-flight items.
+
+    Called after user/credits/capacity/task locks. Save identities are committed
+    before any T11 disk write; no filesystem probe or upstream I/O is needed here.
+    Keep the original reservation and increase it when declared bytes exceeded its
+    estimate. Capacity exhaustion aborts the caller's entire manual settlement.
+    """
+    from app.results.models import ResultManifestRecord, ResultSaveItem
+    from app.storage.models import File
+
+    pool, account, reservation = reservation_locks(session, task.capacity_reservation_id)
+    jobs = session.scalars(
+        select(ResultSaveItem)
+        .join(ResultManifestRecord, ResultManifestRecord.id == ResultSaveItem.manifest_id)
+        .where(ResultManifestRecord.task_id == task.id)
+        .with_for_update(read=True)
+        .execution_options(populate_existing=True)
+    ).all()
+    files = session.scalars(
+        select(File)
+        .where(File.reservation_id == reservation.id, File.user_id == task.user_id)
+        .with_for_update(read=True)
+        .execution_options(populate_existing=True)
+    ).all()
+    identities = {}
+    for row in jobs:
+        valid_bytes(row.actual_bytes)
+        key = (row.file_id, row.file_version)
+        identities[key] = max(identities.get(key, 0), row.actual_bytes)
+    for row in files:
+        valid_bytes(row.actual_bytes)
+        key = (row.id, row.version)
+        identities[key] = max(identities.get(key, 0), row.actual_bytes)
+    protected_bytes = sum(identities.values())
+    valid_bytes(protected_bytes, zero=True)
+    if reservation.state == "finalized" and reservation.actual_bytes >= protected_bytes:
+        return reservation
+    if reservation.state != "reserved":
+        raise StorageError("IDEMPOTENCY_CONFLICT")
+    delta = max(0, protected_bytes - reservation.estimated_bytes)
+    if (
+        delta > pool.budget_bytes - pool.actual_bytes - pool.reserved_bytes
+        or delta > account.quota_bytes - account.actual_bytes - account.reserved_bytes
+    ):
+        raise StorageError()
+    pool.reserved_bytes += delta
+    account.reserved_bytes += delta
+    reservation.estimated_bytes += delta
+    session.flush()
+    return reservation

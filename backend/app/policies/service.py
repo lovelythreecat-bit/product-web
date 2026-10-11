@@ -46,6 +46,7 @@ class PolicyConflictError(Exception):
 
 # This is a minimum schema per feature, not a declaration that any policy is decided.
 FIXED_REQUIREMENTS = {
+    "investigations": (("D-08", "investigations", s.InvestigationPolicy),),
     "registration": (("D-05", "registration", s.Credits),),
     "prompt_assist": (("D-05", "assist", s.AssistPolicy),),
     "upload": (("D-10", "upload", s.UploadPolicy),),

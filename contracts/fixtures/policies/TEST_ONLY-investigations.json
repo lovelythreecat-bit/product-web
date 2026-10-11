@@ -1,0 +1,23 @@
+{
+  "decision_id": "D-08",
+  "version": "TEST_ONLY_investigations_v1",
+  "mode": "mock",
+  "test_only": true,
+  "status": "draft",
+  "payload": {
+    "investigations": {
+      "schema_version": "investigations-v1",
+      "deadline_seconds": 3600,
+      "responsible_user_id": "00000000-0000-4000-8000-000000000001",
+      "escalation_ref": "TEST_ONLY:operations",
+      "authorized_actor_ids": ["00000000-0000-4000-8000-000000000001"],
+      "actions": ["resume_original", "confirm_failure", "manual_close", "settle"],
+      "manual_release_basis": "operator_review",
+      "capacity_on_close": "retain_all",
+      "late_delivery": "quarantine",
+      "evidence_types": ["review", "upstream_failure", "durable_delivery"],
+      "deadline_is_failure": false,
+      "requires_complete_delivery": true
+    }
+  }
+}
