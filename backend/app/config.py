@@ -15,6 +15,7 @@ class Settings(BaseSettings):
     auth_origins: list[str] = []
     storage_root: Path | None = None
     storage_persistent: bool = False
+    storage_policy_version: str | None = None
     database_url: SecretStr | None = None
     redis_url: SecretStr | None = None
 

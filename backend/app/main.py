@@ -19,6 +19,9 @@ from app.config import Settings
 from app.db import create_db_engine
 from app.ledger.service import LedgerError
 from app.policies.service import PolicyGateError
+from app.storage.capacity import StorageError
+from app.storage.routes import router as storage_router
+from app.storage.validation import FileValidationError
 
 
 def create_app(settings: Settings) -> FastAPI:
@@ -50,7 +53,16 @@ def create_app(settings: Settings) -> FastAPI:
     application.state.auth_rate_prefix = "auth-rate:"
     application.include_router(auth_router)
     application.include_router(catalog_router)
+    application.include_router(storage_router)
     register_error_handlers(application)
+
+    @application.exception_handler(FileValidationError)
+    async def upload_validation_error(request, exc):
+        return error_response(422, ErrorCode.INPUT_INVALID, exc.public_message)
+
+    @application.exception_handler(StorageError)
+    async def storage_error(request, exc):
+        return error_response(exc.status_code, ErrorCode(exc.code), "存储请求无法完成。")
 
     @application.exception_handler(CatalogError)
     async def catalog_error(request, exc):
