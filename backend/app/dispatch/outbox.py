@@ -8,7 +8,6 @@ from redis.exceptions import RedisError
 from sqlalchemy import select, text, update
 
 from app.dispatch.models import OutboxEvent
-from app.ledger.service import now
 from app.tasks.models import GenerationTask
 
 
@@ -36,7 +35,7 @@ def enqueue_outbox(session, task_id, operation):
             user_id=task.user_id,
             state_version=task.state_version,
             operation=operation,
-            ready_at=now(),
+            ready_at=text("UTC_TIMESTAMP(6)"),
             attempts=0,
         )
         session.add(row)

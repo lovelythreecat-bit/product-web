@@ -1,4 +1,4 @@
-"""Independent worker loop. No upstream integration is enabled by default.
+"""Independent worker loop with trusted TEST_ONLY upstream composition.
 
 Run from backend: python -m worker.main --stream <deployment-owned-stream>
 T09-T13 compose TaskConsumer with trusted stage handlers; missing handlers remain due.
@@ -14,6 +14,8 @@ from redis import Redis
 from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.orm import sessionmaker
 
+from app.agents.registry import AgentRegistry
+from app.agents.upstream import UpstreamService
 from app.config import Settings
 from app.db import create_db_engine
 from app.dispatch.consumer import TaskConsumer
@@ -34,6 +36,25 @@ class Worker:
         return recovery, dispatch, consume
 
 
+def compose_worker(factory, redis, stream, group, worker_id, *, registry, task_ids=None):
+    service = UpstreamService(factory, registry)
+    handlers = {
+        action: service.handle
+        for action in (
+            "prepare_submission",
+            "reconcile_submission",
+            "query_original",
+            "investigate",
+        )
+    }
+    # T10/T11 own result reduction/save_original; no completion or settlement here.
+    return Worker(
+        OutboxDispatcher(factory, redis, stream, task_ids=task_ids),
+        RecoveryScheduler(factory, task_ids=task_ids),
+        TaskConsumer(factory, redis, stream, group, worker_id, handlers=handlers),
+    )
+
+
 def main(argv=None):
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--stream", required=True)
@@ -52,10 +73,13 @@ def main(argv=None):
         settings.redis_url.get_secret_value(), socket_timeout=3, socket_connect_timeout=3
     )
     factory = sessionmaker(engine, expire_on_commit=False)
-    worker = Worker(
-        OutboxDispatcher(factory, redis, args.stream),
-        RecoveryScheduler(factory),
-        TaskConsumer(factory, redis, args.stream, args.group, args.worker_id),
+    worker = compose_worker(
+        factory,
+        redis,
+        args.stream,
+        args.group,
+        args.worker_id,
+        registry=AgentRegistry(mode=settings.mode, test_only=settings.test_only),
     )
     stop = Event()
     for signum in (signal.SIGINT, signal.SIGTERM):

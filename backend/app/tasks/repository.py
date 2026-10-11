@@ -55,3 +55,41 @@ class TaskRepository:
         return CursorPage[TaskView](
             items=[task_view(self.session, r) for r in rows], next_cursor=next_cursor
         )
+
+
+def locked_execution(session, task_id, lease):
+    """Common T09 user→task ownership lock, with database-time fencing."""
+    from app.auth.models import User
+    from app.dispatch.consumer import lease_matches
+    from app.dispatch.recovery import database_now
+    from app.tasks.state_machine import TransitionError
+
+    user_id = session.scalar(select(GenerationTask.user_id).where(GenerationTask.id == task_id))
+    if user_id is None:
+        raise TransitionError("TASK_NOT_FOUND")
+    session.scalar(select(User).where(User.id == user_id).with_for_update())
+    task = session.scalar(
+        select(GenerationTask)
+        .where(GenerationTask.id == task_id)
+        .with_for_update()
+        .execution_options(populate_existing=True)
+    )
+    if not lease_matches(task, lease, database_now(session)):
+        raise TransitionError("LEASE_LOST")
+    return task
+
+
+def original_submission_snapshot(session, task_id):
+    snapshot = session.get(TaskSnapshot, task_id)
+    return {
+        field: getattr(snapshot, field)
+        for field in (
+            "input_snapshot",
+            "agent_snapshot",
+            "spec_snapshot",
+            "price_snapshot",
+            "quote",
+            "policy_versions",
+            "capacity_estimate",
+        )
+    }

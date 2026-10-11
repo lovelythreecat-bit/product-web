@@ -1,7 +1,7 @@
 """T08 crash recovery on real MySQL and isolated Redis keys."""
 
 from concurrent.futures import ThreadPoolExecutor
-from datetime import timedelta
+from datetime import datetime, timedelta
 from uuid import uuid4
 
 import pytest
@@ -11,6 +11,7 @@ from sqlalchemy.orm import Session, sessionmaker
 from app.auth.models import User
 from app.dispatch.models import OutboxEvent
 from app.dispatch.outbox import enqueue_outbox
+from app.dispatch.recovery import database_now
 from app.events.models import DurableEvent
 from app.ledger.models import CreditAccount, CreditLedger, CreditReservation
 from app.ledger.service import freeze_credits, now
@@ -95,6 +96,34 @@ def facts(factory, task_id):
             ),
             s.scalar(select(CreditReservation.state).where(CreditReservation.task_id == task_id)),
         )
+
+
+@pytest.mark.parametrize("host_offset_seconds", [-30, 30])
+def test_initial_outbox_is_immediately_due_despite_host_clock_skew(
+    task_factory, runtime, monkeypatch, host_offset_seconds
+):
+    from app.ledger import service
+
+    class SkewedHostDatetime(datetime):
+        @classmethod
+        def now(cls, tz=None):
+            return datetime.now(tz) + timedelta(seconds=host_offset_seconds)
+
+    monkeypatch.setattr(service, "datetime", SkewedHostDatetime)
+    factory, redis, stream, dispatcher, _, _ = runtime
+    with factory() as s:
+        before = database_now(s)
+    task_id = task_factory()
+    original = facts(factory, task_id)
+    with factory() as s:
+        row = s.scalar(select(OutboxEvent).where(OutboxEvent.task_id == task_id))
+        # Immediate admission uses the same clock as dispatch, in either skew direction.
+        assert before <= row.ready_at <= database_now(s)
+    assert dispatcher.dispatch_pending(1000).dispatched == 1
+    records = redis.xrange(stream)
+    assert len(records) == 1
+    assert records[0][1][b"task_id"].decode() == task_id
+    assert facts(factory, task_id) == original
 
 
 def test_commit_then_redis_failure(task_factory, runtime):
@@ -548,10 +577,14 @@ def test_known_original_cannot_be_resubmitted(task_factory, runtime, state):
 
 
 @pytest.mark.parametrize("basis", ["reliable_idempotency", "proven_not_accepted"])
-def test_verified_original_retry_is_same_task_and_one_freeze(task_factory, runtime, basis):
+@pytest.mark.parametrize("proof_offset_seconds", [0, 30])
+def test_verified_original_retry_is_same_task_and_one_freeze(
+    task_factory, runtime, basis, proof_offset_seconds
+):
     from app.dispatch.consumer import LeaseManager
     from app.tasks.state_machine import (
         SafeRetryEvidence,
+        TransitionError,
         TransitionEvidence,
         TransitionVerifiers,
         VerifiedTransition,
@@ -579,12 +612,22 @@ def test_verified_original_retry_is_same_task_and_one_freeze(task_factory, runti
                 source.id,
                 "TEST_ONLY_protocol",
                 safe_retry=SafeRetryEvidence(
-                    "TEST_ONLY_protocol", basis, source.id, "TEST_ONLY_verifier", now()
+                    "TEST_ONLY_protocol",
+                    basis,
+                    source.id,
+                    "TEST_ONLY_verifier",
+                    database_now(s) + timedelta(seconds=proof_offset_seconds),
                 ),
             )
 
         source_id = s.scalar(select(TaskStateEvent.id).where(TaskStateEvent.task_id == task_id))
         s.info["transition_verifiers"] = TransitionVerifiers({"safe_retry": verified})
+        if proof_offset_seconds > 0:
+            with pytest.raises(TransitionError, match="EVIDENCE_REQUIRED"):
+                transition_task(s, task_id, 1, "SUBMITTING", TransitionEvidence(lease, source_id))
+            assert (task.state, task.state_version) == ("INVESTIGATING", 1)
+            assert facts(factory, task_id) == original
+            return
         receipt = transition_task(s, task_id, 1, "SUBMITTING", TransitionEvidence(lease, source_id))
         assert receipt.state == "SUBMITTING"
     assert facts(factory, task_id) == original

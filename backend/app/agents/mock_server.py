@@ -96,7 +96,8 @@ class Simulator:
         self.records = {}
         self.tasks = {}
         self.instance_id = str(uuid4())
-        self.started = time.time()
+        self.started = int(time.time())
+        self.sequence = 0
 
     def record(self, agent, external):
         key = agent, external
@@ -109,11 +110,18 @@ class Simulator:
         return self.records[key]
 
     def proof(self, agent, external):
-        return wire(agent_id=agent, external_submission_id=external,
-                    reference=f"{self.instance_id}:{agent}:{external}",
-                    verified_by="TEST_ONLY.atomic_simulator", verified_at=time.time(),
-                    coverage_start=self.started, coverage_end=time.time(),
-                    consistency="atomic_simulator_lifetime")
+        # Integer server seconds are descriptive bounds, never cross-host ordering.
+        # The atomic instance-local sequence supplies exact coverage of prior checkpoints.
+        with self.lock:
+            self.sequence += 1
+            current = int(time.time())
+            return wire(agent_id=agent, external_submission_id=external,
+                        reference=f"{self.instance_id}:{agent}:{external}",
+                        verified_by="TEST_ONLY.atomic_simulator", verified_at=current,
+                        coverage_start=self.started, coverage_end=current,
+                        consistency="atomic_simulator_lifetime", scope_instance_id=self.instance_id,
+                        coverage_start_sequence=0, coverage_end_sequence=self.sequence,
+                        verified_sequence=self.sequence)
 
     def configure(self, agent, external, body):
         if set(body) != {"scenario"} or body["scenario"] not in SCENARIOS:
@@ -141,7 +149,10 @@ class Simulator:
 
     def submit(self, agent, body):
         external, snapshot = body.get("external_submission_id"), body.get("snapshot")
-        if (set(body) != {"external_submission_id", "snapshot"}
+        expected_instance = body.get("expected_instance_id")
+        if expected_instance is not None and expected_instance != self.instance_id:
+            raise ProtocolError("INSTANCE_CHANGED", 409)
+        if (set(body) - {"expected_instance_id"} != {"external_submission_id", "snapshot"}
                 or not isinstance(external, str) or not ID.fullmatch(external)
                 or not isinstance(snapshot, dict)):
             raise ProtocolError("INVALID_SUBMISSION")
@@ -222,7 +233,11 @@ class Simulator:
     def route(self, method, path, body):
         parts = path.strip("/").split("/")
         if method == "GET" and path == "/health/live":
-            return 200, wire(live=True, mode="mock", instance_id=self.instance_id)
+            with self.lock:
+                self.sequence += 1
+                return 200, wire(live=True, mode="mock", instance_id=self.instance_id,
+                                 started=self.started, sequence=self.sequence,
+                                 observed_at=int(time.time()))
         with self.lock:
             if len(parts) == 5 and parts[:2] == ["__test__", "agents"]:
                 _, _, agent, operation, external = parts

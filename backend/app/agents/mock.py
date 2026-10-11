@@ -91,12 +91,34 @@ class MockAgentAdapter:
             raise ValueError("Invalid agent identifier")
         return identifier
 
+    def retry_scope(self):
+        """Instance-scoped idempotency only; unavailable probes never authorize retries."""
+        try:
+            status, payload = self._request("GET", "/health/live")
+            self._validate_wire(payload)
+            if (status != 200 or not ID.fullmatch(payload.get("instance_id", ""))
+                    or any(type(payload.get(key)) is not int for key in
+                           ("started", "observed_at", "sequence"))
+                    or payload["sequence"] < 1 or payload["started"] > payload["observed_at"]):
+                return None
+            return {key: payload[key] for key in
+                    ("instance_id", "started", "observed_at", "sequence")}
+        except (URLError, OSError, ValueError, TypeError):
+            return None
+
+    def submit_scoped(self, snapshot, external_submission_id, scope):
+        return self._submit(snapshot, external_submission_id, scope["instance_id"])
+
     def submit(self, snapshot: Mapping[str, Any], external_submission_id: str) -> SubmitOutcome:
+        return self._submit(snapshot, external_submission_id)
+
+    def _submit(self, snapshot, external_submission_id, instance_id=None):
         external = self._id(external_submission_id)
         fallback = dict(protocol_version=PROTOCOL, test_only=True, external_submission_id=external)
         try:
             status, payload = self._request("POST", f"/v1/{self.agent_id}/submissions", {
                 "snapshot": dict(snapshot), "external_submission_id": external,
+                **({"expected_instance_id": instance_id} if instance_id else {}),
             })
             self._validate_wire(payload)
             if status in (400, 409, 413, 415):

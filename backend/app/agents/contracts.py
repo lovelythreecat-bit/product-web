@@ -48,6 +48,11 @@ class AbsenceProof(Contract):
     coverage_end: float
     consistency: str
     test_only: bool = False
+    # Optional for other protocols; mandatory in the trusted TEST_ONLY sequence extension.
+    scope_instance_id: str | None = None
+    coverage_start_sequence: int | None = Field(default=None, strict=True, ge=0)
+    coverage_end_sequence: int | None = Field(default=None, strict=True, ge=0)
+    verified_sequence: int | None = Field(default=None, strict=True, ge=0)
 
     @model_validator(mode="after")
     def covered(self):

@@ -1,6 +1,14 @@
 """Explicit adapter registrations; drafts and TEST_ONLY implementations fail closed."""
 
+from dataclasses import dataclass
+
+from app.catalog.models import AgentRecord
+from app.catalog.schemas import AgentVersion, content_digest
+from app.tasks.models import TaskSnapshot
+
 from .contracts import AgentAdapter
+from .mock import MockAgentAdapter
+from .mock_server import PROTOCOL
 
 
 class AgentRegistry:
@@ -24,3 +32,45 @@ class AgentRegistry:
             return self._adapters[agent_id, protocol_version]
         except KeyError:
             raise LookupError("Agent protocol is not enabled") from None
+
+    def bind_task(self, session, task):
+        """Resolve only the fixed server-side catalog version, never user routing fields."""
+        record = session.get(AgentRecord, (task.agent_id, task.agent_version))
+        snapshot = session.get(TaskSnapshot, task.id)
+        if record is None or snapshot is None or snapshot.agent_snapshot != record.snapshot:
+            raise LookupError("Agent binding unavailable")
+        version = AgentVersion.model_validate(record.snapshot)
+        if (str(version.agent_id), version.version) != (task.agent_id, task.agent_version):
+            raise LookupError("Agent binding identity mismatch")
+        if (
+            self.mode != "mock"
+            or not self.test_only
+            or version.mode != "mock"
+            or not version.test_only
+            or version.protocol_version != PROTOCOL
+        ):
+            raise LookupError("No confirmed upstream integration enabled")
+        adapter = MockAgentAdapter(
+            agent_id=version.kind,
+            base_url=record.endpoint,
+            mode=self.mode,
+            test_only=self.test_only,
+        )
+        return AgentBinding(
+            task.agent_id,
+            task.agent_version,
+            version.kind,
+            version.protocol_version,
+            content_digest(record.endpoint),
+            adapter,
+        )
+
+
+@dataclass(frozen=True)
+class AgentBinding:
+    agent_id: str
+    agent_version: str
+    wire_agent_id: str
+    protocol_version: str
+    endpoint_digest: str
+    adapter: AgentAdapter
