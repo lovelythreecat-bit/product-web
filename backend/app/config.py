@@ -12,6 +12,7 @@ class Settings(BaseSettings):
 
     mode: Literal["mock", "staging", "production"] = "mock"
     test_only: bool = True
+    auth_origins: list[str] = []
     storage_root: Path | None = None
     storage_persistent: bool = False
     database_url: SecretStr | None = None

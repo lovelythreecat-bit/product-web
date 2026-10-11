@@ -123,3 +123,45 @@ def redis_namespace():
         if keys:
             client.delete(*keys)
         client.close()
+
+
+@pytest.fixture
+def auth_client(mysql_engine, mysql_settings, redis_namespace):
+    from fastapi.testclient import TestClient
+
+    from app.main import create_app
+
+    redis, prefix = redis_namespace
+    from sqlalchemy.orm import Session
+
+    from app.ledger.models import RegistrationCreditHead
+    from app.ledger.service import set_registration_credit_config
+    from app.policies.schemas import DecisionVersion
+    from app.policies.service import PolicyService
+
+    with Session(mysql_engine) as session, session.begin():
+        version = "TEST_ONLY_" + uuid4().hex
+        PolicyService(session).add_draft(
+            DecisionVersion(
+                decision_id="D-05",
+                version=version,
+                mode="mock",
+                test_only=True,
+                payload={"registration": {"credits": 100}},
+            )
+        )
+        head = session.get(RegistrationCreditHead, "mock")
+        set_registration_credit_config(
+            session,
+            mode="mock",
+            expected_version=head.version if head else None,
+            amount=100,
+            policy_version=version,
+            reason="TEST_ONLY fixture",
+        )
+    app = create_app(mysql_settings.model_copy(update={"auth_origins": ["https://testserver"]}))
+    app.state.auth_rate_prefix = prefix
+    app.state.auth_redis = redis
+    with TestClient(app, base_url="https://testserver") as client:
+        client.headers.update({"Origin": "https://testserver", "X-Requested-With": "platform"})
+        yield client

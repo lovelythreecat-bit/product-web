@@ -5,14 +5,18 @@ import tempfile
 from contextlib import asynccontextmanager
 
 from fastapi import FastAPI, Response
+from redis import Redis
 from sqlalchemy import text
 from sqlalchemy.exc import SQLAlchemyError
 
-from app.common.errors import ErrorResponse, register_error_handlers
+from app.auth.routes import router as auth_router
+from app.common.errors import ErrorCode, ErrorResponse, error_response, register_error_handlers
 from app.common.health import LiveResponse, ReadyResponse
 from app.common.openapi import install_openapi
 from app.config import Settings
 from app.db import create_db_engine
+from app.ledger.service import LedgerError
+from app.policies.service import PolicyGateError
 
 
 def create_app(settings: Settings) -> FastAPI:
@@ -21,6 +25,8 @@ def create_app(settings: Settings) -> FastAPI:
     @asynccontextmanager
     async def lifespan(application: FastAPI):
         yield
+        if application.state.auth_redis is not None:
+            application.state.auth_redis.close()
         if engine is not None:
             engine.dispose()
 
@@ -32,7 +38,25 @@ def create_app(settings: Settings) -> FastAPI:
     )
     application.state.settings = settings
     application.state.engine = engine
+    application.state.auth_redis = (
+        Redis.from_url(
+            settings.redis_url.get_secret_value(), socket_timeout=3, socket_connect_timeout=3
+        )
+        if settings.redis_url
+        else None
+    )
+    application.state.auth_rate_prefix = "auth-rate:"
+    application.include_router(auth_router)
     register_error_handlers(application)
+
+    @application.exception_handler(LedgerError)
+    async def ledger_error(request, exc):
+        return error_response(exc.status_code, ErrorCode(exc.code), "请求无法完成。")
+
+    @application.exception_handler(PolicyGateError)
+    async def policy_error(request, exc):
+        return error_response(403, ErrorCode.FEATURE_NOT_ENABLED, "当前功能尚未启用。")
+
     install_openapi(application)
 
     @application.get("/api/v1/health/live", response_model=LiveResponse, operation_id="health_live")
