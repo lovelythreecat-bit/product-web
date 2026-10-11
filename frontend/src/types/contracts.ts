@@ -207,6 +207,26 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/assist/prompts": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Prepare Prompt
+         * @description Prepare a draft; request_key is the required Idempotency-Key header, not a body field.
+         */
+        post: operations["prepare_prompt"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/auth/login": {
         parameters: {
             query?: never;
@@ -629,6 +649,60 @@ export interface components {
             policy_version: string;
             /** Reason */
             reason: string;
+        };
+        /** AssistProposal */
+        AssistProposal: {
+            /** Agent Version */
+            agent_version: string;
+            /** Missing Facts */
+            missing_facts: string[];
+            /** Original */
+            original: string;
+            /** Parameters */
+            parameters: {
+                [key: string]: string | number | boolean;
+            };
+            /** Policy Version */
+            policy_version: string;
+            /** Proposed */
+            proposed: string;
+            /** Spec Version */
+            spec_version: string;
+            /**
+             * Test Only
+             * @default true
+             * @constant
+             */
+            test_only: true;
+        };
+        /** AssistRequest */
+        AssistRequest: {
+            /**
+             * Agent Id
+             * Format: uuid
+             */
+            agent_id: string;
+            /** Agent Version */
+            agent_version: string;
+            /** Material Versions */
+            material_versions: components["schemas"]["FileVersionRef"][];
+            /** Original */
+            original: string;
+            /** Parameters */
+            parameters: {
+                [key: string]: string | number | boolean;
+            };
+            /** Product */
+            product: {
+                [key: string]: unknown;
+            };
+            /**
+             * Spec Id
+             * Format: uuid
+             */
+            spec_id: string;
+            /** Spec Version */
+            spec_version: string;
         };
         /** AuthView */
         AuthView: {
@@ -2520,6 +2594,125 @@ export interface operations {
             };
             /** @description Internal Server Error */
             500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    prepare_prompt: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description request_key is carried only in this required Idempotency-Key header. Reuse the key for the same draft request to replay its completed result; reusing it with different input returns 409. */
+                "Idempotency-Key": string;
+                /** @description Required token bound to this session and csrf_token cookie; omission or mismatch returns 403. */
+                "X-CSRF-Token": string;
+                /** @description Required exact allowlisted Origin; browsers send this automatically. Do not set Origin in frontend JavaScript. */
+                origin: string;
+                /** @description Required literal platform; omission or mismatch returns 403. */
+                "X-Requested-With": string;
+            };
+            path?: never;
+            cookie: {
+                /** @description Required session-bound CSRF cookie; omission or mismatch returns 403. */
+                csrf_token: string;
+                /** @description Required Secure HttpOnly session cookie; omission or invalid session returns 401. */
+                session: string;
+            };
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["AssistRequest"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AssistProposal"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unprocessable Entity */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Too Many Requests */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Internal Server Error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Service Unavailable */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Gateway Timeout */
+            504: {
                 headers: {
                     [name: string]: unknown;
                 };

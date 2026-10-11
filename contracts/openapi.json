@@ -328,6 +328,157 @@
         "title": "AssignInvestigation",
         "type": "object"
       },
+      "AssistProposal": {
+        "additionalProperties": false,
+        "properties": {
+          "agent_version": {
+            "maxLength": 128,
+            "minLength": 1,
+            "pattern": "^[\\w.-]+$",
+            "title": "Agent Version",
+            "type": "string"
+          },
+          "missing_facts": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Missing Facts",
+            "type": "array"
+          },
+          "original": {
+            "title": "Original",
+            "type": "string"
+          },
+          "parameters": {
+            "additionalProperties": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "boolean"
+                }
+              ]
+            },
+            "title": "Parameters",
+            "type": "object"
+          },
+          "policy_version": {
+            "maxLength": 128,
+            "minLength": 1,
+            "pattern": "^[\\w.-]+$",
+            "title": "Policy Version",
+            "type": "string"
+          },
+          "proposed": {
+            "title": "Proposed",
+            "type": "string"
+          },
+          "spec_version": {
+            "maxLength": 128,
+            "minLength": 1,
+            "pattern": "^[\\w.-]+$",
+            "title": "Spec Version",
+            "type": "string"
+          },
+          "test_only": {
+            "const": true,
+            "default": true,
+            "title": "Test Only",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "original",
+          "proposed",
+          "missing_facts",
+          "policy_version",
+          "parameters",
+          "agent_version",
+          "spec_version"
+        ],
+        "title": "AssistProposal",
+        "type": "object"
+      },
+      "AssistRequest": {
+        "additionalProperties": false,
+        "properties": {
+          "agent_id": {
+            "format": "uuid",
+            "title": "Agent Id",
+            "type": "string"
+          },
+          "agent_version": {
+            "maxLength": 128,
+            "minLength": 1,
+            "pattern": "^[\\w.-]+$",
+            "title": "Agent Version",
+            "type": "string"
+          },
+          "material_versions": {
+            "items": {
+              "$ref": "#/components/schemas/FileVersionRef"
+            },
+            "maxItems": 100,
+            "title": "Material Versions",
+            "type": "array"
+          },
+          "original": {
+            "maxLength": 20000,
+            "title": "Original",
+            "type": "string"
+          },
+          "parameters": {
+            "additionalProperties": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "boolean"
+                }
+              ]
+            },
+            "title": "Parameters",
+            "type": "object"
+          },
+          "product": {
+            "additionalProperties": true,
+            "title": "Product",
+            "type": "object"
+          },
+          "spec_id": {
+            "format": "uuid",
+            "title": "Spec Id",
+            "type": "string"
+          },
+          "spec_version": {
+            "maxLength": 128,
+            "minLength": 1,
+            "pattern": "^[\\w.-]+$",
+            "title": "Spec Version",
+            "type": "string"
+          }
+        },
+        "required": [
+          "agent_id",
+          "agent_version",
+          "spec_id",
+          "spec_version",
+          "original",
+          "product",
+          "parameters",
+          "material_versions"
+        ],
+        "title": "AssistRequest",
+        "type": "object"
+      },
       "AuthView": {
         "additionalProperties": false,
         "properties": {
@@ -3837,6 +3988,186 @@
           }
         },
         "summary": "Specs"
+      }
+    },
+    "/api/v1/assist/prompts": {
+      "post": {
+        "description": "Prepare a draft; request_key is the required Idempotency-Key header, not a body field.",
+        "operationId": "prepare_prompt",
+        "parameters": [
+          {
+            "description": "request_key is carried only in this required Idempotency-Key header. Reuse the key for the same draft request to replay its completed result; reusing it with different input returns 409.",
+            "in": "header",
+            "name": "Idempotency-Key",
+            "required": true,
+            "schema": {
+              "description": "request_key is carried only in this required Idempotency-Key header. Reuse the key for the same draft request to replay its completed result; reusing it with different input returns 409.",
+              "maxLength": 128,
+              "minLength": 1,
+              "pattern": "^[!-~]+$",
+              "title": "Idempotency-Key",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Required token bound to this session and csrf_token cookie; omission or mismatch returns 403.",
+            "in": "header",
+            "name": "X-CSRF-Token",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "Required exact allowlisted Origin; browsers send this automatically. Do not set Origin in frontend JavaScript.",
+            "in": "header",
+            "name": "origin",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "Required literal platform; omission or mismatch returns 403.",
+            "in": "header",
+            "name": "X-Requested-With",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "Required session-bound CSRF cookie; omission or mismatch returns 403.",
+            "in": "cookie",
+            "name": "csrf_token",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "Required Secure HttpOnly session cookie; omission or invalid session returns 401.",
+            "in": "cookie",
+            "name": "session",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AssistRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AssistProposal"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Unauthorized"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Forbidden"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Conflict"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Unprocessable Entity"
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Too Many Requests"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Internal Server Error"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Service Unavailable"
+          },
+          "504": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Gateway Timeout"
+          }
+        },
+        "summary": "Prepare Prompt"
       }
     },
     "/api/v1/auth/login": {

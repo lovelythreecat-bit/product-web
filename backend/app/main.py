@@ -10,6 +10,7 @@ from sqlalchemy import text
 from sqlalchemy.exc import SQLAlchemyError
 
 from app.agents.callbacks import router as callbacks_router
+from app.assist.routes import router as assist_router
 from app.auth.routes import router as auth_router
 from app.catalog.routes import router as catalog_router
 from app.catalog.service import CatalogError
@@ -63,6 +64,7 @@ def create_app(settings: Settings) -> FastAPI:
     )
     application.include_router(callbacks_router)
     application.include_router(auth_router)
+    application.include_router(assist_router)
     application.include_router(catalog_router)
     application.include_router(storage_router)
     application.include_router(conversations_router)

@@ -1,0 +1,11 @@
+# TEST_ONLY simulation. Never a production choice of free/paid allowance.
+decision_id: D-05
+version: TEST_ONLY_draft_no_meter_v1
+mode: mock
+test_only: true
+status: draft
+payload:
+  assist:
+    scheme: OTHER_CONFIRMED_SCHEME
+    policy_ref: TEST_ONLY_draft_no_meter_v1
+    implementation_ref: TEST_ONLY_draft_no_meter_v1

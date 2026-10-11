@@ -14,6 +14,10 @@ class Settings(BaseSettings):
 
     mode: Literal["mock", "staging", "production"] = "mock"
     test_only: bool = True
+    assist_policy_version: str | None = None
+    assist_provider: Literal["deterministic_mock"] | None = None
+    assist_timeout_seconds: float = Field(default=10, gt=0, le=60)
+    assist_rate_limit: int = Field(default=10, ge=1, le=100)
     auth_origins: list[str] = []
     storage_root: Path | None = None
     storage_persistent: bool = False
