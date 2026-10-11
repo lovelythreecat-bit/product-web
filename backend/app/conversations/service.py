@@ -122,6 +122,7 @@ class ConversationService:
     def read_conversation(self, principal, id, *, task_cursor=None, message_cursor=None, limit=20):
         from app.conversations.schemas import ConversationView
         from app.tasks.repository import TaskRepository
+        from app.works.lifecycle import history_content
 
         authenticate(self.session, principal)
         row = owned_conversation(self.session, principal.user_id, id)
@@ -142,7 +143,7 @@ class ConversationService:
                         task_id=m.task_id,
                         kind=m.kind,
                         role=m.role,
-                        content=m.content,
+                        content=history_content(self.session, m),
                         created_at=m.created_at.replace(tzinfo=UTC),
                     )
                     for m in messages

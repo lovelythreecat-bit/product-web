@@ -203,3 +203,73 @@ class AuthService:
             setattr(user, field, value)
         self.session.flush()
         return profile(user)
+
+    def set_account_status(self, actor, user_id, status, policy_version, *, expected_auth_version):
+        """Live admin authority + exact D-09/D-08 + CAS, in the caller transaction."""
+        from pydantic import ValidationError
+        from sqlalchemy import update
+
+        from app.catalog.service import CatalogService
+        from app.policies.schemas import DisablePolicy, ExceptionPolicy
+        from app.policies.service import PolicyGateError, PolicyService
+        from app.works.lifecycle import audit
+
+        CatalogService(self.session)._principal(actor, admin=True)
+        if status not in ("active", "disabled") or type(expected_auth_version) is not int:
+            raise HTTPException(422)
+        service = PolicyService(self.session)
+        service.require_feature("account_disable", self.mode, {"D-09": policy_version})
+        policy = DisablePolicy.model_validate(
+            service._read("D-09", policy_version).payload["account_disable"]
+        ).execution
+        if policy is None or (status == "active" and policy.restoration != "new_login"):
+            raise PolicyGateError()
+        exception = service._read("D-08", policy.exception_policy_version)
+        if (
+            exception is None
+            or exception.mode != self.mode
+            or (self.mode != "mock" and exception.status != "confirmed")
+        ):
+            raise PolicyGateError()
+        try:
+            ExceptionPolicy.model_validate(exception.payload["generation"])
+        except (KeyError, ValidationError):
+            raise PolicyGateError() from None
+        user = self.session.scalar(
+            select(User)
+            .where(User.id == str(user_id))
+            .with_for_update()
+            .execution_options(populate_existing=True)
+        )
+        if user is None:
+            raise HTTPException(404)
+        if user.auth_version != expected_auth_version:
+            raise HTTPException(409)
+        previous = user.status
+        user.status = status
+        user.auth_version += 1
+        self.session.execute(
+            update(AuthSession)
+            .where(AuthSession.user_id == user.id, AuthSession.revoked_at.is_(None))
+            .values(revoked_at=now())
+        )
+        audit(
+            self.session,
+            actor.user_id,
+            "account_status",
+            user.id,
+            policy_version,
+            previous_status=previous,
+            status=status,
+            auth_version=user.auth_version,
+            exception_policy_version=policy.exception_policy_version,
+            inflight="continue_original",
+            frozen_credits="retain",
+        )
+        self.session.flush()
+        return {
+            "user_id": user.id,
+            "status": status,
+            "auth_version": user.auth_version,
+            "policy_version": policy_version,
+        }

@@ -13,6 +13,7 @@ from app.common.types import DTO, Quote
 
 
 class ErrorCode(StrEnum):
+    MATERIAL_UNAVAILABLE = "MATERIAL_UNAVAILABLE"
     INPUT_INVALID = "INPUT_INVALID"
     SPEC_DISABLED = "SPEC_DISABLED"
     QUOTE_STALE = "QUOTE_STALE"

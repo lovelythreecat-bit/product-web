@@ -1,6 +1,76 @@
 {
   "components": {
     "schemas": {
+      "AccountStatusReceipt": {
+        "additionalProperties": false,
+        "properties": {
+          "auth_version": {
+            "minimum": 0.0,
+            "title": "Auth Version",
+            "type": "integer"
+          },
+          "policy_version": {
+            "maxLength": 128,
+            "minLength": 1,
+            "pattern": "^[\\w.-]+$",
+            "title": "Policy Version",
+            "type": "string"
+          },
+          "status": {
+            "enum": [
+              "active",
+              "disabled"
+            ],
+            "title": "Status",
+            "type": "string"
+          },
+          "user_id": {
+            "format": "uuid",
+            "title": "User Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "policy_version",
+          "user_id",
+          "status",
+          "auth_version"
+        ],
+        "title": "AccountStatusReceipt",
+        "type": "object"
+      },
+      "AccountStatusRequest": {
+        "additionalProperties": false,
+        "properties": {
+          "expected_auth_version": {
+            "minimum": 0.0,
+            "title": "Expected Auth Version",
+            "type": "integer"
+          },
+          "policy_version": {
+            "maxLength": 128,
+            "minLength": 1,
+            "pattern": "^[\\w.-]+$",
+            "title": "Policy Version",
+            "type": "string"
+          },
+          "status": {
+            "enum": [
+              "active",
+              "disabled"
+            ],
+            "title": "Status",
+            "type": "string"
+          }
+        },
+        "required": [
+          "policy_version",
+          "status",
+          "expected_auth_version"
+        ],
+        "title": "AccountStatusRequest",
+        "type": "object"
+      },
       "AccountView": {
         "additionalProperties": false,
         "properties": {
@@ -797,6 +867,52 @@
         "title": "CursorPage[WorkView]",
         "type": "object"
       },
+      "DeleteReceipt": {
+        "additionalProperties": false,
+        "properties": {
+          "deleted": {
+            "const": true,
+            "title": "Deleted",
+            "type": "boolean"
+          },
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "policy_version": {
+            "maxLength": 128,
+            "minLength": 1,
+            "pattern": "^[\\w.-]+$",
+            "title": "Policy Version",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "deleted",
+          "policy_version"
+        ],
+        "title": "DeleteReceipt",
+        "type": "object"
+      },
+      "DeleteRequest": {
+        "additionalProperties": false,
+        "properties": {
+          "policy_version": {
+            "maxLength": 128,
+            "minLength": 1,
+            "pattern": "^[\\w.-]+$",
+            "title": "Policy Version",
+            "type": "string"
+          }
+        },
+        "required": [
+          "policy_version"
+        ],
+        "title": "DeleteRequest",
+        "type": "object"
+      },
       "DurableEventView": {
         "additionalProperties": false,
         "properties": {
@@ -824,6 +940,7 @@
       },
       "ErrorCode": {
         "enum": [
+          "MATERIAL_UNAVAILABLE",
           "INPUT_INVALID",
           "SPEC_DISABLED",
           "QUOTE_STALE",
@@ -4359,6 +4476,151 @@
         "summary": "Resolve Investigation"
       }
     },
+    "/api/v1/admin/users/{id}/status": {
+      "patch": {
+        "operationId": "set_account_status",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Id",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Required token bound to this session and csrf_token cookie; omission or mismatch returns 403.",
+            "in": "header",
+            "name": "X-CSRF-Token",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "Required exact allowlisted Origin; browsers send this automatically. Do not set Origin in frontend JavaScript.",
+            "in": "header",
+            "name": "origin",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "Required literal platform; omission or mismatch returns 403.",
+            "in": "header",
+            "name": "X-Requested-With",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "Required session-bound CSRF cookie; omission or mismatch returns 403.",
+            "in": "cookie",
+            "name": "csrf_token",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "Required Secure HttpOnly session cookie; omission or invalid session returns 401.",
+            "in": "cookie",
+            "name": "session",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AccountStatusRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AccountStatusReceipt"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Unauthorized"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Forbidden"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Conflict"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Unprocessable Entity"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Internal Server Error"
+          }
+        },
+        "summary": "Set Account Status"
+      }
+    },
     "/api/v1/agent-callbacks/{agent_id}/{version}": {
       "post": {
         "operationId": "receive_agent_callback",
@@ -6048,6 +6310,151 @@
         "summary": "Content"
       }
     },
+    "/api/v1/files/{id}": {
+      "delete": {
+        "operationId": "delete_material",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Id",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Required token bound to this session and csrf_token cookie; omission or mismatch returns 403.",
+            "in": "header",
+            "name": "X-CSRF-Token",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "Required exact allowlisted Origin; browsers send this automatically. Do not set Origin in frontend JavaScript.",
+            "in": "header",
+            "name": "origin",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "Required literal platform; omission or mismatch returns 403.",
+            "in": "header",
+            "name": "X-Requested-With",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "Required session-bound CSRF cookie; omission or mismatch returns 403.",
+            "in": "cookie",
+            "name": "csrf_token",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "Required Secure HttpOnly session cookie; omission or invalid session returns 401.",
+            "in": "cookie",
+            "name": "session",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DeleteRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DeleteReceipt"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Unauthorized"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Forbidden"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Conflict"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Unprocessable Entity"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Internal Server Error"
+          }
+        },
+        "summary": "Delete Material"
+      }
+    },
     "/api/v1/health/live": {
       "get": {
         "operationId": "health_live",
@@ -7410,6 +7817,149 @@
       }
     },
     "/api/v1/works/{id}": {
+      "delete": {
+        "operationId": "delete_work",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Id",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Required token bound to this session and csrf_token cookie; omission or mismatch returns 403.",
+            "in": "header",
+            "name": "X-CSRF-Token",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "Required exact allowlisted Origin; browsers send this automatically. Do not set Origin in frontend JavaScript.",
+            "in": "header",
+            "name": "origin",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "Required literal platform; omission or mismatch returns 403.",
+            "in": "header",
+            "name": "X-Requested-With",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "Required session-bound CSRF cookie; omission or mismatch returns 403.",
+            "in": "cookie",
+            "name": "csrf_token",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "Required Secure HttpOnly session cookie; omission or invalid session returns 401.",
+            "in": "cookie",
+            "name": "session",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DeleteRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DeleteReceipt"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Unauthorized"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Forbidden"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Conflict"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Unprocessable Entity"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Internal Server Error"
+          }
+        },
+        "summary": "Delete Work"
+      },
       "get": {
         "operationId": "get_work",
         "parameters": [

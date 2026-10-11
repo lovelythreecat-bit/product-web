@@ -158,6 +158,7 @@ class StoragePolicy(PolicyData):
 
 
 class DeletePolicy(PolicyData):
+    execution: "DeleteExecution | None" = None
     list_history_ref: Text
     old_links_ref: Text
     restoration_ref: Text
@@ -167,6 +168,7 @@ class DeletePolicy(PolicyData):
 
 
 class DisablePolicy(PolicyData):
+    execution: "DisableExecution | None" = None
     tasks_ref: Text
     frozen_credits_ref: Text
     works_access_ref: Text
@@ -234,3 +236,28 @@ class InvestigationPolicy(PolicyData):
     ]
     deadline_is_failure: Literal[False]
     requires_complete_delivery: Literal[True]
+
+
+class DeleteExecution(PolicyData):
+    schema_version: Literal["lifecycle-delete-v1"]
+    list: Literal["hide"]
+    history: Literal["tombstone"]
+    old_links: Literal["deny"]
+    restoration: Literal["disabled"]
+    references: Literal["retain_all"]
+    capacity: Literal["until_physical_removal"]
+    retention_seconds: NonNegativeInt
+    unreferenced_cleanup: bool = Field(strict=True)
+
+
+class DisableExecution(PolicyData):
+    schema_version: Literal["lifecycle-disable-v1"]
+    inflight: Literal["continue_original"]
+    frozen_credits: Literal["retain"]
+    works_access: Literal["deny"]
+    restoration: Literal["disabled", "new_login"]
+    exception_policy_version: Version
+
+
+DeletePolicy.model_rebuild()
+DisablePolicy.model_rebuild()

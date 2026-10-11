@@ -11,6 +11,7 @@ from fastapi import APIRouter, Depends, Header, HTTPException, Query, Request
 from fastapi.responses import StreamingResponse
 from redis import RedisError
 from sqlalchemy import select
+from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.orm import Session
 from starlette.background import BackgroundTask
 from starlette.concurrency import run_in_threadpool
@@ -164,6 +165,26 @@ def parse_range(value, size):
     return start, end, 206
 
 
+def authorize_download_chunk(engine, cookie, principal, file_id, version):
+    """Fresh database authority; the transaction ends before the chunk is yielded."""
+    with Session(engine) as current, current.begin():
+        if AuthService(current).require_active_principal(cookie) != principal:
+            raise HTTPException(401)
+        available = current.scalar(
+            select(File.id)
+            .where(
+                File.id == file_id,
+                File.version == version,
+                File.user_id == str(principal.user_id),
+                File.deleted_at.is_(None),
+                File.state == "durable",
+            )
+            .with_for_update(read=True)
+        )
+        if available is None:
+            raise HTTPException(404)
+
+
 @router.get(
     "/files/{file_id}/content",
     operation_id="read_file_content",
@@ -228,6 +249,11 @@ def content(
     if status == 206:
         headers["Content-Range"] = f"bytes {start}-{end}/{file.actual_bytes}"
 
+    # Capture immutable values before rolling back the request Session. Never
+    # reuse its ORM identities or transaction while iterating the response.
+    identity, version = file.id, file.version
+    engine, cookie = request.app.state.engine, request.cookies.get("session")
+
     def body():
         try:
             remaining = end - start + 1
@@ -235,12 +261,17 @@ def content(
                 chunk = source.read(min(65536, remaining))
                 if not chunk:
                     return
+                try:
+                    authorize_download_chunk(engine, cookie, principal, identity, version)
+                except (HTTPException, SQLAlchemyError):
+                    return  # Headers may already be sent; fail closed and close the source.
                 remaining -= len(chunk)
                 yield chunk
         finally:
             source.close()
 
-    # Authorization decision is complete; do not keep the user row locked during streaming.
+    # Release initial locks. Each chunk reauthorizes in a separate short Session;
+    # neither that Session nor its locks cross a slow client's send boundary.
     media_type = file.actual_mime
     session.rollback()
     return StreamingResponse(

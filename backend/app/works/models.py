@@ -27,6 +27,8 @@ class Work(Base):
     manifest_id: Mapped[str] = mapped_column(ForeignKey("result_manifests.id"), unique=True)
     message_id: Mapped[str] = mapped_column(ForeignKey("messages.id"), unique=True)
     created_at: Mapped[datetime] = mapped_column(DATETIME(fsp=6))
+    deletion_policy_version: Mapped[str | None] = mapped_column(String(128))
+    deleted_at: Mapped[datetime | None] = mapped_column(DATETIME(fsp=6))
 
 
 class WorkItem(Base):

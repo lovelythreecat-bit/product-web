@@ -34,6 +34,14 @@ from app.tasks.models import GenerationTask, TaskSnapshot, TaskStateEvent
 from app.tasks.repository import task_view
 from app.tasks.schemas import GenerationEstimate
 
+
+class MaterialUnavailable(Exception):
+    """Owned original material needs an explicit reupload and new quote."""
+
+    def __init__(self, status_code=404):
+        self.status_code = status_code
+
+
 TERMINAL_STATES = ("SUCCEEDED", "FAILED", "MANUALLY_CLOSED")
 
 
@@ -190,25 +198,25 @@ class AdmissionService:
                     File.id == file_id,
                     File.version == version,
                     File.user_id == user_id,
-                    File.deleted_at.is_(None),
-                    File.state == "durable",
                 )
                 .with_for_update()
             )
             if file is None:
                 raise HTTPException(404)
+            if file.deleted_at is not None or file.state != "durable":
+                raise MaterialUnavailable()
             try:
                 digest, size = hashlib.sha256(), 0
                 with store.read(file.internal_path) as stream:
                     while chunk := stream.read(65536):
                         size += len(chunk)
                         if size > file.actual_bytes:
-                            raise HTTPException(422)
+                            raise MaterialUnavailable(422)
                         digest.update(chunk)
                 if size != file.actual_bytes or digest.hexdigest() != file.sha256:
-                    raise HTTPException(422)
+                    raise MaterialUnavailable(422)
             except OSError:
-                raise HTTPException(422) from None
+                raise MaterialUnavailable(422) from None
             session.add(
                 FileRef(
                     id=str(uuid4()),

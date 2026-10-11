@@ -99,6 +99,7 @@ class File(Base):
     deleted_at: Mapped[datetime | None] = mapped_column(DATETIME(fsp=6))
     created_at: Mapped[datetime] = mapped_column(DATETIME(fsp=6))
     reservation_id: Mapped[str] = mapped_column(ForeignKey("capacity_reservations.id"), index=True)
+    deletion_policy_version: Mapped[str | None] = mapped_column(String(128))
 
 
 class FileRef(Base):
@@ -121,3 +122,15 @@ class FileRef(Base):
     ref_type: Mapped[str] = mapped_column(String(32))
     ref_id: Mapped[str] = mapped_column(String(36))
     created_at: Mapped[datetime] = mapped_column(DATETIME(fsp=6))
+
+
+class FileCleanup(Base):
+    """Committed claim before unlink; completed is the exactly-once capacity receipt."""
+
+    __tablename__ = "file_cleanups"
+    __table_args__ = (CheckConstraint("state IN ('pending','completed')", name="ck_cleanup_state"),)
+    file_id: Mapped[str] = mapped_column(ForeignKey("files.id"), primary_key=True)
+    policy_version: Mapped[str] = mapped_column(String(128))
+    state: Mapped[str] = mapped_column(String(16), default="pending")
+    created_at: Mapped[datetime] = mapped_column(DATETIME(fsp=6))
+    completed_at: Mapped[datetime | None] = mapped_column(DATETIME(fsp=6))

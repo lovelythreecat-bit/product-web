@@ -29,7 +29,16 @@ class WorkService:
             GenerationTask.state == "SUCCEEDED",
             GenerationTask.settlement_state == "CONSUMED",
         )
-        predicates = [Work.user_id == str(principal.user_id), Work.task_id.in_(tasks)]
+        predicates = [
+            Work.user_id == str(principal.user_id),
+            Work.task_id.in_(tasks),
+            Work.deleted_at.is_(None),
+            ~Work.id.in_(
+                select(WorkItem.work_id)
+                .join(File, File.id == WorkItem.file_id)
+                .where(File.deleted_at.is_not(None))
+            ),
+        ]
         if kind is not None:
             if kind not in ("copy", "image", "video"):
                 raise HTTPException(422)

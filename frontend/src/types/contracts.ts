@@ -190,6 +190,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/admin/users/{id}/status": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /** Set Account Status */
+        patch: operations["set_account_status"];
+        trace?: never;
+    };
     "/api/v1/agent-callbacks/{agent_id}/{version}": {
         parameters: {
             query?: never;
@@ -401,6 +418,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/files/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /** Delete Material */
+        delete: operations["delete_material"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/health/live": {
         parameters: {
             query?: never;
@@ -584,7 +618,8 @@ export interface paths {
         get: operations["get_work"];
         put?: never;
         post?: never;
-        delete?: never;
+        /** Delete Work */
+        delete: operations["delete_work"];
         options?: never;
         head?: never;
         patch?: never;
@@ -594,6 +629,35 @@ export interface paths {
 export type webhooks = Record<string, never>;
 export interface components {
     schemas: {
+        /** AccountStatusReceipt */
+        AccountStatusReceipt: {
+            /** Auth Version */
+            auth_version: number;
+            /** Policy Version */
+            policy_version: string;
+            /**
+             * Status
+             * @enum {string}
+             */
+            status: "active" | "disabled";
+            /**
+             * User Id
+             * Format: uuid
+             */
+            user_id: string;
+        };
+        /** AccountStatusRequest */
+        AccountStatusRequest: {
+            /** Expected Auth Version */
+            expected_auth_version: number;
+            /** Policy Version */
+            policy_version: string;
+            /**
+             * Status
+             * @enum {string}
+             */
+            status: "active" | "disabled";
+        };
         /** AccountView */
         AccountView: {
             /** Available */
@@ -864,6 +928,26 @@ export interface components {
             /** Next Cursor */
             next_cursor: string | null;
         };
+        /** DeleteReceipt */
+        DeleteReceipt: {
+            /**
+             * Deleted
+             * @constant
+             */
+            deleted: true;
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Policy Version */
+            policy_version: string;
+        };
+        /** DeleteRequest */
+        DeleteRequest: {
+            /** Policy Version */
+            policy_version: string;
+        };
         /** DurableEventView */
         DurableEventView: {
             /**
@@ -879,7 +963,7 @@ export interface components {
          * ErrorCode
          * @enum {string}
          */
-        ErrorCode: "INPUT_INVALID" | "SPEC_DISABLED" | "QUOTE_STALE" | "IDEMPOTENCY_CONFLICT" | "INSUFFICIENT_CREDITS" | "CAPACITY_INSUFFICIENT" | "FEATURE_NOT_ENABLED" | "RATE_LIMITED" | "UNAUTHENTICATED" | "FORBIDDEN" | "NOT_FOUND" | "METHOD_NOT_ALLOWED" | "INTERNAL_ERROR";
+        ErrorCode: "MATERIAL_UNAVAILABLE" | "INPUT_INVALID" | "SPEC_DISABLED" | "QUOTE_STALE" | "IDEMPOTENCY_CONFLICT" | "INSUFFICIENT_CREDITS" | "CAPACITY_INSUFFICIENT" | "FEATURE_NOT_ENABLED" | "RATE_LIMITED" | "UNAUTHENTICATED" | "FORBIDDEN" | "NOT_FOUND" | "METHOD_NOT_ALLOWED" | "INTERNAL_ERROR";
         /** ErrorDetail */
         ErrorDetail: {
             code: components["schemas"]["ErrorCode"];
@@ -2781,6 +2865,98 @@ export interface operations {
             };
         };
     };
+    set_account_status: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description Required token bound to this session and csrf_token cookie; omission or mismatch returns 403. */
+                "X-CSRF-Token": string;
+                /** @description Required exact allowlisted Origin; browsers send this automatically. Do not set Origin in frontend JavaScript. */
+                origin: string;
+                /** @description Required literal platform; omission or mismatch returns 403. */
+                "X-Requested-With": string;
+            };
+            path: {
+                id: string;
+            };
+            cookie: {
+                /** @description Required session-bound CSRF cookie; omission or mismatch returns 403. */
+                csrf_token: string;
+                /** @description Required Secure HttpOnly session cookie; omission or invalid session returns 401. */
+                session: string;
+            };
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["AccountStatusRequest"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AccountStatusReceipt"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unprocessable Entity */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Internal Server Error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
     receive_agent_callback: {
         parameters: {
             query?: never;
@@ -3958,6 +4134,98 @@ export interface operations {
             };
         };
     };
+    delete_material: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description Required token bound to this session and csrf_token cookie; omission or mismatch returns 403. */
+                "X-CSRF-Token": string;
+                /** @description Required exact allowlisted Origin; browsers send this automatically. Do not set Origin in frontend JavaScript. */
+                origin: string;
+                /** @description Required literal platform; omission or mismatch returns 403. */
+                "X-Requested-With": string;
+            };
+            path: {
+                id: string;
+            };
+            cookie: {
+                /** @description Required session-bound CSRF cookie; omission or mismatch returns 403. */
+                csrf_token: string;
+                /** @description Required Secure HttpOnly session cookie; omission or invalid session returns 401. */
+                session: string;
+            };
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["DeleteRequest"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DeleteReceipt"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unprocessable Entity */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Internal Server Error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
     health_live: {
         parameters: {
             query?: never;
@@ -4986,6 +5254,98 @@ export interface operations {
             };
             /** @description Not Found */
             404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unprocessable Entity */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Internal Server Error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    delete_work: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description Required token bound to this session and csrf_token cookie; omission or mismatch returns 403. */
+                "X-CSRF-Token": string;
+                /** @description Required exact allowlisted Origin; browsers send this automatically. Do not set Origin in frontend JavaScript. */
+                origin: string;
+                /** @description Required literal platform; omission or mismatch returns 403. */
+                "X-Requested-With": string;
+            };
+            path: {
+                id: string;
+            };
+            cookie: {
+                /** @description Required session-bound CSRF cookie; omission or mismatch returns 403. */
+                csrf_token: string;
+                /** @description Required Secure HttpOnly session cookie; omission or invalid session returns 401. */
+                session: string;
+            };
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["DeleteRequest"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DeleteReceipt"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Conflict */
+            409: {
                 headers: {
                     [name: string]: unknown;
                 };
