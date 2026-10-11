@@ -3,15 +3,17 @@
 import json
 import os
 import shutil
+import socket
 import subprocess
 import sys
+import time
 from concurrent.futures import ThreadPoolExecutor
-from http.client import HTTPConnection
+from http.client import HTTPConnection, HTTPResponse
 from http.server import ThreadingHTTPServer
 from importlib.util import find_spec
 from pathlib import Path
 from queue import Queue
-from threading import Thread
+from threading import Event, Thread
 from urllib.error import HTTPError
 from urllib.request import Request, urlopen
 
@@ -425,3 +427,141 @@ def test_complete_media_has_valid_format_and_original_content_metadata(server, a
     _, counts = call(server, "GET", f"/__test__/agents/{agent}/calls/media-1")
     assert counts["generation_intents"] == 1
     assert counts["retrieve_original"] == 2
+
+
+@pytest.fixture
+def closing_server(monkeypatch):
+    """Control actual request segmentation; observe real server reads and close."""
+    monkeypatch.setenv("APP_MODE", "mock")
+    monkeypatch.setenv("APP_TEST_ONLY", "true")
+    written, resume, closed = Event(), Event(), Event()
+    discarded = []
+
+    class ObservedSocket:
+        def __init__(self, actual):
+            self.actual = actual
+
+        def __getattr__(self, name):
+            return getattr(self.actual, name)
+
+        def recv(self, size):
+            chunk = self.actual.recv(size)
+            discarded.append(len(chunk))
+            return chunk
+
+    class SegmentedHandler(Handler):
+        def setup(self):
+            super().setup()
+            self.connection = ObservedSocket(self.connection)
+
+        def respond(self, status, payload):
+            super().respond(status, payload)
+            written.set()
+            assert resume.wait(2), "test did not release response boundary"
+
+    class ObservedServer(ThreadingHTTPServer):
+        def shutdown_request(self, request):
+            super().shutdown_request(request)
+            closed.set()
+
+    httpd = ObservedServer(("127.0.0.1", 0), SegmentedHandler)
+    thread = Thread(target=lambda: httpd.serve_forever(poll_interval=0.01), daemon=True)
+    thread.start()
+    try:
+        yield httpd, written, resume, closed, discarded
+    finally:
+        resume.set()
+        httpd.shutdown()
+        httpd.server_close()
+        thread.join(timeout=3)
+
+
+def rejection_headers(size):
+    return ("POST /v1/copy/submissions HTTP/1.1\r\nHost: localhost\r\n"
+            "Content-Type: application/json\r\n"
+            f"Content-Length: {size}\r\n\r\n").encode()
+
+
+def test_inflight_oversized_body_keeps_complete_error_response(closing_server):
+    httpd, written, resume, closed, discarded = closing_server
+    with socket.create_connection(httpd.server_address, timeout=2) as client:
+        client.sendall(rejection_headers(70000))
+        assert written.wait(1)
+        client.sendall(b"x" * 8192)
+        resume.set()
+        # Force the same boundary as sendall's remaining in-flight segments.
+        closed.wait(0.1)
+        try:
+            client.sendall(b"x" * (70000 - 8192))
+            response = HTTPResponse(client)
+            response.begin()
+            body = json.loads(response.read())
+        except OSError as error:
+            pytest.fail(f"413 lost while request tail was in flight: {type(error).__name__}")
+        assert (response.status, body["error"], body["test_only"]) == (413, "BODY_TOO_LARGE", True)
+        assert sum(discarded) <= 131072
+        client.shutdown(socket.SHUT_WR)
+        assert closed.wait(1)
+    assert not hasattr(httpd, "simulator"), "rejected body must not create a generation intent"
+
+
+def test_huge_declared_body_does_not_delay_error_or_hold_worker(closing_server):
+    httpd, written, resume, closed, _ = closing_server
+    with socket.create_connection(httpd.server_address, timeout=2) as client:
+        client.sendall(rejection_headers(10**12))
+        assert written.wait(1)
+        started = time.monotonic()
+        resume.set()
+        response = HTTPResponse(client)
+        response.begin()
+        assert json.loads(response.read())["error"] == "BODY_TOO_LARGE"
+        # Keep client write side open: cleanup must not await Content-Length or EOF forever.
+        assert closed.wait(0.8)
+        assert time.monotonic() - started < 0.8
+
+
+def test_error_discard_stops_at_byte_budget(closing_server):
+    httpd, written, resume, closed, discarded = closing_server
+    with socket.create_connection(httpd.server_address, timeout=2) as client:
+        client.sendall(rejection_headers(10**12))
+        assert written.wait(1)
+        client.sendall(b"x" * 262144)
+        resume.set()
+        assert closed.wait(0.8)
+        assert 0 < sum(discarded) <= 131072
+
+
+
+def test_error_discard_deadline_cannot_be_extended_by_trickling_body(closing_server):
+    httpd, written, resume, closed, _ = closing_server
+    stop = Event()
+    errors = []
+    sent = []
+    with socket.create_connection(httpd.server_address, timeout=2) as client:
+        client.sendall(rejection_headers(10**12))
+        assert written.wait(1)
+        resume.set()
+        response = HTTPResponse(client)
+        response.begin()
+        assert json.loads(response.read())["error"] == "BODY_TOO_LARGE"
+
+        def trickle():
+            while not stop.wait(0.02):
+                try:
+                    client.sendall(b"x")
+                    sent.append(1)
+                except OSError as error:
+                    # Closing after the rejection is intentional; a prior failure is not.
+                    if not closed.wait(0.1):
+                        errors.append(type(error).__name__)
+                    return
+
+        sender = Thread(target=trickle, daemon=True)
+        sender.start()
+        try:
+            assert closed.wait(0.8), "each received byte extended the cleanup deadline"
+            assert len(sent) >= 2
+            assert not errors
+        finally:
+            stop.set()
+            sender.join(timeout=1)

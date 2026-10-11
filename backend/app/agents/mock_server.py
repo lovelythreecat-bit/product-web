@@ -20,6 +20,8 @@ from uuid import NAMESPACE_URL, uuid4, uuid5
 PROTOCOL = "mock-v1-TEST_ONLY"
 CALLBACK_KEY = b"TEST_ONLY-not-a-production-secret"
 MAX_BODY = 65536
+MAX_DISCARD = 2 * MAX_BODY
+DISCARD_TIMEOUT = 0.25
 MAX_RECORDS = 1000
 AGENTS = {"copy", "image", "video"}
 SCENARIOS = {
@@ -255,6 +257,30 @@ class Handler(BaseHTTPRequestHandler):
     def setup(self):
         super().setup()
         self.connection.settimeout(3)
+
+    def finish(self):
+        # Closing a socket with request bytes still in flight can reset a response
+        # already written (notably on Windows). Send FIN after the response, then
+        # discard a bounded amount until peer EOF or the absolute cleanup deadline.
+        try:
+            self.wfile.flush()
+            self.connection.shutdown(socket.SHUT_WR)
+            deadline = time.monotonic() + DISCARD_TIMEOUT
+            remaining = MAX_DISCARD
+            while remaining:
+                wait = deadline - time.monotonic()
+                if wait <= 0:
+                    break
+                self.connection.settimeout(wait)
+                chunk = self.connection.recv(min(8192, remaining))
+                if not chunk:
+                    break
+                remaining -= len(chunk)
+        except OSError:
+            # Peer EOF/reset/timeout ends cleanup; never retry or change the response.
+            pass
+        finally:
+            super().finish()
 
     def log_message(self, *_):
         pass  # No snapshots, identifiers, query strings or credentials in access logs.

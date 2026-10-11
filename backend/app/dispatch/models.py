@@ -1,6 +1,6 @@
 from datetime import datetime
 
-from sqlalchemy import BigInteger, ForeignKeyConstraint, String, UniqueConstraint
+from sqlalchemy import BigInteger, ForeignKeyConstraint, Index, String, UniqueConstraint
 from sqlalchemy.dialects.mysql import DATETIME
 from sqlalchemy.orm import Mapped, mapped_column
 
@@ -10,6 +10,7 @@ from app.db import Base
 class OutboxEvent(Base):
     __tablename__ = "dispatch_outbox"
     __table_args__ = (
+        Index("ix_outbox_pending", "dispatched_at", "ready_at"),
         UniqueConstraint("task_id", "state_version", "operation", name="uq_outbox_operation"),
         ForeignKeyConstraint(
             ["task_id", "user_id"], ["generation_tasks.id", "generation_tasks.user_id"]

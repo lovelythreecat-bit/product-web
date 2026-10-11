@@ -8,8 +8,10 @@ from sqlalchemy import (
     CheckConstraint,
     ForeignKey,
     ForeignKeyConstraint,
+    Index,
     String,
     UniqueConstraint,
+    text,
 )
 from sqlalchemy.dialects.mysql import DATETIME
 from sqlalchemy.orm import Mapped, mapped_column
@@ -20,6 +22,7 @@ from app.db import Base
 class GenerationTask(Base):
     __tablename__ = "generation_tasks"
     __table_args__ = (
+        Index("ix_task_recovery_due", "recovery_due_at", "lease_expires_at"),
         UniqueConstraint("id", "user_id", name="uq_task_owner"),
         UniqueConstraint("user_id", "idempotency_key", name="uq_task_intent"),
         UniqueConstraint("agent_id", "upstream_id", name="uq_task_upstream"),
@@ -56,6 +59,9 @@ class GenerationTask(Base):
     lease_owner: Mapped[str | None] = mapped_column(String(128))
     lease_expires_at: Mapped[datetime | None] = mapped_column(DATETIME(fsp=6))
     fencing_token: Mapped[int] = mapped_column(BigInteger, default=0)
+    recovery_due_at: Mapped[datetime] = mapped_column(
+        DATETIME(fsp=6), server_default=text("CURRENT_TIMESTAMP(6)")
+    )
     investigation_reason: Mapped[str | None] = mapped_column(String(500))
     created_at: Mapped[datetime] = mapped_column(DATETIME(fsp=6))
 
