@@ -1,6 +1,6 @@
 {
   "TEST_ONLY": true,
-  "description": "Simulated registration only; no human confirmation claimed.",
+  "description": "TEST_ONLY examples: registration and fixed original-result persistence. No human confirmation or production policy.",
   "decisions": [
     {
       "decision_id": "D-05",
@@ -19,6 +19,107 @@
       "confirmed_by": null,
       "confirmed_at": null,
       "evidence_refs": []
+    },
+    {
+      "decision_id": "D-01",
+      "version": "TEST_ONLY-original-results-v1",
+      "mode": "mock",
+      "test_only": true,
+      "status": "draft",
+      "payload": {
+        "result_specs": {
+          "11111111-1111-4111-8111-111111111111": {
+            "protocol_version": "mock-v1-TEST_ONLY",
+            "spec_version": "TEST_ONLY-original-results-v1",
+            "spec_digest": "e87ab471cff008635f084bcde6763cef11307dabdc24ff284d25af274301bbe2",
+            "expected_item_keys": [
+              "original-1",
+              "original-2"
+            ],
+            "media_type": "text/plain"
+          }
+        }
+      },
+      "confirmed_by": null,
+      "confirmed_at": null,
+      "evidence_refs": []
+    },
+    {
+      "decision_id": "D-04",
+      "version": "TEST_ONLY-original-results-v1",
+      "mode": "mock",
+      "test_only": true,
+      "status": "draft",
+      "payload": {
+        "result_specs": {
+          "11111111-1111-4111-8111-111111111111": {
+            "protocol_version": "mock-v1-TEST_ONLY",
+            "spec_version": "TEST_ONLY-original-results-v1",
+            "spec_digest": "e87ab471cff008635f084bcde6763cef11307dabdc24ff284d25af274301bbe2",
+            "expected_item_keys": [
+              "original-1",
+              "original-2"
+            ],
+            "media_type": "text/plain",
+            "delivery": "complete_only"
+          }
+        }
+      },
+      "confirmed_by": null,
+      "confirmed_at": null,
+      "evidence_refs": []
+    },
+    {
+      "decision_id": "D-10",
+      "version": "TEST_ONLY-original-results-v1",
+      "mode": "mock",
+      "test_only": true,
+      "status": "draft",
+      "payload": {
+        "result_download": {
+          "allowed_download_sources": [
+            "TEST_ONLY:bound-mock"
+          ],
+          "max_download_bytes": 10000,
+          "max_total_bytes": 20000,
+          "download_timeout_seconds": 10,
+          "max_redirects": 2
+        }
+      },
+      "confirmed_by": null,
+      "confirmed_at": null,
+      "evidence_refs": []
     }
-  ]
+  ],
+  "original_result_spec_example": {
+    "spec_id": "11111111-1111-4111-8111-111111111111",
+    "version": "TEST_ONLY-original-results-v1",
+    "agent_id": "22222222-2222-4222-8222-222222222222",
+    "agent_version": "TEST_ONLY_v1",
+    "name": "TEST_ONLY two original copies",
+    "enabled": true,
+    "delivery_kind": "multiple",
+    "parameter_schema": {
+      "fields": {
+        "test_only_result_count": {
+          "kind": "integer",
+          "required": true,
+          "choices": [
+            2
+          ]
+        }
+      },
+      "combinations": [
+        {
+          "test_only_result_count": 2
+        }
+      ]
+    },
+    "policy_versions": {
+      "D-04": "TEST_ONLY-original-results-v1"
+    }
+  },
+  "original_result_input_parameters": {
+    "test_only_result_count": 2
+  }
 }

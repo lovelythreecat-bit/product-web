@@ -134,12 +134,20 @@ class Simulator:
 
     def result(self, agent, record):
         complete = record["scenario"] != "partial"
+        count = record.get("result_count", 1)
         media_type, content = self.content(agent, record["task_id"])
-        return dict(complete=complete, expected_items=1 if complete else 2, items=[{
-            "item_key": "original-1", "locator": f"/v1/{agent}/results/{record['task_id']}",
-            "media_type": media_type, "byte_length": len(content),
-            "sha256": hashlib.sha256(content).hexdigest(),
-        }])
+        items = [
+            {
+                "item_key": f"original-{index + 1}",
+                "locator": f"/v1/{agent}/results/{record['task_id']}"
+                + (f"/original-{index + 1}" if count == 2 else ""),
+                "media_type": media_type,
+                "byte_length": len(content),
+                "sha256": hashlib.sha256(content).hexdigest(),
+            }
+            for index in range(count)
+        ]
+        return dict(complete=complete, expected_items=count if complete else count + 1, items=items)
 
     @staticmethod
     def content(agent, task_id):
@@ -162,6 +170,15 @@ class Simulator:
         if record["digest"] is not None and record["digest"] != digest:
             raise ProtocolError("SNAPSHOT_CONFLICT", 409)
         record["digest"] = digest
+        # Fixed TEST_ONLY protocol supports exactly two results for a declared multi spec.
+        spec = snapshot.get("spec_snapshot", {})
+        parameters = snapshot.get("input_snapshot", {}).get("parameters", {})
+        multi = spec.get("delivery_kind") in {"multiple", "detail_images"}
+        if multi and (parameters != {"test_only_result_count": 2}
+                or spec.get("parameter_schema", {}).get("combinations")
+                != [{"test_only_result_count": 2}]):
+            raise ProtocolError("UNSUPPORTED_RESULT_SPEC", 400)
+        record["result_count"] = 2 if multi else 1
         base = wire(external_submission_id=external, upstream_task_id=None, absence_proof=None)
         if record["scenario"] == "proven_not_accepted":
             return 200, dict(base, status="PROVEN_NOT_ACCEPTED",
@@ -197,21 +214,40 @@ class Simulator:
         return 200, dict(base, status="FOUND", state="RESULT_READY",
                          upstream_task_id=record["task_id"], result=self.result(agent, record))
 
-    def retrieve(self, agent, task_id):
+    def retrieve(self, agent, task_id, item_key=None):
         external = self.tasks.get((agent, task_id))
-        base = wire(status="NOT_FOUND", locator=f"/v1/{agent}/results/{task_id}",
-                    content_base64=None, media_type=None, complete=False,
-                    sha256=None, byte_length=None)
+        base = wire(
+            status="NOT_FOUND",
+            locator=f"/v1/{agent}/results/{task_id}" + (f"/{item_key}" if item_key else ""),
+            content_base64=None,
+            media_type=None,
+            complete=False,
+            sha256=None,
+            byte_length=None,
+        )
         if external is None:
             return 404, base
         record = self.records[agent, external]
+        if (
+            record.get("result_count", 1) == 2
+            and item_key not in {"original-1", "original-2"}
+            or record.get("result_count", 1) == 1
+            and item_key is not None
+        ):
+            return 404, base
         record["calls"]["retrieve_original"] += 1
         if record["scenario"] == "expired_link":
             return 410, dict(base, status="EXPIRED")
         media_type, body = self.content(agent, task_id)
-        return 200, dict(base, status="AVAILABLE", complete=record["scenario"] != "partial",
-                         media_type=media_type, content_base64=base64.b64encode(body).decode(),
-                         sha256=hashlib.sha256(body).hexdigest(), byte_length=len(body))
+        return 200, dict(
+            base,
+            status="AVAILABLE",
+            complete=record["scenario"] != "partial",
+            media_type=media_type,
+            content_base64=base64.b64encode(body).decode(),
+            sha256=hashlib.sha256(body).hexdigest(),
+            byte_length=len(body),
+        )
 
     def events(self, agent, external):
         record = self.records.get((agent, external))
@@ -249,6 +285,10 @@ class Simulator:
                     return 200, wire(**(record["calls"] if record else counters()))
                 if method == "GET" and operation == "events":
                     return self.events(agent, external)
+            if (len(parts) == 5 and parts[0] == "v1" and parts[2] == "results"
+                    and method == "GET"):
+                self.validate_ids(parts[1], parts[3])
+                return self.retrieve(parts[1], parts[3], parts[4])
             if len(parts) in (3, 4) and parts[0] == "v1":
                 agent, operation = parts[1:3]
                 self.validate_ids(agent, parts[3] if len(parts) == 4 else "submit")

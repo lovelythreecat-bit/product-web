@@ -265,6 +265,12 @@ class CallbackService:
     def _manifest(self, session, task, event, binding):
         manifest = event.result
         snapshot = session.get(TaskSnapshot, task.id)
+        if snapshot.spec_snapshot.get("delivery_kind", "single") != "single":
+            from app.results.manifest import result_rule, validate_manifest
+
+            return validate_manifest(
+                manifest, result_rule(session, task, binding), binding, event.upstream_task_id
+            )
         # Confirmed mock-v1 emits exactly one original artifact. A multiple/detail
         # specification cannot silently inherit this single-item test protocol.
         if (
@@ -320,13 +326,14 @@ class CallbackService:
         row, event, _ = self._event(session, task, reference)
         return self._proof(task, event, row, "accepted")
 
-    def install_verifiers(self, session):
+    def install_verifiers(self, session, *, extra=None):
         session.info["transition_verifiers"] = TransitionVerifiers(
             {
                 "accepted": self._accepted,
                 "safe_retry": self.upstream._safe_retry,
                 "original_result": self.verify_original_result,
                 "definite_failure": self.verify_definite_failure,
+                **(extra or {}),
             }
         )
 

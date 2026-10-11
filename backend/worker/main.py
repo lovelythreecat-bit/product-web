@@ -36,7 +36,9 @@ class Worker:
         return recovery, dispatch, consume
 
 
-def compose_worker(factory, redis, stream, group, worker_id, *, registry, task_ids=None):
+def compose_worker(
+    factory, redis, stream, group, worker_id, *, registry, task_ids=None, store=None
+):
     service = UpstreamService(factory, registry)
     handlers = {
         action: service.handle
@@ -47,7 +49,14 @@ def compose_worker(factory, redis, stream, group, worker_id, *, registry, task_i
             "investigate",
         )
     }
-    # T10 reduces callbacks and polls through service.handle. T11 owns save_original.
+    if store is not None:
+        from app.results.persistence import ResultPersistence
+
+        persistence = ResultPersistence(factory, service, store)
+        handlers["save_original"] = persistence.handle
+        handlers["investigate"] = persistence.recover_or_query
+        handlers["query_original"] = persistence.recover_or_query
+    # No private persistent root means saving stays due; never claim a saved result.
     return Worker(
         OutboxDispatcher(factory, redis, stream, task_ids=task_ids),
         RecoveryScheduler(factory, task_ids=task_ids),
@@ -73,6 +82,13 @@ def main(argv=None):
         settings.redis_url.get_secret_value(), socket_timeout=3, socket_connect_timeout=3
     )
     factory = sessionmaker(engine, expire_on_commit=False)
+    from app.storage.local_store import LocalStore
+
+    store = (
+        LocalStore(settings.storage_root)
+        if settings.storage_persistent and settings.storage_root is not None
+        else None
+    )
     worker = compose_worker(
         factory,
         redis,
@@ -80,6 +96,7 @@ def main(argv=None):
         args.group,
         args.worker_id,
         registry=AgentRegistry(mode=settings.mode, test_only=settings.test_only),
+        store=store,
     )
     stop = Event()
     for signum in (signal.SIGINT, signal.SIGTERM):

@@ -159,7 +159,14 @@ class MockAgentAdapter:
     def retrieve_original(self, locator: str) -> ResultSource:
         fallback = dict(protocol_version=PROTOCOL, test_only=True, locator=locator)
         prefix = f"/v1/{self.agent_id}/results/"
-        if not locator.startswith(prefix) or not ID.fullmatch(locator[len(prefix):]):
+        parts = locator[len(prefix) :].split("/")
+        if (
+            not locator.startswith(prefix)
+            or len(parts) not in {1, 2}
+            or not ID.fullmatch(parts[0])
+            or len(parts) == 2
+            and parts[1] not in {"original-1", "original-2"}
+        ):
             return ResultSource(status="UNSUPPORTED", **fallback)
         try:
             _, payload = self._request("GET", locator)

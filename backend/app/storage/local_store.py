@@ -10,6 +10,7 @@ import json
 import os
 import re
 import shutil
+from contextlib import contextmanager
 from dataclasses import dataclass
 from pathlib import Path
 from uuid import UUID, uuid4
@@ -26,6 +27,7 @@ class StagedFile:
     actual_bytes: int
     sha256: str
     reservation_id: str | None = None
+    identity: dict | None = None
 
 
 class LocalStore:
@@ -74,6 +76,7 @@ class LocalStore:
             "bytes": staged.actual_bytes,
             "sha256": staged.sha256,
             "reservation_id": staged.reservation_id,
+            "identity": staged.identity,
         }
         with temporary.open("x", encoding="utf-8") as f:
             json.dump(payload, f)
@@ -128,7 +131,9 @@ class LocalStore:
                     raise FileValidationError("empty")
                 f.flush()
                 os.fsync(f.fileno())
-            staged = StagedFile(key, count, digest.hexdigest(), staged.reservation_id)
+            staged = StagedFile(
+                key, count, digest.hexdigest(), staged.reservation_id, staged.identity
+            )
             self._journal(staged, "staged")
             return staged
         except BaseException:
@@ -166,3 +171,86 @@ class LocalStore:
         path = self._path(key, ".blob")
         flags = os.O_RDONLY | getattr(os, "O_BINARY", 0) | getattr(os, "O_NOFOLLOW", 0)
         return os.fdopen(os.open(path, flags), "rb")
+
+    @contextmanager
+    def result_guard(self, key):
+        """Nonblocking OS lock prevents expired writers and successors sharing a path.
+
+        Lock files are retained: deleting an inode while another process waits
+        can create two independent locks. This lock never substitutes DB fencing.
+        """
+        path = self._path(key, ".lock")
+        path.parent.mkdir(exist_ok=True)
+        self._sync_directory(self.root)
+        with path.open("a+b") as handle:
+            if path.stat().st_size == 0:
+                handle.write(b"0")
+                handle.flush()
+            handle.seek(0)
+            if os.name == "nt":
+                import msvcrt
+
+                msvcrt.locking(handle.fileno(), msvcrt.LK_NBLCK, 1)
+            else:
+                import fcntl
+
+                fcntl.flock(handle.fileno(), fcntl.LOCK_EX | fcntl.LOCK_NB)
+            try:
+                yield
+            finally:
+                handle.seek(0)
+                if os.name == "nt":
+                    msvcrt.locking(handle.fileno(), msvcrt.LK_UNLCK, 1)
+                else:
+                    fcntl.flock(handle.fileno(), fcntl.LOCK_UN)
+
+    def recover_result(self, expected, *, recorded=False):
+        """Only a full blob with the immutable save identity can recover a record.
+
+        Called under result_guard, outside every database transaction. Parts and
+        stale journal temp files may be retried; durable blobs are never discarded.
+        """
+        path = self._path(expected.key, ".blob")
+        journal = self._path(expected.key, ".journal")
+        if not path.exists():
+            for suffix in (".part", ".journal-tmp"):
+                self._path(expected.key, suffix).unlink(missing_ok=True)
+            return False
+        if not journal.exists() and not recorded:
+            raise FileValidationError()
+        if journal.exists():
+            if journal.stat().st_size > 16384:
+                raise FileValidationError()
+            data = json.loads(journal.read_text(encoding="utf-8"))
+            if any(
+                data.get(k) != v
+                for k, v in {
+                    "key": expected.key,
+                    "state": "publishing",
+                    "bytes": expected.actual_bytes,
+                    "sha256": expected.sha256,
+                    "reservation_id": expected.reservation_id,
+                    "identity": expected.identity,
+                }.items()
+            ):
+                raise FileValidationError()
+        digest, count = hashlib.sha256(), 0
+        with self.read(expected.key) as source:
+            while chunk := source.read(65536):
+                count += len(chunk)
+                if count > expected.actual_bytes:
+                    raise FileValidationError("size")
+                digest.update(chunk)
+        if count != expected.actual_bytes or digest.hexdigest() != expected.sha256:
+            raise FileValidationError()
+        flags = os.O_RDWR | getattr(os, "O_BINARY", 0) | getattr(os, "O_NOFOLLOW", 0)
+        fd = os.open(path, flags)
+        try:
+            os.fsync(fd)  # Windows FlushFileBuffers requires a writable handle.
+        finally:
+            os.close(fd)
+        self._sync_directory(path.parent)
+        return True
+
+    def result_path(self, key):
+        return self._path(key, ".blob")
