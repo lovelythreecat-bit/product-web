@@ -8,6 +8,7 @@ from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
 from starlette.exceptions import HTTPException
 
+from app.catalog.schemas import SpecVersion
 from app.common.types import DTO, Quote
 
 
@@ -31,6 +32,7 @@ class ErrorDetail(DTO):
     code: ErrorCode
     message: str
     current_quotes: list[Quote] | None = None
+    current_specs: list[SpecVersion] | None = None
 
 
 class ErrorResponse(DTO):
@@ -38,9 +40,16 @@ class ErrorResponse(DTO):
     trace_id: UUID
 
 
-def error_response(status: int, code: ErrorCode, message: str) -> JSONResponse:
+def error_response(
+    status: int, code: ErrorCode, message: str, *, current_quotes=None, current_specs=None
+) -> JSONResponse:
     trace_id = uuid4()
-    payload = ErrorResponse(error=ErrorDetail(code=code, message=message), trace_id=trace_id)
+    payload = ErrorResponse(
+        error=ErrorDetail(
+            code=code, message=message, current_quotes=current_quotes, current_specs=current_specs
+        ),
+        trace_id=trace_id,
+    )
     return JSONResponse(
         status_code=status,
         content=payload.model_dump(mode="json"),

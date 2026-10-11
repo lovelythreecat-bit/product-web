@@ -33,6 +33,23 @@ def install_openapi(app: FastAPI) -> None:
     def platform_openapi() -> dict:
         if app.openapi_schema is None:
             schema = get_openapi(title=app.title, version=app.version, routes=app.routes)
+            # Runtime intentionally uses 401/403 for missing security values instead of
+            # FastAPI's body-validation 422. They are still mandatory client contracts.
+            for path in schema["paths"].values():
+                for operation in path.values():
+                    if not isinstance(operation, dict):
+                        continue
+                    for parameter in operation.get("parameters", []):
+                        if (
+                            parameter["in"] == "header"
+                            and parameter["name"].lower()
+                            in {"origin", "x-requested-with", "x-csrf-token"}
+                        ) or (
+                            parameter["in"] == "cookie"
+                            and parameter["name"] in {"session", "csrf_token"}
+                        ):
+                            parameter["required"] = True
+                            parameter["schema"] = {"type": "string"}
             _, definitions = models_json_schema(
                 [(model, "validation") for model in CONTRACT_MODELS],
                 ref_template="#/components/schemas/{model}",

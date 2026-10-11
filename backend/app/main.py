@@ -10,6 +10,8 @@ from sqlalchemy import text
 from sqlalchemy.exc import SQLAlchemyError
 
 from app.auth.routes import router as auth_router
+from app.catalog.routes import router as catalog_router
+from app.catalog.service import CatalogError
 from app.common.errors import ErrorCode, ErrorResponse, error_response, register_error_handlers
 from app.common.health import LiveResponse, ReadyResponse
 from app.common.openapi import install_openapi
@@ -47,7 +49,18 @@ def create_app(settings: Settings) -> FastAPI:
     )
     application.state.auth_rate_prefix = "auth-rate:"
     application.include_router(auth_router)
+    application.include_router(catalog_router)
     register_error_handlers(application)
+
+    @application.exception_handler(CatalogError)
+    async def catalog_error(request, exc):
+        return error_response(
+            exc.status_code,
+            ErrorCode(exc.code),
+            "请检查规格并重新确认当前报价。",
+            current_quotes=exc.current_quotes,
+            current_specs=exc.current_specs,
+        )
 
     @application.exception_handler(LedgerError)
     async def ledger_error(request, exc):

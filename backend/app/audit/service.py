@@ -18,3 +18,34 @@ def audit_credit_config(session, actor_id, version, reason, amount, policy_versi
             created_at=datetime.now(UTC).replace(tzinfo=None),
         )
     )
+
+
+def audit_catalog(
+    session,
+    actor_id,
+    kind,
+    object_id,
+    version,
+    reason,
+    enabled,
+    *,
+    secret_configured=None,
+    credits=None,
+):
+    """Only typed publication metadata enters audit; endpoints/credential refs never do."""
+    changes = {"version": version, "enabled": enabled}
+    if secret_configured is not None:
+        changes["secret_configured"] = secret_configured
+    if credits is not None:
+        changes["credits"] = credits
+    session.add(
+        AuditEvent(
+            id=str(uuid4()),
+            actor_id=str(actor_id),
+            action=f"catalog_{kind}",
+            object_id=str(object_id),
+            reason=reason,
+            changes=changes,
+            created_at=datetime.now(UTC).replace(tzinfo=None),
+        )
+    )

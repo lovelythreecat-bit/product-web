@@ -3,7 +3,7 @@
 import secrets
 from typing import Annotated
 
-from fastapi import APIRouter, Cookie, Depends, HTTPException, Request, Response
+from fastapi import APIRouter, Cookie, Depends, Header, HTTPException, Request, Response
 from redis import RedisError
 from sqlalchemy.exc import OperationalError
 from sqlalchemy.orm import Session
@@ -32,6 +32,29 @@ def origin_check(request):
         raise HTTPException(403)
     if request.headers.get("x-requested-with") != "platform":
         raise HTTPException(403)
+
+
+def require_origin_headers(
+    request: Request,
+    origin: Annotated[
+        str | None,
+        Header(
+            description=(
+                "Required exact allowlisted Origin; browsers send this automatically. "
+                "Do not set Origin in frontend JavaScript."
+            )
+        ),
+    ] = None,
+    requested_with: Annotated[
+        str | None,
+        Header(
+            alias="X-Requested-With",
+            description="Required literal platform; omission or mismatch returns 403.",
+        ),
+    ] = None,
+):
+    # Optional in Python preserves the existing 403 security semantics on omission.
+    origin_check(request)
 
 
 def limit_auth(request, account):
@@ -75,7 +98,17 @@ def set_cookies(response, result):
 
 
 def require_active_principal(
-    request: Request, session: DB, cookie: Annotated[str | None, Cookie(alias="session")] = None
+    request: Request,
+    session: DB,
+    cookie: Annotated[
+        str | None,
+        Cookie(
+            alias="session",
+            description=(
+                "Required Secure HttpOnly session cookie; omission or invalid session returns 401."
+            ),
+        ),
+    ] = None,
 ):
     return service(request, session).require_active_principal(cookie)
 
@@ -83,13 +116,36 @@ def require_active_principal(
 PrincipalDep = Annotated[Principal, Depends(require_active_principal)]
 
 
-def require_csrf(request, session, principal):
+def require_csrf(
+    request: Request,
+    session: DB,
+    principal: PrincipalDep,
+    origin_headers: Annotated[None, Depends(require_origin_headers)] = None,
+    csrf_header: Annotated[
+        str | None,
+        Header(
+            alias="X-CSRF-Token",
+            description=(
+                "Required token bound to this session and csrf_token cookie; "
+                "omission or mismatch returns 403."
+            ),
+        ),
+    ] = None,
+    csrf_cookie: Annotated[
+        str | None,
+        Cookie(
+            alias="csrf_token",
+            description="Required session-bound CSRF cookie; omission or mismatch returns 403.",
+        ),
+    ] = None,
+):
     origin_check(request)
     token = request.headers.get("x-csrf-token", "")
     cookie = request.cookies.get("csrf_token", "")
     credential = session.get(AuthSession, str(principal.session_id))
     if (
-        not token
+        credential is None
+        or not token
         or len(token) > 128
         or not secrets.compare_digest(token, cookie)
         or not secrets.compare_digest(digest(token), credential.csrf_hash)
@@ -103,6 +159,7 @@ def require_csrf(request, session, principal):
     status_code=201,
     responses={200: {"model": AuthView}},
     operation_id="auth_register",
+    dependencies=[Depends(require_origin_headers)],
 )
 def register(dto: RegisterRequest, request: Request, response: Response, session: DB):
     origin_check(request)
@@ -124,7 +181,12 @@ def register(dto: RegisterRequest, request: Request, response: Response, session
     return AuthView(profile=result.profile, replayed=result.replayed)
 
 
-@router.post("/auth/login", response_model=AuthView, operation_id="auth_login")
+@router.post(
+    "/auth/login",
+    response_model=AuthView,
+    operation_id="auth_login",
+    dependencies=[Depends(require_origin_headers)],
+)
 def login(dto: LoginRequest, request: Request, response: Response, session: DB):
     origin_check(request)
     limit_auth(request, normalize_account(dto.account))
@@ -134,9 +196,13 @@ def login(dto: LoginRequest, request: Request, response: Response, session: DB):
     return AuthView(profile=result.profile, replayed=False)
 
 
-@router.post("/auth/logout", status_code=204, operation_id="auth_logout")
+@router.post(
+    "/auth/logout",
+    status_code=204,
+    operation_id="auth_logout",
+    dependencies=[Depends(require_csrf)],
+)
 def logout(request: Request, session: DB, principal: PrincipalDep):
-    require_csrf(request, session, principal)
     service(request, session).revoke_session(principal.session_id)
     session.commit()
     response = Response(status_code=204)
@@ -152,9 +218,13 @@ def get_profile(request: Request, session: DB, principal: PrincipalDep):
     return service(request, session).get_profile(principal)
 
 
-@router.patch("/me", response_model=ProfileView, operation_id="update_profile")
+@router.patch(
+    "/me",
+    response_model=ProfileView,
+    operation_id="update_profile",
+    dependencies=[Depends(require_csrf)],
+)
 def update_profile(dto: ProfileUpdate, request: Request, session: DB, principal: PrincipalDep):
-    require_csrf(request, session, principal)
     result = service(request, session).update_profile(principal, dto)
     session.commit()
     return result

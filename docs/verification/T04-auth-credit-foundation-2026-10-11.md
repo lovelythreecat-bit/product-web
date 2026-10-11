@@ -11,3 +11,5 @@
 评审保留一项 Minor：强制安全请求头尚未完整声明进 OpenAPI，后续共享接口接线补齐。T07 补任务关联与所有权，T12 补结算释放，T19 接后台权限及政策确认，并验证配置首次初始化和已有版本的并发 CAS；T18/T22 验证实际浏览器 HTTPS、Origin 和可信代理部署。上述后续能力不计入本步完成范围。
 
 报告与原始证据保存在本地 `.agent-runs/2026-10-11-implementation/`，任务 T04 / R-T04。迁移实际 revision 为 `0003_auth_credit_base`，承接 `0002_policy_versions`。
+
+后续更新：上述 OpenAPI 请求头 Minor 已在 T05 实现、运行时回归并获独立评审确认关闭，见[目录与报价验收](T05-catalog-quotes-2026-10-11.md)。其他阶段边界继续保留。
