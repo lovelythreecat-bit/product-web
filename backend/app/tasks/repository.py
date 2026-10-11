@@ -6,6 +6,7 @@ from app.common.types import CursorPage, TaskView
 from app.conversations.service import authenticate, owned_conversation
 from app.tasks.models import GenerationTask, TaskSnapshot
 from app.tasks.schemas import TaskDetail
+from app.works.models import Work
 
 
 def task_view(session, row):
@@ -18,7 +19,14 @@ def task_view(session, row):
         state_version=row.state_version,
         settlement_state=row.settlement_state,
         quote=snapshot.quote,
-        work_ids=[],
+        work_ids=list(
+            session.scalars(
+                select(Work.id)
+                .where(Work.task_id == row.id)
+                .order_by(Work.id)
+                .with_for_update(read=True)
+            )
+        ),
         investigation_reason=row.investigation_reason,
     )
 

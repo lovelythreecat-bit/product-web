@@ -324,7 +324,19 @@ def test_actual_composed_worker_saves_original(upstream, ready, tmp_path, redis_
             select(ResultManifestRecord).where(ResultManifestRecord.task_id == task)
         )
         assert manifest and s.get(ResultDeliveryRecord, manifest.id)
-        assert s.get(GenerationTask, task).state == "SAVING"
+        assert s.get(GenerationTask, task).state == "SUCCEEDED"
+        assert s.get(GenerationTask, task).settlement_state == "CONSUMED"
+        delivery = persistence(upstream, tmp_path).verified_delivery(
+            s, s.get(GenerationTask, task), manifest.id
+        )
+        assert delivery and len(delivery.items) == 2
+        assert all(len(item.sha256) == 64 for item in delivery.items)
+        from app.ledger.models import CreditLedger
+
+        settlements = s.scalars(
+            select(CreditLedger).where(CreditLedger.task_id == task, CreditLedger.kind == "consume")
+        ).all()
+        assert len(settlements) == 1 and settlements[0].amount == 30
     assert calls(upstream, task)["submit"] == 1
 
 

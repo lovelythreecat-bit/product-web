@@ -49,13 +49,14 @@ def compose_worker(
             "investigate",
         )
     }
-    if store is not None:
-        from app.results.persistence import ResultPersistence
+    from app.results.persistence import ResultPersistence
+    from app.results.publisher import ResultPublisher
 
-        persistence = ResultPersistence(factory, service, store)
-        handlers["save_original"] = persistence.handle
-        handlers["investigate"] = persistence.recover_or_query
-        handlers["query_original"] = persistence.recover_or_query
+    publisher = ResultPublisher(ResultPersistence(factory, service, store))
+    for action in handlers:
+        handlers[action] = publisher.handle
+    if store is not None:
+        handlers["save_original"] = publisher.handle
     # No private persistent root means saving stays due; never claim a saved result.
     return Worker(
         OutboxDispatcher(factory, redis, stream, task_ids=task_ids),
