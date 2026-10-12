@@ -19,8 +19,12 @@ class AccountReads:
 
     def account(self, principal):
         authenticate(self.session, principal)
+        return self._account_for_user(principal.user_id)
+
+    def _account_for_user(self, user_id):
+        """Internal projection; caller must authorize owner or administrative access."""
         row = self.session.scalar(
-            select(CreditAccount).where(CreditAccount.user_id == str(principal.user_id))
+            select(CreditAccount).where(CreditAccount.user_id == str(user_id))
         )
         if row is None:
             raise HTTPException(404)
@@ -28,7 +32,11 @@ class AccountReads:
 
     def ledger(self, principal, cursor=None, limit=20):
         authenticate(self.session, principal)
-        predicates = [CreditLedger.user_id == str(principal.user_id)]
+        return self._ledger_for_user(principal.user_id, cursor, limit)
+
+    def _ledger_for_user(self, user_id, cursor=None, limit=20):
+        """Internal projection; cursor stays bound to the explicitly authorized user."""
+        predicates = [CreditLedger.user_id == str(user_id)]
         if cursor:
             try:
                 cursor = str(UUID(cursor))

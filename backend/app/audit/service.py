@@ -6,6 +6,21 @@ from uuid import uuid4
 from app.audit.models import AuditEvent
 
 
+def audit_admin(session, actor_id, action, object_id, reason, changes):
+    """Internal call sites supply explicit metadata, never raw DTOs or snapshots."""
+    row = AuditEvent(
+        id=str(uuid4()),
+        actor_id=str(actor_id),
+        action=action,
+        object_id=str(object_id),
+        reason=reason,
+        changes=changes,
+        created_at=datetime.now(UTC).replace(tzinfo=None),
+    )
+    session.add(row)
+    return row
+
+
 def audit_credit_config(session, actor_id, version, reason, amount, policy_version):
     session.add(
         AuditEvent(

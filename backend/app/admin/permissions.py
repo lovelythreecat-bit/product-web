@@ -10,6 +10,7 @@ from uuid import UUID
 from fastapi import HTTPException
 from sqlalchemy import select
 
+from app.auth.models import User
 from app.catalog.service import CatalogService
 from app.conversations.models import Conversation, Message, Product, ProductVersion
 from app.storage.models import File
@@ -56,6 +57,22 @@ class ResourceGrant:
     resource_id: UUID
     user_id: UUID
     version: str | None = None
+
+
+def authorize_admin(session, principal, *, user_ids=()):
+    """Start with sorted user locks before sessions/accounts/resources.
+
+    Mutation routes release dependency authentication locks before calling this.
+    The live database role, not the incoming Principal role, is authoritative.
+    """
+    for user_id in sorted({str(principal.user_id), *map(str, user_ids)}):
+        session.scalar(
+            select(User)
+            .where(User.id == user_id)
+            .with_for_update()
+            .execution_options(populate_existing=True)
+        )
+    CatalogService(session)._principal(principal, admin=True)
 
 
 def authorize_resource(session, principal, resource_type, resource_id, *, version=None):

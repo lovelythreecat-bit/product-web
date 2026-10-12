@@ -134,7 +134,10 @@ def list_investigations(
     if owner:
         query = query.where(Investigation.owner == str(owner))
     if cursor:
-        anchor = session.scalar(query.where(Investigation.task_id == str(cursor)))
+        # A previous page's last row may now be resolved or assigned elsewhere.
+        # Its immutable ordering identity remains valid; current filters apply only
+        # to the result set. Admin authorization above still governs every page.
+        anchor = session.get(Investigation, str(cursor))
         if anchor is None:
             raise HTTPException(422)
         query = query.where(

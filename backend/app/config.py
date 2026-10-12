@@ -2,6 +2,7 @@
 
 from pathlib import Path
 from typing import Literal
+from uuid import UUID
 
 from pydantic import Field, SecretStr, model_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
@@ -14,6 +15,9 @@ class Settings(BaseSettings):
 
     mode: Literal["mock", "staging", "production"] = "mock"
     test_only: bool = True
+    # Production approval authority is unresolved. Only an explicitly isolated
+    # mock approver list is supported; there is no production default authority.
+    test_only_content_approver_ids: list[UUID] = []
     assist_policy_version: str | None = None
     assist_provider: Literal["deterministic_mock"] | None = None
     assist_timeout_seconds: float = Field(default=10, gt=0, le=60)
@@ -30,6 +34,8 @@ class Settings(BaseSettings):
 
     @model_validator(mode="after")
     def reject_test_configuration(self) -> "Settings":
+        if self.test_only_content_approver_ids and (self.mode != "mock" or not self.test_only):
+            raise ValueError("Content approvers are TEST_ONLY and require mock mode")
         if self.mode != "mock":
             values = [self.database_url, self.redis_url]
             contains_test_value = any(
