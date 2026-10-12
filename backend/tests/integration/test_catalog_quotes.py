@@ -188,6 +188,47 @@ class CatalogFixture:
             )
 
 
+def test_agent_listing_uses_bounded_queries_without_losing_visibility_or_transaction(catalog):
+    from sqlalchemy import event
+
+    from app.catalog.service import CatalogService
+
+    assert catalog.agent().status_code == 201
+    disabled = CatalogFixture(catalog.client, catalog.engine, catalog.user)
+    assert disabled.agent(enabled=False).status_code == 201
+    another = CatalogFixture(catalog.client, catalog.engine, catalog.user)
+    assert another.agent().status_code == 201
+    statements = []
+
+    def count(_connection, _cursor, statement, _parameters, _context, _many):
+        if statement.lstrip().upper().startswith("SELECT"):
+            statements.append(statement)
+
+    with Session(catalog.engine) as session:
+        session.execute(text("SELECT 1"))
+        transaction = session.get_transaction()
+        event.listen(catalog.engine, "before_cursor_execute", count)
+        try:
+            visible = CatalogService(session, mode="mock").list_agents()
+        finally:
+            event.remove(catalog.engine, "before_cursor_execute", count)
+        ids = {str(agent.agent_id) for agent in visible}
+        assert {catalog.agent_id, another.agent_id} <= ids
+        assert disabled.agent_id not in ids
+        assert all(agent.mode == "mock" and agent.enabled for agent in visible)
+        assert session.get_transaction() is transaction
+        assert len(statements) <= 3, f"Catalog list used {len(statements)} SELECTs"
+        statements.clear()
+        event.listen(catalog.engine, "before_cursor_execute", count)
+        try:
+            administrative = CatalogService(session, mode="mock").list_agents(admin=True)
+        finally:
+            event.remove(catalog.engine, "before_cursor_execute", count)
+        assert disabled.agent_id in {str(agent.agent_id) for agent in administrative}
+        assert len(statements) <= 2
+        assert session.get_transaction() is transaction
+
+
 def test_quote_stale_after_reprice_delist(catalog):
     catalog.publish()
     quote = catalog.quote().json()

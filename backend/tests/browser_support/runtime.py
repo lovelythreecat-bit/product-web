@@ -321,6 +321,47 @@ class Runtime:
             ]
             return dict(task_id=task_id, receipts=receipts)
 
+    def reprice(self, kind):
+        """Publish a new exact version at the same TEST_ONLY 8/20/60 price."""
+        from app.auth.service import AuthService
+        from app.catalog.models import PriceHead, PriceRecord
+        from app.catalog.schemas import PriceDraft
+        from app.catalog.service import CatalogService
+
+        if kind not in self.agents:
+            raise ValueError("Agent outside this run")
+        spec_id = self.metadata["specs"][kind]
+        with self.lock, self.factory() as session, session.begin():
+            auth = AuthService(session, mode="mock")
+            login = auth.authenticate(self.prefix + "admin", "TEST_ONLY_browser_password")
+            actor = auth.require_active_principal(login.session_token)
+            head = session.get(PriceHead, spec_id)
+            previous = session.get(PriceRecord, (spec_id, head.version)).snapshot
+            result = CatalogService(session, mode="mock").set_price_version(
+                actor,
+                PriceDraft(
+                    spec_id=spec_id,
+                    version="TEST_ONLY_requote_" + uuid4().hex,
+                    expected_version=head.version,
+                    enabled=True,
+                    credits=previous["credits"],
+                    policy_version=previous["policy_version"],
+                    reason="TEST_ONLY exact stale quote browser scenario",
+                ),
+            )
+            return result.model_dump(mode="json")
+
+    def prune(self, task_id):
+        """Expire only this run's owner's event history via the real retention service."""
+        from app.events.service import prune_events
+
+        with self.lock, self.factory() as session, session.begin():
+            task = self.checked_task(session, task_id)
+            head = prune_events(session, task.user_id, retention_seconds=0)
+            return dict(
+                user_id=task.user_id, last_seq=head.last_seq, pruned_through=head.pruned_through
+            )
+
     def tick(self):
         while not self.stop.wait(0.15):
             try:
@@ -382,6 +423,10 @@ def main():
                     result = runtime.notify(**data)
                 elif self.path == "/inspect":
                     result = runtime.inspect(data["task_id"])
+                elif self.path == "/reprice":
+                    result = runtime.reprice(data["kind"])
+                elif self.path == "/prune":
+                    result = runtime.prune(data["task_id"])
                 elif self.path == "/resume":
                     with runtime.lock:
                         if data["task_id"] not in runtime.owned:
@@ -411,7 +456,13 @@ def main():
 
     server = uvicorn.Server(
         uvicorn.Config(
-            runtime.app, host="127.0.0.1", port=args.api_port, access_log=False, log_level="warning"
+            runtime.app,
+            host="127.0.0.1",
+            port=args.api_port,
+            access_log=False,
+            log_level="warning",
+            proxy_headers=True,
+            forwarded_allow_ips="127.0.0.1",
         )
     )
     (runtime.root / "control.json").write_text(

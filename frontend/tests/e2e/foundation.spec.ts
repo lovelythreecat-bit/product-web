@@ -45,7 +45,7 @@ test('six routes keep authenticated navigation and responsive V2 layout',async({
  await expect(page).toHaveURL(/\/workspace$/)
  for(const path of ['/workspace','/workspace/TEST_ONLY','/works','/account','/recharge']){
   await page.goto(path)
-  if(path.startsWith('/workspace')||path==='/works') await expect(page.getByRole('heading',{name:'业务页面正在开发'})).toBeVisible()
+  if(path.startsWith('/workspace')||path==='/works') await expect(page.getByRole('heading',{name:path==='/works'?'我的作品':'创作工作台',exact:true})).toBeVisible()
   else await expect(page.getByRole('heading',{name:path==='/account'?'个人中心':'充值说明',exact:true})).toBeVisible()
   expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true)
  }

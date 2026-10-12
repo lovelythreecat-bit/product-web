@@ -11,7 +11,7 @@ from uuid import UUID
 
 from fastapi import HTTPException
 from pydantic import ValidationError
-from sqlalchemy import insert, select, update
+from sqlalchemy import insert, select, tuple_, update
 from sqlalchemy.exc import IntegrityError
 
 from app.audit.service import audit_catalog
@@ -133,6 +133,9 @@ class CatalogService:
             .mappings()
             .one_or_none()
         )
+        return self._policy_value(row, path, schema)
+
+    def _policy_value(self, row, path, schema):
         if row is None:
             raise PolicyGateError()
         values = dict(row)
@@ -153,8 +156,9 @@ class CatalogService:
         except (KeyError, TypeError, ValidationError):
             raise PolicyGateError() from None
 
-    def _agent_gate(self, agent):
-        inputs = self._policy(
+    def _agent_gate(self, agent, policy_reader=None):
+        read_policy = policy_reader or self._policy
+        inputs = read_policy(
             "D-03", agent.policy_versions, ("agents", str(agent.agent_id)), ps.InputPolicy
         )
         if (
@@ -163,7 +167,7 @@ class CatalogService:
         ):
             raise PolicyGateError()
         if self.mode != "mock":
-            protocol = self._policy(
+            protocol = read_policy(
                 "D-01", agent.policy_versions, ("agents", str(agent.agent_id)), ps.AgentPolicy
             )
             if protocol.protocol_version != agent.protocol_version:
@@ -436,22 +440,61 @@ class CatalogService:
         raise CatalogError("QUOTE_STALE", 409, current_quotes=quotes, current_specs=specs)
 
     def list_agents(self, *, admin=False):
+        # Keep authoritative current reads and the caller's transaction, but
+        # acquire each class of shared locks in one ordered batch.
+        heads = self.session.execute(
+            select(AgentHead.agent_id, AgentHead.version)
+            .order_by(AgentHead.agent_id)
+            .with_for_update(read=True)
+        ).all()
+        if not heads:
+            return []
+        candidates = [
+            s.AgentVersion.model_validate(snapshot)
+            for snapshot in self.session.scalars(
+                select(AgentRecord.snapshot)
+                .where(tuple_(AgentRecord.agent_id, AgentRecord.version).in_(heads))
+                .order_by(AgentRecord.agent_id, AgentRecord.version)
+                .with_for_update(read=True)
+            )
+        ]
+        candidates = [agent for agent in candidates if agent.mode == self.mode]
+        if admin:
+            return candidates
+        candidates = [agent for agent in candidates if agent.enabled]
+        decisions = ("D-03",) if self.mode == "mock" else ("D-01", "D-03")
+        keys = {
+            (decision, agent.policy_versions.get(decision, ""))
+            for agent in candidates
+            for decision in decisions
+        }
+        rows = (
+            self.session.execute(
+                select(DecisionVersionRecord.__table__)
+                .where(
+                    tuple_(DecisionVersionRecord.decision_id, DecisionVersionRecord.version).in_(
+                        sorted(keys)
+                    )
+                )
+                .order_by(DecisionVersionRecord.decision_id, DecisionVersionRecord.version)
+                .with_for_update(read=True)
+            ).mappings()
+            if keys
+            else []
+        )
+        policies = {(row["decision_id"], row["version"]): row for row in rows}
+
+        def read_policy(decision, versions, path, schema):
+            row = policies.get((decision, versions.get(decision, "")))
+            return self._policy_value(row, path, schema)
+
         result = []
-        for id in self.session.scalars(
-            select(AgentHead.agent_id).order_by(AgentHead.agent_id).with_for_update(read=True)
-        ):
-            version = self._head(AgentHead, "agent_id", id)
-            agent = self.read_agent_version(id, version)
-            if agent is None:
-                continue
-            if admin:
+        for agent in candidates:
+            try:
+                self._agent_gate(agent, read_policy)
                 result.append(agent)
-            elif agent.enabled:
-                try:
-                    self._agent_gate(agent)
-                    result.append(agent)
-                except PolicyGateError:
-                    pass
+            except PolicyGateError:
+                pass
         return result
 
     def list_specs(self, agent_id=None, *, admin=False):

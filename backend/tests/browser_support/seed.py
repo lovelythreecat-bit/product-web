@@ -50,10 +50,30 @@ def seed(factory, settings, prefix, endpoint):
             support = dict(
                 product_required_fields=["name"],
                 instruction_required=False,
-                min_materials=0,
+                min_materials=0 if kind == "copy" else 1,
                 max_materials=2,
             )
-            parameters = {"fields": {}, "combinations": []}
+            # This run's explicit TEST_ONLY contract. Optional fields preserve callers
+            # exercising empty parameters; UI consumes the actual published defaults.
+            fields = {
+                "copy": {
+                    "tone": dict(
+                        kind="string", required=False, choices=["自然", "专业"], default="自然"
+                    )
+                },
+                "image": {
+                    "purpose": dict(
+                        kind="string", required=False, choices=["场景图", "主图"], default="场景图"
+                    )
+                },
+                "video": {
+                    "aspect_ratio": dict(
+                        kind="string", required=False, choices=["9:16", "16:9"], default="9:16"
+                    ),
+                    "subtitles": dict(kind="boolean", required=False, default=True),
+                },
+            }[kind]
+            parameters = {"fields": fields, "combinations": []}
             versions = {
                 "D-03": policy(
                     s,

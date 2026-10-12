@@ -391,6 +391,55 @@ h1 {
 }
 
 .public-shell { display:block }
+.workspace-grid { display:grid; grid-template-columns:minmax(0,1fr) minmax(340px,405px); gap:24px; align-items:start }
+.creation-panel { grid-column:2; grid-row:1; padding:24px }
+.creation-panel>h2 { margin-top:0 }
+.task-history { grid-column:1; grid-row:1; min-width:0 }
+.task-card { padding:24px; border:1px solid var(--color-border); border-radius:var(--radius-panel); background:var(--color-panel); margin-bottom:24px }
+.task-card h2 { font-size:18px }
+.task-instruction { padding:16px; background:var(--color-message); border-radius:8px; white-space:pre-wrap }
+.status-label { border-radius:24px; padding:4px 10px; font-size:12px; background:var(--color-success-bg); color:var(--color-success) }
+.creation-panel fieldset { border:0; padding:0; margin:0; min-width:0 }
+.creation-panel label { font-size:14px }
+.creation-section { border-top:1px solid var(--color-border); padding-top:20px; min-width:0 }
+.creation-section h3 { font-size:16px; margin:0 }
+.creation-section summary { cursor:pointer; min-height:44px; display:flex; align-items:center; font-weight:600 }
+.creation-section label { margin-top:12px }
+.agent-types,.action-row { display:flex; flex-wrap:wrap; gap:8px }
+.agent-types .button { flex:1 }
+.agent-types .button[aria-pressed=true] { background:var(--color-selected); border-color:var(--color-primary); color:var(--color-primary) }
+select { width:100%; padding:8px 12px; border:1px solid var(--color-border); border-radius:var(--radius-control); background:var(--color-panel); color:var(--color-text); min-width:0 }
+.material-row { display:flex; gap:12px; align-items:center; margin:12px 0; flex-wrap:wrap }
+.material-row img { width:64px; height:64px; object-fit:contain; border-radius:8px }
+.material-row small { overflow-wrap:anywhere; flex:1; min-width:80px }
+.form-stack input[type=file] { font-size:12px; padding:8px; max-width:100% }
+.quote-panel { border-top:1px solid var(--color-border); padding-top:20px }
+.quote-panel p { margin:4px 0; color:var(--color-primary) }
+.quote-panel strong { font-size:36px }
+.charge-amount { font-size:28px; color:var(--color-primary); font-weight:700 }
+.field-hint { font-size:14px; margin:0 }
+.assist-preview { background:var(--color-message); padding:16px; margin-top:16px; border-radius:8px }
+.prompt-editor .action-row { margin-top:12px }
+.conversation-nav>.button { width:100% }
+.desktop-history>a { display:block; padding:12px; text-decoration:none; border-radius:8px; margin:8px -8px; overflow-wrap:anywhere }
+.desktop-history>a.router-link-exact-active { background:var(--color-selected) }
+.desktop-history small { display:block }
+.mobile-history { display:none }
+.result-item { margin:16px 0 }
+.result-item>img,.result-item>video,.preview-media { display:block; width:100%; max-height:560px; object-fit:contain; border-radius:8px; background:var(--color-background) }
+.result-item .action-row { margin-top:12px }
+pre { white-space:pre-wrap; overflow-wrap:anywhere; font:inherit; font-size:14px; margin:0; max-width:100% }
+.copy-result { line-height:1.8; padding:16px; background:var(--color-background); border-radius:8px }
+.works-toolbar { display:flex; align-items:center; flex-wrap:wrap; gap:12px; margin-bottom:24px }
+.works-toolbar select { width:160px }
+.works-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(min(100%,320px),1fr)); gap:24px; margin-bottom:24px }
+.work-card { padding:24px; min-width:0 }
+.work-card>.action-row { margin-top:16px }
+.empty-state { text-align:center; padding:48px 24px }
+.transient { padding:16px; border:1px dashed var(--color-border) }
+@media(max-width:1180px) { .workspace-grid { grid-template-columns:minmax(0,1fr) minmax(300px,360px); gap:16px } main { padding:24px } .creation-panel,.task-card { padding:20px } }
+@media(max-width:900px) { .workspace-grid { display:flex; flex-direction:column } .creation-panel,.task-history { width:100% } .shell-body { grid-template-columns:180px minmax(0,1fr) } .shell-sidebar { padding:16px } }
+@media(max-width:700px) { .desktop-history { display:none } .mobile-history { display:block } .conversation-nav { display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-top:8px } .conversation-nav label { align-self:center } .conversation-nav select { grid-column:1/-1 } .conversation-nav>.button { width:auto } main { padding:24px 16px } .creation-panel,.task-card { padding:20px } .sidebar-bottom { flex-wrap:wrap } }
 .auth-card { max-width:480px; margin:32px auto }
 .form-stack { display:grid; gap:20px }
 .form-stack label { display:block; margin-bottom:8px }
