@@ -2,7 +2,7 @@ import { beforeEach, expect, it, vi } from 'vitest'
 import { flushPromises, mount } from '@vue/test-utils'
 import { defineComponent } from 'vue'
 import { ApiError } from '../../src/api/client'
-const api = vi.hoisted(()=>({getAdminSiteContent:vi.fn(),getAdminCases:vi.fn(),updateSiteContent:vi.fn(),getPublicSite:vi.fn(),getPublicCases:vi.fn()}))
+const api = vi.hoisted(()=>({getAdminSiteContent:vi.fn(),getAdminCases:vi.fn(),updateSiteContent:vi.fn(),getPublicSite:vi.fn(),getPublicCases:vi.fn(),withdrawCase:vi.fn()}))
 const identity=vi.hoisted(()=>({epoch:{value:0},profile:{value:{user_id:'admin'}}}))
 vi.mock('../../src/api/site',()=>api)
 vi.mock('../../src/features/auth/session',()=>({session:identity}))
@@ -13,6 +13,17 @@ const global={stubs:{AppDrawer:overlay,AppDialog:overlay,RouterLink:{template:'<
 const content={product_intro:'original',agent_descriptions:{text:'text',image:'image',video:'video'},process_steps:['one']}
 const row={version:1,content,status:'draft',policy_version:'D11_draft',policy_versions:{},content_ref:'sha256:test'}
 beforeEach(()=>{vi.clearAllMocks();identity.epoch.value=0;api.getAdminSiteContent.mockResolvedValue(row);api.getAdminCases.mockResolvedValue([])})
+it('cleanup retry keeps the recorded withdrawal version instead of the publication version',async()=>{
+ const pending={id:'original-case',work_id:'original-work',owner_id:'original-owner',authorization_ref:'approval',policy_version:'D11_publish_v1',withdrawal_policy_version:'D11_withdraw_v2',state:'cleanup_pending'}
+ api.getAdminCases.mockResolvedValue([pending]);api.withdrawCase.mockResolvedValue({...pending,state:'withdrawn'})
+ const wrapper=mount(SiteView,{global});await flushPromises()
+ const button=(label:string)=>wrapper.findAll('button').find(b=>b.text()===label)!
+ await button('重试清理').trigger('click')
+ expect((wrapper.get('input').element as HTMLInputElement).value).toBe('D11_withdraw_v2')
+ await button('撤回并清理').trigger('click');await flushPromises()
+ expect(api.withdrawCase).toHaveBeenCalledExactlyOnceWith('original-case','D11_withdraw_v2')
+ wrapper.unmount()
+})
 it('409 retains all edits and keeps CAS baseline until explicit adoption',async()=>{
  api.updateSiteContent.mockRejectedValue(new ApiError('conflict',409))
  const wrapper=mount(SiteView,{global});await flushPromises()

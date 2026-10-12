@@ -67,6 +67,7 @@ class AdminCaseView(DTO):
     owner_id: UUID
     authorization_ref: str
     policy_version: str
+    withdrawal_policy_version: str | None
     state: Literal["published", "cleanup_pending", "withdrawn"]
 
 

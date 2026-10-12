@@ -25,7 +25,7 @@ async function submit() {
     }
   } catch (e) {
     // Never surface server validation details, request bodies or credentials.
-    error.value = e instanceof ApiError && e.status === 0 ? '网络连接失败，请重试。同一次注册重试会沿用原请求。' : props.register ? '注册未完成，请检查账号是否已使用，或稍后重试。' : '登录未完成，请检查账号和密码，或稍后重试。'
+    error.value = e instanceof ApiError && e.status === 0 ? props.register ? '网络连接失败，请重试。同一次注册重试会沿用原请求。' : '网络连接失败，请重试登录。' : props.register ? '注册未完成，请检查账号是否已使用，或稍后重试。' : '登录未完成，请检查账号和密码，或稍后重试。'
   }
 }
 </script>

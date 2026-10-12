@@ -134,6 +134,17 @@
             "title": "State",
             "type": "string"
           },
+          "withdrawal_policy_version": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Withdrawal Policy Version"
+          },
           "work_id": {
             "format": "uuid",
             "title": "Work Id",
@@ -146,6 +157,7 @@
           "owner_id",
           "authorization_ref",
           "policy_version",
+          "withdrawal_policy_version",
           "state"
         ],
         "title": "AdminCaseView",

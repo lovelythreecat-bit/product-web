@@ -1017,6 +1017,8 @@ export interface components {
              * @enum {string}
              */
             state: "published" | "cleanup_pending" | "withdrawn";
+            /** Withdrawal Policy Version */
+            withdrawal_policy_version: string | null;
             /**
              * Work Id
              * Format: uuid

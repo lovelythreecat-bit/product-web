@@ -159,6 +159,7 @@ def admin_case(row):
         owner_id=row.owner_id,
         authorization_ref=row.authorization_ref,
         policy_version=row.policy_versions["D-11"],
+        withdrawal_policy_version=row.withdrawal_policy_version,
         state=row.state,
     )
 
