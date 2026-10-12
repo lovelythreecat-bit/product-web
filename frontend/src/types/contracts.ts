@@ -896,6 +896,8 @@ export interface components {
         AdminUserView: {
             /** Account Normalized */
             account_normalized: string;
+            /** Auth Version */
+            auth_version: number;
             /**
              * Created At
              * Format: date-time

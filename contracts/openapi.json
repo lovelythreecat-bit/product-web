@@ -111,6 +111,11 @@
             "title": "Account Normalized",
             "type": "string"
           },
+          "auth_version": {
+            "minimum": 0.0,
+            "title": "Auth Version",
+            "type": "integer"
+          },
           "created_at": {
             "format": "date-time",
             "title": "Created At",
@@ -155,6 +160,7 @@
           "nickname",
           "role",
           "status",
+          "auth_version",
           "created_at"
         ],
         "title": "AdminUserView",

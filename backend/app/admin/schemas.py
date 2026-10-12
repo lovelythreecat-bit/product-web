@@ -21,6 +21,7 @@ class AdminUserView(Data):
     nickname: str | None
     role: Literal["user", "admin"]
     status: Literal["active", "disabled"]
+    auth_version: Annotated[int, Field(ge=0)]
     created_at: DatabaseTimestamp
 
 

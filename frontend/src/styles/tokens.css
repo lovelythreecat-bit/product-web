@@ -391,6 +391,27 @@ h1 {
 }
 
 .public-shell { display:block }
+.admin-page { display:grid; gap:24px; min-width:0 }
+.admin-page .page-heading { margin:0 }
+.admin-nav { display:flex; flex-direction:column; gap:8px; margin:16px 0 }
+.admin-nav a { min-height:44px; padding:10px 12px; border-radius:var(--radius-control); text-decoration:none }
+.admin-nav a.router-link-active { color:var(--color-primary); background:var(--color-selected); font-weight:600 }
+.admin-table { max-width:100%; overflow-x:auto; margin:16px 0; overscroll-behavior-x:contain }
+.admin-table table { width:100%; min-width:640px; border-collapse:collapse; font-size:14px; font-variant-numeric:tabular-nums }
+.admin-table th,.admin-table td { padding:16px 12px; border-bottom:1px solid var(--color-border); text-align:left; vertical-align:top; max-width:280px; overflow-wrap:anywhere }
+.admin-table th { color:var(--color-muted); font-weight:500; background:var(--color-background) }
+.admin-table td small { display:block; margin-top:4px }
+.admin-table td:last-child { min-width:140px }
+.admin-filters { display:flex; flex-wrap:wrap; align-items:end; gap:16px }
+.admin-filters label { display:grid; gap:8px; flex:1; min-width:160px }
+.admin-filters input { width:100%; min-width:0; padding:8px 12px; border:1px solid var(--color-border); border-radius:var(--radius-control); background:var(--color-panel) }
+.admin-records { list-style:none; padding:0; margin:16px 0 }
+.admin-records li { padding:16px 0; border-top:1px solid var(--color-border); overflow-wrap:anywhere }
+.admin-records p { margin:8px 0 }
+.admin-records summary { cursor:pointer; min-height:44px; padding:10px 0 }
+.admin-statistics { display:grid; grid-template-columns:minmax(160px,1fr) minmax(0,2fr); gap:12px 24px; font-variant-numeric:tabular-nums }
+.overlay-content .action-row { margin:20px 0 }
+@media(max-width:700px) { .admin-nav { flex-direction:row; flex-wrap:wrap; gap:4px; margin:8px 0 } .admin-nav a { padding:10px; font-size:14px } .admin-page .panel { padding:20px } .admin-statistics { grid-template-columns:1fr; gap:4px } .admin-statistics dd { margin-bottom:12px } .app-header nav { flex-wrap:wrap; gap:16px } }
 .workspace-grid { display:grid; grid-template-columns:minmax(0,1fr) minmax(340px,405px); gap:24px; align-items:start }
 .creation-panel { grid-column:2; grid-row:1; padding:24px }
 .creation-panel>h2 { margin-top:0 }
