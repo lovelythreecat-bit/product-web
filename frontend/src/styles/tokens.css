@@ -389,3 +389,36 @@ h1 {
 }
 
 }
+
+.public-shell { display:block }
+.auth-card { max-width:480px; margin:32px auto }
+.form-stack { display:grid; gap:20px }
+.form-stack label { display:block; margin-bottom:8px }
+.form-stack input,.form-stack textarea { width:100%; padding:10px 12px; border:1px solid var(--color-border); border-radius:var(--radius-control); background:var(--color-panel); color:var(--color-text) }
+.form-stack textarea { resize:vertical }
+.field-error { color:var(--color-danger); margin:4px 0; font-size:14px }
+.field-error:empty { display:none }
+.auth-switch a { display:inline-flex; min-height:44px; align-items:center }
+.header-actions { display:flex; gap:8px; margin-left:auto }
+.app-header { gap:24px }
+.app-header nav { gap:24px }
+.account-page { display:grid; gap:24px; max-width:1100px }
+.account-page .page-heading { margin-bottom:0 }
+.section-heading { display:flex; align-items:center; justify-content:space-between; gap:16px; margin-bottom:16px }
+.section-heading h2 { margin:0 }
+.profile-summary { display:grid; grid-template-columns:90px minmax(0,1fr); gap:12px 24px; margin:0 }
+dt { color:var(--color-muted) }
+dd { margin:0; min-width:0; overflow-wrap:anywhere; white-space:pre-wrap }
+.balance-grid { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:24px }
+.balance-grid span { display:block; color:var(--color-muted); font-size:14px }
+.balance-grid strong { display:block; font-size:32px; font-variant-numeric:tabular-nums; overflow-wrap:anywhere }
+.balance-grid>div:first-child strong { color:var(--color-primary) }
+.ledger-list { list-style:none; margin:0; padding:0 }
+.ledger-list li { display:grid; grid-template-columns:minmax(0,1fr) auto auto; align-items:center; gap:16px; padding:20px 0; border-top:1px solid var(--color-border) }
+.ledger-list p { margin:4px 0 }
+.ledger-amount { font-variant-numeric:tabular-nums }
+.detail-list { display:grid; gap:8px }
+.detail-list dt:not(:first-child) { margin-top:12px }
+.recharge-panel { max-width:840px }
+@media(max-width:1000px) { .app-header { height:auto; flex-wrap:wrap; padding:16px; gap:12px } .app-header nav { order:3; flex-basis:100%; min-height:44px } }
+@media(max-width:700px) { .header-actions { order:4; width:100%; margin:0 } .header-actions .button { flex:1 } .auth-card { margin:8px auto } .balance-grid { gap:8px } .balance-grid strong { font-size:26px } .profile-summary { grid-template-columns:1fr; gap:4px } .profile-summary dd { margin-bottom:12px } .ledger-list li { grid-template-columns:minmax(0,1fr) auto } .ledger-list li .button { grid-column:2 } .section-heading { flex-wrap:wrap } }

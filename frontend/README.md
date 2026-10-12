@@ -1,6 +1,16 @@
-# T18a 前端共享基础
+# T18a 共享基础与 T18b 账号 / 积分
 
-需求与视觉入口：`../docs/product-design.md`。Vue3/Vite依赖沿用锁定版本。六条业务路由仍为明确占位；T18b/c替换`src/views/PlaceholderView.vue`对应路由，不能将测试 smoke 当成 UI 业务流程验收。
+需求与视觉入口：`../docs/product-design.md`。Vue3/Vite依赖沿用锁定版本。注册、登录、个人中心和充值说明已消费真实接口；创作工作台与作品仍为明确占位，等待 T18c，不能将 API smoke 当成其 UI 业务流程验收。
+
+## 共享身份边界（供 T18c 使用）
+
+`src/features/auth/session.ts` 导出 `session` 和 `onIdentityChange(listener)`；后者返回取消订阅函数。事件为 `{epoch,userId,reason}`，reason 为 authenticated / logout / unauthorized。初始登录由 GET /me 恢复，资料保存不切换 epoch。身份变更同步清空共享 profile/account 并通知订阅者，RouterView 按 epoch 重建，清空本页账本和分页游标。
+
+创作消费者须订阅身份变化，关闭 EventSource、清空用户任务 / 作品 / 会话 / 草稿与事件游标；异步处理捕获 epoch 并在回写前比较，不能把旧用户 after 用于新连接。当前阶段尚无 SSE 消费者或事件游标存储，不能宣称 T18c 已验证。HTTP client 对跨 epoch 的迟到响应（包括旧 401）抛出 IDENTITY_CHANGED，当前受保护请求 401 才清身份并回登录；登录 / 注册错误保留公共表单反馈。身份、密码与注册重试意图均只在内存中，未写入浏览器持久存储。
+
+注册网络重试保留同一原始 account/password/request_key 对象，字段编辑才生成新意图；无自动 POST 重试。退出成功须经服务端 POST 撤销；失败显示重试反馈。账户余额和累计入账全部取 GET /account，分页消费 GET /account/ledger 的不透明 next_cursor，来源任务只经本人 GET /tasks/{id} 读取。充值页仅 GET，未实现订单 / 支付。
+
+`auth-account.spec.ts`、`auth-account-failures.spec.ts`、`account-ledger.spec.ts` 是实际点击 UI 验证（桌面 / 手机），网络故障只 abort 真正请求或丢弃真实响应，不伪造业务响应。分页场景通过真实受理 / Worker / mock 上游生成 23 条流水后，在翻页中插入第 24 条；这部分 API 准备不代表创作 UI 已实现。
 
 - `src/styles/tokens.css`：已确认 V2 暖色语义变量。
 - `AppDialog` / `AppDrawer`：受控`v-model:open`、`title`、`purpose=read|edit|charge|delete`，默认内容和`actions`插槽。read初焦标题，edit用`data-initial-focus`（否则标题），charge/delete初焦取消。内置取消和关闭按钮明确为`type="button"`，嵌入父form也只通知父层，不提交或保存业务数据；actions插槽的业务按钮由调用方显式选择`type="submit"`或`type="button"`。保存成功由调用方关闭；失败保留open与输入。原生dialog+显式Tab首尾循环，Escape和关闭恢复触发焦点；抽屉手机全屏。

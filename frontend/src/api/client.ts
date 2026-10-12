@@ -1,5 +1,8 @@
 import type { components } from '../types/contracts'
 type PublicError = components['schemas']['ErrorResponse']
+let identityBoundary: { epoch: () => number; unauthorized: () => void } | undefined
+/** Session owner installs this once; stale requests cannot update a new identity. */
+export function setIdentityBoundary(boundary: typeof identityBoundary) { identityBoundary = boundary }
 export class ApiError extends Error {
   constructor(message: string, public status = 0, public code?: string, public response?: PublicError) { super(message); this.name = 'ApiError' }
 }
@@ -13,6 +16,7 @@ function csrfToken(): string {
   try { return value ? decodeURIComponent(value.slice(11)) : '' } catch { return '' }
 }
 export async function request<T>(path: string, options: {method?: 'GET'|'POST'|'PATCH'|'DELETE'; body?: string|FormData|Blob; key?: string; signal?: AbortSignal} = {}): Promise<T> {
+  const epoch = identityBoundary?.epoch()
   if (!path.startsWith('/api/v1/') || path.includes('\\') || new URL(path, location.origin).origin !== location.origin) throw new ApiError('仅允许同源平台接口。')
   const method = options.method ?? 'GET'
   const headers = new Headers({ Accept:'application/json' })
@@ -26,8 +30,11 @@ export async function request<T>(path: string, options: {method?: 'GET'|'POST'|'
   let response: Response
   try { response = await fetch(path, {method, headers, body:options.body, signal:options.signal, credentials:'same-origin', redirect:'error'}) }
   catch { throw new ApiError('网络连接失败，请核查原请求状态。') }
-  if (response.status === 204) return undefined as T
   const payload: unknown = await response.json().catch(() => null)
+  if (epoch !== identityBoundary?.epoch()) throw new ApiError('登录身份已变更，请重新读取。', 0, 'IDENTITY_CHANGED')
+  // Invalid credentials on public forms are local errors, not a session revocation.
+  if (response.status === 401 && path !== '/api/v1/auth/login' && path !== '/api/v1/auth/register') identityBoundary?.unauthorized()
+  if (response.status === 204) return undefined as T
   if (!response.ok) {
     const publicError = payload as PublicError | null
     if (publicError?.error && typeof publicError.error.code === 'string' && typeof publicError.error.message === 'string')

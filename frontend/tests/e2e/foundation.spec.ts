@@ -32,11 +32,21 @@ test('dialog keyboard isolation, cancel-first, rapid reopen, drawer scroll and f
  await page.keyboard.press('Escape');await expect(page.getByRole('button',{name:'打开详情'})).toBeFocused()
 })
 
-test('six routed placeholders keep navigation and responsive V2 layout',async({page},info)=>{
+test('six routes keep authenticated navigation and responsive V2 layout',async({page},info)=>{
  const errors:string[]=[];page.on('pageerror',e=>errors.push(e.message))
- for(const path of ['/login','/register','/workspace','/workspace/TEST_ONLY','/works','/account','/recharge']){
+ for(const path of ['/login','/register']) {
   await page.goto(path)
-  await expect(page.getByRole('heading',{name:'业务页面正在开发'})).toBeVisible()
+  await expect(page.getByLabel('账号',{exact:true})).toBeVisible()
+  expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true)
+ }
+ await page.getByLabel('账号',{exact:true}).fill('TEST_ONLY_nav_'+crypto.randomUUID().slice(0,8))
+ await page.getByLabel('密码',{exact:true}).fill('TEST_ONLY_navigation_password')
+ await page.getByRole('button',{name:'创建账号',exact:true}).click()
+ await expect(page).toHaveURL(/\/workspace$/)
+ for(const path of ['/workspace','/workspace/TEST_ONLY','/works','/account','/recharge']){
+  await page.goto(path)
+  if(path.startsWith('/workspace')||path==='/works') await expect(page.getByRole('heading',{name:'业务页面正在开发'})).toBeVisible()
+  else await expect(page.getByRole('heading',{name:path==='/account'?'个人中心':'充值说明',exact:true})).toBeVisible()
   expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true)
  }
  await page.goto('/workspace')
