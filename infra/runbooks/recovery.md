@@ -1,10 +1,48 @@
-# 任务恢复操作手册草稿（T08）
+# 备份、隔离恢复与原任务恢复
+
+## T22a 工具边界
+
+以下代码路径已实现；实际导出/导入、停写、故障演练与 RPO/RTO 核验属于 T24，尚未执行。D12 的真实环境、绝对路径、频率、恢复时限和批准引用缺失时拒绝运行。脚本不停止服务、不自动获取停写权、不修改只读围栏、不清理失败现场。
+
+### 一致备份
+
+运维必须先在已批准目标证明所有 API、worker、cleanup、上传和后台写者静止并完成在途文件写入，同时提供同一 cutoff 的只读文件系统快照/不可变存储引用，且 MySQL `super_read_only=1`（包括停止该快照上的复制写入）。这一步必须由平台特定受控流程实施并留下证据；脚本不会根据一张 JSON 自行宣布停止成功。服务器 UUID、cutoff、冻结有效期和批准引用必须来自该流程。
+
+备份拥有根须预先创建 `.operations-owner.json`，形如 `{"owner":"<归属UUID>","purpose":"backup"}`；设置操作员独占 ACL，目标必须是该根下不存在的新子目录，不能在 release 或 storage 内。输入的 storage 与 release 必须是独立绝对路径，路径链不允许符号链接/junction。数据库凭据由 `OPS_DATABASE_URL` 提供给 Python，客户端使用独立受保护 `DefaultsFile`；该文件只放相同账号的认证/TLS配置，host/port/user/database 由已批准 URL 明确覆盖。不要将秘密放到命令行、记录日志或提交仓库。
+
+Proof JSON 必填：`d12_approved:true`、`approval_ref`、`writer_fence_ref`、`storage_snapshot_ref`、`writers_quiesced:true`、`storage_root`、`host`、`port`、`database`、`server_uuid`、`cutoff`、`fenced_until`（带时区 ISO8601）、`migration_head`（当前代码为 `0021_site_content`）、`release_sha`（40位）。这些是有权操作员提供的证据引用，不是应用政策批准 API。未有真实批准不得填 true 冒充批准。
+
+在项目根执行接口（所有占位值必须替换为获批绝对路径；本步未运行）：
+
+```powershell
+& ./infra/scripts/backup.ps1 -Destination <fresh-backup-dir> -Manifest <fresh-backup-dir/manifest.json> -StorageRoot <fenced-storage-root> -ReleaseRoot <release-root> -OwnedRoot <backup-owned-root> -Owner <uuid> -Proof <proof-json> -MySqlDump <mysql-8.4-mysqldump-exe> -DefaultsFile <protected-client-file> -Python <backend-python>
+```
+
+脚本验证服务器/版本/只读围栏、全部表为 InnoDB、实际 migration head、DB 引用与磁盘摘要，运行 mysqldump 一致事务并包含触发器；复制持久根所有文件（包括未确认保存 journal/part、独立公开副本）。导出前后全树 hash 与引用清单必须一致，围栏和有效期必须仍成立。缺失 durable/published 文件拒绝；cleanup_pending/withdrawn/unavailable 的物理缺失合法，但若仍有副本必须校验 hash 并纳入清单。清单不可通过只扫磁盘替代 DB 引用核对。
+
+成功输出 `database.sql`、`storage/`、`inventory.json`、`consistency.json` 和最后生成的 `manifest.json`；manifest 包含 cutoff、完成时间、release SHA、数据库版本/head、锁文件与 compose SHA256、数据库和全部文件的大小/hash。打印 manifest SHA256，保存到独立受控证据库。无 manifest 或退出非零都是不完整备份，不可用于恢复。备份含敏感用户数据，访问权限、加密和保留期按 D12 执行，不自动上传或删旧备份。
+
+### 隔离恢复
+
+目标必须是与源不同 UUID 的独立 MySQL 8.4 服务器，网络隔离，由 `OPS_RESTORE_DATABASE_URL` 指定；账号只授权本次新库及必要创建权限，不授予跨库写入/FILE 权限。库名固定为 `restore_<owner UUID去连字符>`，既有同名库一律拒绝。目标父根标记为 `{"owner":"<uuid>","purpose":"isolated-restore","network_isolated":true}`，目标目录必须不存在。隔离 proof 必填 `d12_approved:true`、`approval_ref`、`network_isolated:true`、`host`、`port`、`database`、`server_uuid`、`owner`、带时区 `expires_at`；通过基础设施受控流程真实验证网络隔离，JSON 不代替防火墙。
+
+```powershell
+& ./infra/scripts/restore.ps1 -Manifest <backup-manifest> -ManifestSha256 <independently-recorded-sha256> -Target <fresh-isolated-dir> -OwnedRoot <restore-owned-root> -Owner <uuid> -Proof <isolation-proof> -MySql <mysql-8.4-client-exe> -DefaultsFile <isolated-protected-client-file> -Python <backend-python>
+```
+
+恢复先核对独立保存的 manifest hash、数据库 SQL/文件摘要和 DB 引用，再复制清单中的文件，创建隔离标记，再创建新库并通过 mysql 导入（不自动启动服务）。随后核对 migration head 与恢复 DB 文件引用。失败保留 `.restore-incomplete.json` 和新库现场，不删除、不覆盖、不自动重试到既有目标；`restore-result.json` 才是隔离恢复结束记录，incomplete 标记保留为原始开始记录。
+
+恢复的 storage 始终带 `.restore-isolated.json`；API 全部返回503，worker/Compose入口拒绝使用它。旧快照可能仍记 published，因此恢复绝不直接开放公开访问。必须从权威审计/存续库取得 cutoff 之后的撤回、禁用和删除记录，逐项重放经批准的业务处置并验证公开 API 拒绝状态；无法取得完整记录则持续封锁。保留原 cleanup_pending/withdrawn 事实和容量占用，不把物理复制成功当作重新授权。经过账本、文件、原任务、撤回差异核对以及 D12/T24 明确批准后，才能由独立受控流程解除隔离；本脚本不提供解锁参数。
+
+离线摘要核对：`<backend-python> infra/scripts/verify_storage.py --root <storage> --inventory <inventory.json>`。运营账本核对：`<backend-python> infra/scripts/reconcile.py --storage-root <root> --thresholds <D12-json>`。reconcile 仅 SELECT，不自动修复账本、任务、结算或冻结。Redis 流不恢复为业务事实，原 MySQL Outbox/recovery_due 驱动后续恢复；不运行 FLUSH。
+
+## 原任务恢复机制（T08 及后续接线）
 
 MySQL 是任务、原始快照、积分冻结、状态事件和恢复时间的事实源；Redis Stream 只是可重复的唤醒提示。新增迁移 `0010_task_recovery` 承接 `0009_tasks_admission`，不修改已有版本。
 
 ## 运行与诊断
 
-从 backend 目录启动 `python -m worker.main --stream <本部署专用流>`，配置 `APP_DATABASE_URL` 和 `APP_REDIS_URL`；`--once` 执行一个周期。先升级数据库到 head。开发 compose 的 backend-test 使用 `ecommerce_ai_test_t07_20261011`；首次 MySQL 初始化脚本同时保留旧测试库并创建/授权此库。已有卷不会重跑初始化脚本，已有库沿用主控已创建的新 schema，不能通过删除共享卷或旧库来重建测试环境。当前默认没有 T09/T10/T11/T12/T13 上游处理器，日志 `unhandled` 表示原任务保留待接入/待恢复，不能据此宣称已生成、已保存或已交付。生产相关 D 决策仍须通过后续服务门槛。
+从 backend 目录启动 `python -m worker.main --stream <本部署专用流>`，配置 `APP_DATABASE_URL` 和 `APP_REDIS_URL`；`--once` 执行一个周期。先核实数据库 head。开发 compose 的 backend-test 使用 `ecommerce_ai_test_t07_20261011`；首次 MySQL 初始化脚本同时保留旧测试库并创建/授权此库。已有卷不会重跑初始化脚本，不能通过删除共享卷或旧库来重建测试环境。T09–T13 已接阶段处理器，真实上游协议仍未启用；`unhandled` 表示原任务保留待恢复，不能据此宣称已生成、已保存或已交付。生产相关 D 决策仍须通过后续服务门槛。
 
 每周期扫描到期任务，重新激活 Outbox（包括已经投递和 ACK 的事件），再派发 Redis 并消费。Redis 故障不删除 MySQL 记录；数据库故障只记录固定错误码并等待下一轮。消费异常不会自动改失败或积分。停止后重新启动即可按同一个 task ID 恢复，无需建立新任务、重新冻结或手改结算。
 

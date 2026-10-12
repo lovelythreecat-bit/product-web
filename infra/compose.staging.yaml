@@ -1,0 +1,109 @@
+# Disabled by default. All paths, image digests and D12 approvals must be supplied explicitly.
+name: ${STAGING_PROJECT:?set a unique approved staging project}
+x-runtime: &runtime
+  image: ${APP_IMAGE:?set the reviewed application image digest}
+  profiles: [approved-staging]
+  env_file:
+    - ${APP_CONFIG_FILE:?absolute protected application env file}
+  environment:
+    APP_MODE: staging
+    APP_TEST_ONLY: "false"
+    APP_STORAGE_ROOT: /persistent/storage
+    APP_STORAGE_PERSISTENT: "true"
+    OPS_RELEASE_ROOT: ${RELEASE_ROOT:?absolute release root}
+    OPS_PERSISTENT_ROOT: ${PERSISTENT_ROOT:?absolute persistent root independent of release}
+  volumes:
+    - type: bind
+      source: ${PERSISTENT_ROOT}/storage
+      target: /persistent/storage
+      bind: {create_host_path: false}
+    - type: bind
+      source: ${D12_APPROVAL_FILE:?absolute approved D12 JSON}
+      target: /run/d12/approval.json
+      read_only: true
+      bind: {create_host_path: false}
+  read_only: true
+  tmpfs: [/tmp]
+  cap_drop: [ALL]
+  security_opt: [no-new-privileges:true]
+  restart: "no"
+  networks: [private]
+
+services:
+  preflight:
+    <<: *runtime
+    command: [python, -c, "print('D12 staging preflight accepted')"]
+  api:
+    <<: *runtime
+    healthcheck:
+      test: [CMD, python, -c, "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/api/v1/health/ready', timeout=3)"]
+      interval: 15s
+      timeout: 5s
+      retries: 3
+    depends_on:
+      mysql: {condition: service_healthy}
+      redis: {condition: service_healthy}
+  worker:
+    <<: *runtime
+    command: [python, -m, worker.main, --stream, "${WORKER_STREAM:?approved deployment-owned stream}"]
+    stop_grace_period: 60s
+    depends_on:
+      api: {condition: service_healthy}
+  mysql:
+    profiles: [approved-staging]
+    image: mysql:8.4.8@sha256:2952e3be7807f06fc18de50b3ea1a632d5c70d63482ff7d7376fe3aa8999babf
+    env_file: ["${MYSQL_CONFIG_FILE:?protected MySQL initialization env file}"]
+    command: [mysqld, --log-bin-trust-function-creators=ON]
+    volumes:
+      - type: bind
+        source: ${PERSISTENT_ROOT}/mysql
+        target: /var/lib/mysql
+        bind: {create_host_path: false}
+    healthcheck:
+      test: [CMD, mysqladmin, ping, --silent]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+    networks: [private]
+    depends_on:
+      preflight: {condition: service_completed_successfully}
+  redis:
+    profiles: [approved-staging]
+    image: public.ecr.aws/docker/library/redis:7.4.8-alpine@sha256:7aec734b2bb298a1d769fd8729f13b8514a41bf90fcdd1f38ec52267fbaa8ee6
+    command: [redis-server, --appendonly, "yes"]
+    volumes:
+      - type: bind
+        source: ${PERSISTENT_ROOT}/redis
+        target: /data
+        bind: {create_host_path: false}
+    healthcheck:
+      test: [CMD, redis-cli, ping]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks: [private]
+    depends_on:
+      preflight: {condition: service_completed_successfully}
+  nginx:
+    profiles: [approved-staging]
+    image: ${NGINX_IMAGE:?explicit approved pinned nginx image digest}
+    ports: ["127.0.0.1:${STAGING_HTTP_PORT:?explicit local staging port}:8080"]
+    volumes:
+      - type: bind
+        source: ${RELEASE_ROOT}/infra/nginx.conf
+        target: /etc/nginx/nginx.conf
+        read_only: true
+        bind: {create_host_path: false}
+      - type: bind
+        source: ${RELEASE_ROOT}/frontend/dist
+        target: /srv/frontend
+        read_only: true
+        bind: {create_host_path: false}
+    read_only: true
+    tmpfs: [/tmp, /var/cache/nginx, /var/run]
+    depends_on:
+      api: {condition: service_healthy}
+    networks: [private]
+networks:
+  private:
+    internal: true

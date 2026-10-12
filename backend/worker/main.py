@@ -10,10 +10,6 @@ import signal
 from threading import Event
 from uuid import uuid4
 
-from redis import Redis
-from sqlalchemy.exc import SQLAlchemyError
-from sqlalchemy.orm import sessionmaker
-
 from app.agents.registry import AgentRegistry
 from app.agents.upstream import UpstreamService
 from app.config import Settings
@@ -21,6 +17,9 @@ from app.db import create_db_engine
 from app.dispatch.consumer import TaskConsumer
 from app.dispatch.outbox import OutboxDispatcher
 from app.dispatch.recovery import RecoveryScheduler
+from redis import Redis
+from sqlalchemy.exc import SQLAlchemyError
+from sqlalchemy.orm import sessionmaker
 
 logger = logging.getLogger(__name__)
 
@@ -81,6 +80,9 @@ def main(argv=None):
     if args.interval <= 0 or not args.stream or not args.group:
         parser.error("interval, stream and group must be valid")
     settings = Settings()
+    if (settings.storage_root is not None
+            and (settings.storage_root / ".restore-isolated.json").exists()):
+        parser.error("Restored storage remains isolated; worker startup refused")
     if settings.database_url is None or settings.redis_url is None:
         parser.error("APP_DATABASE_URL and APP_REDIS_URL are required")
     engine = create_db_engine(settings)

@@ -3,13 +3,14 @@
 from collections.abc import Callable, Mapping
 from dataclasses import dataclass
 from datetime import datetime, timedelta
-
-from redis.exceptions import RedisError, ResponseError
-from sqlalchemy import select, text, update
+from time import monotonic
 
 from app.dispatch.models import OutboxEvent
 from app.dispatch.recovery import TERMINAL_STATES, database_now, recovery_action
+from app.operations.telemetry import event as operational_event
 from app.tasks.models import GenerationTask
+from redis.exceptions import RedisError, ResponseError
+from sqlalchemy import select, text, update
 
 
 @dataclass(frozen=True)
@@ -187,6 +188,7 @@ class TaskConsumer:
         lease = self.leases.claim_task(task_id, self.worker_id)
         if lease is None:
             return "busy"
+        started, outcome = monotonic(), "failed"
         try:
             with self.session_factory() as session:
                 task = session.get(GenerationTask, task_id)
@@ -204,11 +206,15 @@ class TaskConsumer:
                 )
             handler = self.handlers.get(action)
             if handler is None:
+                outcome = "unhandled"
                 return "unhandled"
             handler(context)
+            outcome = "handled"
             return "handled"
         except Exception:
             # Never disclose adapter errors/input/credentials or infer generation failure.
             return "failed"
         finally:
+            operational_event("task_stage", task_id=task_id, outcome=outcome,
+                              elapsed_ms=(monotonic() - started) * 1000)
             self.leases.release(lease)

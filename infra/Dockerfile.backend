@@ -1,0 +1,12 @@
+FROM python:3.12.14-slim@sha256:f77ac9e44ae96ef2c90b8053ea08c31f8be030f824196b0ae4db6d462c84e51f
+WORKDIR /app/backend
+RUN python -m pip install --no-cache-dir uv==0.12.19
+COPY backend/pyproject.toml backend/uv.lock ./
+RUN uv sync --frozen --no-dev --no-install-project
+COPY backend/app ./app
+COPY backend/worker ./worker
+COPY backend/alembic.ini ./
+COPY backend/migrations ./migrations
+ENV PATH="/app/backend/.venv/bin:$PATH" PYTHONDONTWRITEBYTECODE=1 PYTHONUNBUFFERED=1
+ENTRYPOINT ["python", "-m", "app.operations.runtime"]
+CMD ["uvicorn", "app.main:application", "--factory", "--host", "0.0.0.0", "--port", "8000", "--no-access-log", "--log-level", "info"]

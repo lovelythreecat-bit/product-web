@@ -83,6 +83,9 @@ def create_app(settings: Settings) -> FastAPI:
     application.include_router(investigations_router)
     application.include_router(events_router)
     register_error_handlers(application)
+    from app.operations.telemetry import install_http_logging
+
+    install_http_logging(application)
 
     @application.exception_handler(MaterialUnavailable)
     async def material_unavailable(request, exc):
