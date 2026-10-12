@@ -198,7 +198,15 @@ class SitePolicy(PolicyData):
     visual_ref: Text
 
 
+class CaseCopyExecution(PolicyData):
+    schema_version: Literal["public-copy-v1"]
+    storage: Literal["persistent_disk"]
+    withdrawal: Literal["deny_then_delete_copy"]
+    max_total_bytes: Annotated[int, Field(strict=True, ge=1, le=16777216)]
+
+
 class CasePolicy(PolicyData):
+    execution: CaseCopyExecution | None = None
     source_work_ref: Text
     owner_ref: Text
     authorization_ref: Text

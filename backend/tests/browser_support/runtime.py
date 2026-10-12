@@ -114,9 +114,9 @@ class Runtime:
         with self.engine.connect() as c:
             if (
                 c.execute(text("SELECT version_num FROM alembic_version")).scalar_one()
-                != "0020_content_grants"
+                != "0021_site_content"
             ):
-                raise ValueError("Browser harness requires migration 0020_content_grants")
+                raise ValueError("Browser harness requires migration 0021_site_content")
         self.redis = Redis.from_url(redis_url, socket_timeout=3, socket_connect_timeout=3)
         self.redis.ping()
         self.mock = BoundedServer(("127.0.0.1", 0))

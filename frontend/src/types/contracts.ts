@@ -259,6 +259,59 @@ export interface paths {
         patch: operations["admin_update_registration_credit_config"];
         trace?: never;
     };
+    "/api/v1/admin/site/cases": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Admin Cases */
+        get: operations["admin_site_cases"];
+        put?: never;
+        /** Publish Case */
+        post: operations["publish_site_case"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/site/cases/{case_id}/withdraw": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Withdraw Case */
+        post: operations["withdraw_site_case"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/site/content": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Admin Content */
+        get: operations["admin_site_content"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /** Update Content */
+        patch: operations["update_site_content"];
+        trace?: never;
+    };
     "/api/v1/admin/specs": {
         parameters: {
             query?: never;
@@ -761,6 +814,57 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/site/cases": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Cases */
+        get: operations["public_site_cases"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/site/cases/{case_id}/copies/{copy_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Case Copy */
+        get: operations["public_site_copy"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/site/content": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Content */
+        get: operations["public_site_content"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/tasks": {
         parameters: {
             query?: never;
@@ -892,6 +996,33 @@ export interface components {
             /** Frozen */
             frozen: number;
         };
+        /** AdminCaseView */
+        AdminCaseView: {
+            /** Authorization Ref */
+            authorization_ref: string;
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /**
+             * Owner Id
+             * Format: uuid
+             */
+            owner_id: string;
+            /** Policy Version */
+            policy_version: string;
+            /**
+             * State
+             * @enum {string}
+             */
+            state: "published" | "cleanup_pending" | "withdrawn";
+            /**
+             * Work Id
+             * Format: uuid
+             */
+            work_id: string;
+        };
         /** AdminUserView */
         AdminUserView: {
             /** Account Normalized */
@@ -926,6 +1057,15 @@ export interface components {
             /** Replayed */
             replayed: boolean;
             task: components["schemas"]["TaskView"];
+        };
+        /** AgentDescriptions */
+        AgentDescriptions: {
+            /** Image */
+            image: string;
+            /** Text */
+            text: string;
+            /** Video */
+            video: string;
         };
         /** AgentDraft */
         AgentDraft: {
@@ -1161,6 +1301,27 @@ export interface components {
             profile: components["schemas"]["ProfileView"];
             /** Replayed */
             replayed: boolean;
+        };
+        /** CasePublish */
+        CasePublish: {
+            /** Authorization Ref */
+            authorization_ref: string;
+            /** Policy Version */
+            policy_version: string;
+            /** Policy Versions */
+            policy_versions: {
+                [key: string]: string;
+            };
+            /**
+             * Work Id
+             * Format: uuid
+             */
+            work_id: string;
+        };
+        /** CaseWithdraw */
+        CaseWithdraw: {
+            /** Policy Version */
+            policy_version: string;
         };
         /** ContentGrantRequest */
         ContentGrantRequest: {
@@ -1821,6 +1982,32 @@ export interface components {
              */
             user_id: string;
         };
+        /** PublicCaseView */
+        PublicCaseView: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Items */
+            items: components["schemas"]["PublicCopyView"][];
+        };
+        /** PublicCopyView */
+        PublicCopyView: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Media Type */
+            media_type: string;
+            /** Url */
+            url: string;
+        };
+        /** PublicSiteView */
+        PublicSiteView: {
+            content: components["schemas"]["SiteContentView"] | null;
+        };
         /** Quote */
         Quote: {
             /** Agent Version */
@@ -1992,6 +2179,45 @@ export interface components {
          * @enum {string}
          */
         SettlementState: "FROZEN" | "CONSUMED" | "RELEASED";
+        /** SiteContent */
+        SiteContent: {
+            agent_descriptions: components["schemas"]["AgentDescriptions"];
+            /** Process Steps */
+            process_steps: string[];
+            /** Product Intro */
+            product_intro: string;
+        };
+        /** SiteContentUpdate */
+        SiteContentUpdate: {
+            content: components["schemas"]["SiteContent"];
+            /** Expected Version */
+            expected_version: number;
+            /** Policy Version */
+            policy_version: string;
+            /** Policy Versions */
+            policy_versions?: {
+                [key: string]: string;
+            };
+        };
+        /** SiteContentView */
+        SiteContentView: {
+            content: components["schemas"]["SiteContent"] | null;
+            /** Content Ref */
+            content_ref: string | null;
+            /** Policy Version */
+            policy_version: string;
+            /** Policy Versions */
+            policy_versions: {
+                [key: string]: string;
+            };
+            /**
+             * Status
+             * @enum {string}
+             */
+            status: "draft" | "approved";
+            /** Version */
+            version: number;
+        };
         /** SourceMaterial */
         SourceMaterial: {
             /** Action */
@@ -3984,6 +4210,432 @@ export interface operations {
             };
             /** @description Service Unavailable */
             503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    admin_site_cases: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie: {
+                /** @description Required Secure HttpOnly session cookie; omission or invalid session returns 401. */
+                session: string;
+            };
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AdminCaseView"][];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unprocessable Entity */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Internal Server Error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    publish_site_case: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description Required token bound to this session and csrf_token cookie; omission or mismatch returns 403. */
+                "X-CSRF-Token": string;
+                /** @description Required exact allowlisted Origin; browsers send this automatically. Do not set Origin in frontend JavaScript. */
+                origin: string;
+                /** @description Required literal platform; omission or mismatch returns 403. */
+                "X-Requested-With": string;
+            };
+            path?: never;
+            cookie: {
+                /** @description Required session-bound CSRF cookie; omission or mismatch returns 403. */
+                csrf_token: string;
+                /** @description Required Secure HttpOnly session cookie; omission or invalid session returns 401. */
+                session: string;
+            };
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CasePublish"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AdminCaseView"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unprocessable Entity */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Internal Server Error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    withdraw_site_case: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description Required token bound to this session and csrf_token cookie; omission or mismatch returns 403. */
+                "X-CSRF-Token": string;
+                /** @description Required exact allowlisted Origin; browsers send this automatically. Do not set Origin in frontend JavaScript. */
+                origin: string;
+                /** @description Required literal platform; omission or mismatch returns 403. */
+                "X-Requested-With": string;
+            };
+            path: {
+                case_id: string;
+            };
+            cookie: {
+                /** @description Required session-bound CSRF cookie; omission or mismatch returns 403. */
+                csrf_token: string;
+                /** @description Required Secure HttpOnly session cookie; omission or invalid session returns 401. */
+                session: string;
+            };
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CaseWithdraw"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AdminCaseView"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unprocessable Entity */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Internal Server Error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    admin_site_content: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie: {
+                /** @description Required Secure HttpOnly session cookie; omission or invalid session returns 401. */
+                session: string;
+            };
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SiteContentView"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unprocessable Entity */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Internal Server Error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    update_site_content: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description Required token bound to this session and csrf_token cookie; omission or mismatch returns 403. */
+                "X-CSRF-Token": string;
+                /** @description Required exact allowlisted Origin; browsers send this automatically. Do not set Origin in frontend JavaScript. */
+                origin: string;
+                /** @description Required literal platform; omission or mismatch returns 403. */
+                "X-Requested-With": string;
+            };
+            path?: never;
+            cookie: {
+                /** @description Required session-bound CSRF cookie; omission or mismatch returns 403. */
+                csrf_token: string;
+                /** @description Required Secure HttpOnly session cookie; omission or invalid session returns 401. */
+                session: string;
+            };
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SiteContentUpdate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SiteContentView"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unprocessable Entity */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Internal Server Error */
+            500: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -6705,6 +7357,229 @@ export interface operations {
             };
             /** @description Forbidden */
             403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unprocessable Entity */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Internal Server Error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    public_site_cases: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PublicCaseView"][];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unprocessable Entity */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Internal Server Error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    public_site_copy: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                case_id: string;
+                copy_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unprocessable Entity */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Internal Server Error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    public_site_content: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PublicSiteView"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Not Found */
+            404: {
                 headers: {
                     [name: string]: unknown;
                 };

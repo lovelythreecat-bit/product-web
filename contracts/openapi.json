@@ -104,6 +104,53 @@
         "title": "AccountView",
         "type": "object"
       },
+      "AdminCaseView": {
+        "additionalProperties": false,
+        "properties": {
+          "authorization_ref": {
+            "title": "Authorization Ref",
+            "type": "string"
+          },
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "owner_id": {
+            "format": "uuid",
+            "title": "Owner Id",
+            "type": "string"
+          },
+          "policy_version": {
+            "title": "Policy Version",
+            "type": "string"
+          },
+          "state": {
+            "enum": [
+              "published",
+              "cleanup_pending",
+              "withdrawn"
+            ],
+            "title": "State",
+            "type": "string"
+          },
+          "work_id": {
+            "format": "uuid",
+            "title": "Work Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "work_id",
+          "owner_id",
+          "authorization_ref",
+          "policy_version",
+          "state"
+        ],
+        "title": "AdminCaseView",
+        "type": "object"
+      },
       "AdminUserView": {
         "additionalProperties": false,
         "properties": {
@@ -182,6 +229,39 @@
           "replayed"
         ],
         "title": "AdmissionResult",
+        "type": "object"
+      },
+      "AgentDescriptions": {
+        "additionalProperties": false,
+        "properties": {
+          "image": {
+            "maxLength": 5000,
+            "minLength": 1,
+            "pattern": "\\S",
+            "title": "Image",
+            "type": "string"
+          },
+          "text": {
+            "maxLength": 5000,
+            "minLength": 1,
+            "pattern": "\\S",
+            "title": "Text",
+            "type": "string"
+          },
+          "video": {
+            "maxLength": 5000,
+            "minLength": 1,
+            "pattern": "\\S",
+            "title": "Video",
+            "type": "string"
+          }
+        },
+        "required": [
+          "text",
+          "image",
+          "video"
+        ],
+        "title": "AgentDescriptions",
         "type": "object"
       },
       "AgentDraft": {
@@ -768,6 +848,64 @@
           "replayed"
         ],
         "title": "AuthView",
+        "type": "object"
+      },
+      "CasePublish": {
+        "additionalProperties": false,
+        "properties": {
+          "authorization_ref": {
+            "maxLength": 1024,
+            "minLength": 1,
+            "title": "Authorization Ref",
+            "type": "string"
+          },
+          "policy_version": {
+            "maxLength": 128,
+            "minLength": 1,
+            "pattern": "^[\\w.-]+$",
+            "title": "Policy Version",
+            "type": "string"
+          },
+          "policy_versions": {
+            "additionalProperties": {
+              "maxLength": 128,
+              "minLength": 1,
+              "pattern": "^[\\w.-]+$",
+              "type": "string"
+            },
+            "title": "Policy Versions",
+            "type": "object"
+          },
+          "work_id": {
+            "format": "uuid",
+            "title": "Work Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "work_id",
+          "authorization_ref",
+          "policy_version",
+          "policy_versions"
+        ],
+        "title": "CasePublish",
+        "type": "object"
+      },
+      "CaseWithdraw": {
+        "additionalProperties": false,
+        "properties": {
+          "policy_version": {
+            "maxLength": 128,
+            "minLength": 1,
+            "pattern": "^[\\w.-]+$",
+            "title": "Policy Version",
+            "type": "string"
+          }
+        },
+        "required": [
+          "policy_version"
+        ],
+        "title": "CaseWithdraw",
         "type": "object"
       },
       "ContentGrantRequest": {
@@ -2540,6 +2678,74 @@
         "title": "ProfileView",
         "type": "object"
       },
+      "PublicCaseView": {
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/PublicCopyView"
+            },
+            "title": "Items",
+            "type": "array"
+          }
+        },
+        "required": [
+          "id",
+          "items"
+        ],
+        "title": "PublicCaseView",
+        "type": "object"
+      },
+      "PublicCopyView": {
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "media_type": {
+            "title": "Media Type",
+            "type": "string"
+          },
+          "url": {
+            "title": "Url",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "media_type",
+          "url"
+        ],
+        "title": "PublicCopyView",
+        "type": "object"
+      },
+      "PublicSiteView": {
+        "additionalProperties": false,
+        "properties": {
+          "content": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/SiteContentView"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "required": [
+          "content"
+        ],
+        "title": "PublicSiteView",
+        "type": "object"
+      },
       "Quote": {
         "additionalProperties": false,
         "properties": {
@@ -2937,6 +3143,137 @@
         ],
         "title": "SettlementState",
         "type": "string"
+      },
+      "SiteContent": {
+        "additionalProperties": false,
+        "properties": {
+          "agent_descriptions": {
+            "$ref": "#/components/schemas/AgentDescriptions"
+          },
+          "process_steps": {
+            "items": {
+              "maxLength": 5000,
+              "minLength": 1,
+              "pattern": "\\S",
+              "type": "string"
+            },
+            "maxItems": 12,
+            "minItems": 1,
+            "title": "Process Steps",
+            "type": "array"
+          },
+          "product_intro": {
+            "maxLength": 5000,
+            "minLength": 1,
+            "pattern": "\\S",
+            "title": "Product Intro",
+            "type": "string"
+          }
+        },
+        "required": [
+          "product_intro",
+          "agent_descriptions",
+          "process_steps"
+        ],
+        "title": "SiteContent",
+        "type": "object"
+      },
+      "SiteContentUpdate": {
+        "additionalProperties": false,
+        "properties": {
+          "content": {
+            "$ref": "#/components/schemas/SiteContent"
+          },
+          "expected_version": {
+            "minimum": 0.0,
+            "title": "Expected Version",
+            "type": "integer"
+          },
+          "policy_version": {
+            "maxLength": 128,
+            "minLength": 1,
+            "pattern": "^[\\w.-]+$",
+            "title": "Policy Version",
+            "type": "string"
+          },
+          "policy_versions": {
+            "additionalProperties": {
+              "maxLength": 128,
+              "minLength": 1,
+              "pattern": "^[\\w.-]+$",
+              "type": "string"
+            },
+            "title": "Policy Versions",
+            "type": "object"
+          }
+        },
+        "required": [
+          "expected_version",
+          "content",
+          "policy_version"
+        ],
+        "title": "SiteContentUpdate",
+        "type": "object"
+      },
+      "SiteContentView": {
+        "additionalProperties": false,
+        "properties": {
+          "content": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/SiteContent"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "content_ref": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Content Ref"
+          },
+          "policy_version": {
+            "title": "Policy Version",
+            "type": "string"
+          },
+          "policy_versions": {
+            "additionalProperties": {
+              "type": "string"
+            },
+            "title": "Policy Versions",
+            "type": "object"
+          },
+          "status": {
+            "enum": [
+              "draft",
+              "approved"
+            ],
+            "title": "Status",
+            "type": "string"
+          },
+          "version": {
+            "minimum": 0.0,
+            "title": "Version",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "version",
+          "content",
+          "status",
+          "policy_version",
+          "policy_versions",
+          "content_ref"
+        ],
+        "title": "SiteContentView",
+        "type": "object"
       },
       "SourceMaterial": {
         "additionalProperties": false,
@@ -6151,6 +6488,599 @@
           }
         },
         "summary": "Update Registration Config"
+      }
+    },
+    "/api/v1/admin/site/cases": {
+      "get": {
+        "operationId": "admin_site_cases",
+        "parameters": [
+          {
+            "description": "Required Secure HttpOnly session cookie; omission or invalid session returns 401.",
+            "in": "cookie",
+            "name": "session",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/AdminCaseView"
+                  },
+                  "title": "Response Admin Site Cases",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Unauthorized"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Forbidden"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Conflict"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Unprocessable Entity"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Internal Server Error"
+          }
+        },
+        "summary": "Admin Cases"
+      },
+      "post": {
+        "operationId": "publish_site_case",
+        "parameters": [
+          {
+            "description": "Required token bound to this session and csrf_token cookie; omission or mismatch returns 403.",
+            "in": "header",
+            "name": "X-CSRF-Token",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "Required exact allowlisted Origin; browsers send this automatically. Do not set Origin in frontend JavaScript.",
+            "in": "header",
+            "name": "origin",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "Required literal platform; omission or mismatch returns 403.",
+            "in": "header",
+            "name": "X-Requested-With",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "Required session-bound CSRF cookie; omission or mismatch returns 403.",
+            "in": "cookie",
+            "name": "csrf_token",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "Required Secure HttpOnly session cookie; omission or invalid session returns 401.",
+            "in": "cookie",
+            "name": "session",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CasePublish"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminCaseView"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Unauthorized"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Forbidden"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Conflict"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Unprocessable Entity"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Internal Server Error"
+          }
+        },
+        "summary": "Publish Case"
+      }
+    },
+    "/api/v1/admin/site/cases/{case_id}/withdraw": {
+      "post": {
+        "operationId": "withdraw_site_case",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "case_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Case Id",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Required token bound to this session and csrf_token cookie; omission or mismatch returns 403.",
+            "in": "header",
+            "name": "X-CSRF-Token",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "Required exact allowlisted Origin; browsers send this automatically. Do not set Origin in frontend JavaScript.",
+            "in": "header",
+            "name": "origin",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "Required literal platform; omission or mismatch returns 403.",
+            "in": "header",
+            "name": "X-Requested-With",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "Required session-bound CSRF cookie; omission or mismatch returns 403.",
+            "in": "cookie",
+            "name": "csrf_token",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "Required Secure HttpOnly session cookie; omission or invalid session returns 401.",
+            "in": "cookie",
+            "name": "session",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CaseWithdraw"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminCaseView"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Unauthorized"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Forbidden"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Conflict"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Unprocessable Entity"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Internal Server Error"
+          }
+        },
+        "summary": "Withdraw Case"
+      }
+    },
+    "/api/v1/admin/site/content": {
+      "get": {
+        "operationId": "admin_site_content",
+        "parameters": [
+          {
+            "description": "Required Secure HttpOnly session cookie; omission or invalid session returns 401.",
+            "in": "cookie",
+            "name": "session",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SiteContentView"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Unauthorized"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Forbidden"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Conflict"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Unprocessable Entity"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Internal Server Error"
+          }
+        },
+        "summary": "Admin Content"
+      },
+      "patch": {
+        "operationId": "update_site_content",
+        "parameters": [
+          {
+            "description": "Required token bound to this session and csrf_token cookie; omission or mismatch returns 403.",
+            "in": "header",
+            "name": "X-CSRF-Token",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "Required exact allowlisted Origin; browsers send this automatically. Do not set Origin in frontend JavaScript.",
+            "in": "header",
+            "name": "origin",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "Required literal platform; omission or mismatch returns 403.",
+            "in": "header",
+            "name": "X-Requested-With",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "Required session-bound CSRF cookie; omission or mismatch returns 403.",
+            "in": "cookie",
+            "name": "csrf_token",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "Required Secure HttpOnly session cookie; omission or invalid session returns 401.",
+            "in": "cookie",
+            "name": "session",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SiteContentUpdate"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SiteContentView"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Unauthorized"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Forbidden"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Conflict"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Unprocessable Entity"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Internal Server Error"
+          }
+        },
+        "summary": "Update Content"
       }
     },
     "/api/v1/admin/specs": {
@@ -10077,6 +11007,259 @@
           }
         },
         "summary": "Quote"
+      }
+    },
+    "/api/v1/site/cases": {
+      "get": {
+        "operationId": "public_site_cases",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/PublicCaseView"
+                  },
+                  "title": "Response Public Site Cases",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Unauthorized"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Forbidden"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Conflict"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Unprocessable Entity"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Internal Server Error"
+          }
+        },
+        "summary": "Cases"
+      }
+    },
+    "/api/v1/site/cases/{case_id}/copies/{copy_id}": {
+      "get": {
+        "operationId": "public_site_copy",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "case_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Case Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "copy_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Copy Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Unauthorized"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Forbidden"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Conflict"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Unprocessable Entity"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Internal Server Error"
+          }
+        },
+        "summary": "Case Copy"
+      }
+    },
+    "/api/v1/site/content": {
+      "get": {
+        "operationId": "public_site_content",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PublicSiteView"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Unauthorized"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Forbidden"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Conflict"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Unprocessable Entity"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Internal Server Error"
+          }
+        },
+        "summary": "Content"
       }
     },
     "/api/v1/tasks": {

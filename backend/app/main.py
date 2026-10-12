@@ -27,6 +27,7 @@ from app.investigations.routes import router as investigations_router
 from app.ledger.routes import router as ledger_router
 from app.ledger.service import LedgerError
 from app.policies.service import PolicyGateError
+from app.site.routes import router as site_router
 from app.storage.capacity import StorageError
 from app.storage.routes import router as storage_router
 from app.storage.validation import FileValidationError
@@ -70,6 +71,7 @@ def create_app(settings: Settings) -> FastAPI:
     application.include_router(callbacks_router)
     application.include_router(auth_router)
     application.include_router(admin_router)
+    application.include_router(site_router)
     application.include_router(assist_router)
     application.include_router(catalog_router)
     application.include_router(storage_router)

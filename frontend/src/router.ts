@@ -10,10 +10,12 @@ import UsersView from './features/admin/UsersView.vue'
 import AgentsView from './features/admin/AgentsView.vue'
 import PricesView from './features/admin/PricesView.vue'
 import TasksView from './features/admin/TasksView.vue'
+import HomeView from './features/site/HomeView.vue'
+import SiteView from './features/admin/SiteView.vue'
 import AuditView from './features/admin/AuditView.vue'
 import { session, onIdentityChange } from './features/auth/session'
 export const router = createRouter({ history:createWebHistory(), routes:[
-  {path:'/',redirect:'/workspace'},
+  {path:'/',component:HomeView,meta:{public:true}},
   {path:'/login',component:LoginView,meta:{public:true}},
   {path:'/register',component:RegisterView,meta:{public:true}},
   {path:'/account',component:AccountView},
@@ -25,6 +27,7 @@ export const router = createRouter({ history:createWebHistory(), routes:[
   {path:'/admin/agents',component:AgentsView,meta:{admin:true}},
   {path:'/admin/prices',component:PricesView,meta:{admin:true}},
   {path:'/admin/tasks',component:TasksView,meta:{admin:true}},
+  {path:'/admin/site',component:SiteView,meta:{admin:true}},
   {path:'/admin/audit',component:AuditView,meta:{admin:true}},
   {path:'/:pathMatch(.*)*',component:PlaceholderView,meta:{title:'页面未找到'}}
 ] })
@@ -32,7 +35,7 @@ router.beforeEach(async to => {
   await session.restore()
   if (!to.meta.public && !session.profile.value) return '/login'
   if (to.meta.admin && session.profile.value?.role !== 'admin') return '/workspace'
-  if (to.meta.public && session.profile.value) return '/workspace'
+  if (['/login','/register'].includes(to.path) && session.profile.value) return '/workspace'
 })
 onIdentityChange(change => {
   if (!change.userId && router.currentRoute.value.matched.length && !router.currentRoute.value.meta.public) void router.replace('/login')
