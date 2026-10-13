@@ -43,7 +43,7 @@ $env:PLAYWRIGHT_BROWSERS_PATH=(Join-Path $PWD 'frontend/.cache/ms-playwright')
 pnpm --dir frontend exec playwright test
 ```
 
-Python使用`backend/.venv/Scripts/python.exe`，已安装项目依赖，MySQL migration须为0019_lifecycle。API本地18018、Vite HTTPS15173必须空闲；mock/control端口随机。没有reuseExistingServer。测试证书保存在每次独立`frontend/.cache/browser/TEST_ONLY-UUID/`，只测试忽略其信任，不改系统证书或生产安全。测试结束关闭自己创建的Vite、API、mock与worker；`startup.json`/`processes.json`记录健康与exit，保留本run磁盘/SQL业务证据，仅清本run Redis前缀。
+Python使用`backend/.venv/Scripts/python.exe`，已安装项目依赖，MySQL migration须为0021_site_content。API本地18018、Vite HTTPS15173必须空闲；mock/control端口随机。没有reuseExistingServer。测试证书保存在每次独立`frontend/.cache/browser/TEST_ONLY-UUID/`，只测试忽略其信任，不改系统证书或生产安全。测试结束关闭自己创建的Vite、API、mock与worker；`startup.json`/`processes.json`记录健康与exit，保留本run磁盘/SQL业务证据，仅清本run Redis前缀。
 
 全量后端测试和本套浏览器测试串行，因为注册测试政策head在共享mock库。每次启动建立独立账号前缀、真实服务发布的目录/TEST_ONLY政策和独立stream/group；Worker只处理通过`/register`校验过的本run账号及Agent的实际task ID。并不扫描其他任务。API无生产调试路由。
 
@@ -69,3 +69,11 @@ Python使用`backend/.venv/Scripts/python.exe`，已安装项目依赖，MySQL m
 健康请求每次最多1秒且受启动45秒总期限约束；退出在网络await之前设立5秒优雅退出期限，控制请求最多1秒，超时后只强制终止本次spawn的进程并最多再等5秒观察真实exit。Vite与子进程并行收尾，单个失败不会跳过另一个；强制关闭仅处理自有Vite连接。清理完成或报错均在finally保存`processes.json`和`runtime.log`，`exitObserved`与`cleanupError`区分已退出和清理失败；未观察到退出不会记为成功。
 
 `pnpm --dir frontend exec playwright test overlay-form.spec.ts` 覆盖真实AppDialog/AppDrawer父form组合：四种purpose、页头/页脚、鼠标/Enter/Space，桌面和手机各48次取消/关闭无submit；调用方明确submit按钮仍提交一次。此命令须使用上面的TEST_ONLY环境。
+
+## 2026-10-13 平台交付边界
+
+三核心文案 / 图片 / 视频 Agent 仍调试，本次仅预留平台适配与 TEST_ONLY mock；真实接入和独立桥接均 DEFERRED_BY_USER，最新指令覆盖 10-12 桥接实施安排。协议 draft、生产关闭约束保留。原 T18～T25 聚合验收仍待完成，不把历史专项通过汇总为全量 PASS。
+
+普通 pnpm dev 默认为 HTTP，身份 Secure cookie、Origin / CSRF 检查需要正确 HTTPS 同源配置；裸启动不能完整演示登录与生成。普通空库没有测试 harness seed 的策略、目录、管理员和存储配置，相关功能继续关闭。上方 HTTPS TEST_ONLY harness 仅用于隔离验证，本次不重跑或新增启动器。
+
+交付入口：[仓库 README](../README.md)、[本次范围](../docs/development-scope-2026-10-13.md)、[交付清单](../docs/release-checklist.md)、[AC 追踪](../docs/verification/acceptance.csv)。
