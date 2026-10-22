@@ -4,15 +4,27 @@ from enum import StrEnum
 from typing import Annotated, Any, Generic, TypeVar
 from uuid import UUID
 
-from pydantic import AwareDatetime, BaseModel, ConfigDict, Field
+from pydantic import AwareDatetime, BaseModel, ConfigDict, Field, model_validator
 
 NonNegativeInt = Annotated[int, Field(strict=True, ge=0)]
 PositiveInt = Annotated[int, Field(strict=True, ge=1)]
 Timestamp = AwareDatetime
+MAX_REFERENCE_IMAGES = 4
 
 
 class DTO(BaseModel):
     model_config = ConfigDict(extra="forbid")
+
+
+class ConfigurationChange(DTO):
+    """Change reasons were removed; tolerate and discard the legacy input only."""
+
+    @model_validator(mode="before")
+    @classmethod
+    def discard_legacy_reason(cls, value):
+        if isinstance(value, dict) and "reason" in value:
+            return {key: item for key, item in value.items() if key != "reason"}
+        return value
 
 
 class UserRole(StrEnum):
@@ -69,21 +81,33 @@ class Quote(DTO):
     input_digest: str
 
 
+class RegenerationConfirmation(DTO):
+    source_task_id: UUID
+    expected_credits: NonNegativeInt
+    expected_used: Annotated[int, Field(strict=True, ge=0, le=3)]
+
+
 class SubmitTaskRequest(DTO):
     conversation_id: UUID
     agent_id: UUID
     input: InputSnapshot
     confirmed_quote: Quote
+    regeneration: RegenerationConfirmation | None = Field(
+        default=None, json_schema_extra=lambda schema: schema.pop('default', None),
+    )
 
 
 class TaskView(DTO):
     task_id: UUID
+    display_number: str = Field(pattern=r"^T\d{8}-\d{6,19}$", json_schema_extra={"readOnly": True})
     state: TaskState
     state_version: PositiveInt
     settlement_state: SettlementState
     quote: Quote
     work_ids: list[UUID]
     investigation_reason: str | None
+    created_at: Timestamp
+    updated_at: Timestamp
 
 
 class AdmissionResult(DTO):
@@ -102,3 +126,9 @@ T = TypeVar("T")
 class CursorPage(DTO, Generic[T]):
     items: list[T]
     next_cursor: str | None
+
+
+class NumberedPage(CursorPage[T], Generic[T]):
+    total: NonNegativeInt
+    page: PositiveInt | None = None
+    page_size: PositiveInt

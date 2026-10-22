@@ -12,6 +12,7 @@ test('real UI registration profile persistence cancel recharge and logout isolat
   await page.goto('/register')
   await page.getByLabel('账号', { exact: true }).fill(account)
   await page.getByLabel('密码', { exact: true }).fill(password)
+  await page.getByLabel('确认密码', { exact: true }).fill(password)
   await page.getByRole('button', { name: '创建账号', exact: true }).click()
   await expect(page).toHaveURL(/\/workspace$/)
   await page.getByRole('link', { name: '个人中心', exact: true }).click()
@@ -39,16 +40,20 @@ test('real UI registration profile persistence cancel recharge and logout isolat
   for (const escape of [false, true]) {
     await edit.click()
     await page.getByLabel('昵称', { exact: true }).fill('不保存')
-    if (escape) await page.keyboard.press('Escape')
-    else await page.getByRole('button', { name: '取消', exact: true }).click()
+    if (escape) {
+      await page.keyboard.press('Escape')
+      await expect(page.getByRole('dialog')).toBeVisible()
+      await expect(page.getByLabel('昵称', { exact: true })).toHaveValue('不保存')
+    }
+    await page.getByRole('button', { name: '取消', exact: true }).click()
     await expect(edit).toBeFocused()
   }
   expect(mutations.filter(x => x === 'PATCH /api/v1/me')).toHaveLength(patches)
   const beforeRecharge = mutations.length
   for (const source of ['account', 'header']) {
     await page.getByTestId(source + '-recharge').click()
-    await expect(page.getByRole('heading', { name: '充值说明' })).toBeVisible()
-    await expect(page.getByText('首版尚未开通真实充值')).toBeVisible()
+    await expect(page.getByRole('heading', { name: '充值积分' })).toBeVisible()
+    await expect(page.getByText('在线充值暂未开放', { exact: true })).toBeVisible()
     await page.getByRole('link', { name: '个人中心', exact: true }).click()
   }
   expect(mutations).toHaveLength(beforeRecharge)

@@ -1,0 +1,14 @@
+{
+  "mobileReferencePreview": true,
+  "mobileStatusAlignment": {
+    "count": 7,
+    "aligned": true
+  },
+  "mobileDrawer": {
+    "left": 0,
+    "width": 390,
+    "viewport": 390,
+    "footerBottom": 844,
+    "height": 844
+  }
+}

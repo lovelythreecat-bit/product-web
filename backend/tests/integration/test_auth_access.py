@@ -65,16 +65,19 @@ def test_csrf_profile_and_cookie_security(auth_client):
     )
     assert auth_client.get("/api/v1/me").json()["nickname"] == "测试昵称"
     for patch in [
-        {"nickname": "x" * 81},
+        {"nickname": "x" * 41},
         {"nickname": ""},
-        {"bio": "x" * 501},
+        {"nickname": None},
+        {"bio": "x" * 301},
         {"role": "admin"},
         {"account": "other"},
         {"available": 999},
     ]:
         assert auth_client.patch("/api/v1/me", json=patch).status_code == 422
-    assert auth_client.patch("/api/v1/me", json={"nickname": None}).status_code == 200
-    assert auth_client.get("/api/v1/me").json()["nickname"] is None
+    # Edited profiles use the current required-name limits; rejected updates
+    # must leave the previously saved profile intact.
+    profile = auth_client.get("/api/v1/me").json()
+    assert profile["nickname"] == "测试昵称" and profile["bio"] == "简介"
     auth_client.headers["Origin"] = "https://evil.invalid"
     assert (
         auth_client.post(

@@ -6,7 +6,7 @@ import type { Schema } from '../../src/types/api'
 
 const route = reactive({ params: { conversationId: 'recovery' } })
 const refreshTask = vi.fn(async () => {}), reconnect = vi.fn(async () => {})
-vi.mock('vue-router', () => ({ useRoute: () => route, useRouter: () => ({ push: vi.fn() }) }))
+vi.mock('vue-router', () => ({ useRoute: () => route, useRouter: () => ({ push: vi.fn(), replace: vi.fn() }) }))
 vi.mock('../../src/features/auth/session', () => ({
   session: { epoch: ref(1), profile: ref({ user_id: 'recovery-user' }), refreshAccount: vi.fn(async () => {}) },
   onIdentityChange: () => () => {},
@@ -18,6 +18,7 @@ vi.mock('../../src/api/catalog', () => ({ listAgents: vi.fn(async () => []), lis
 
 import WorkspaceView from '../../src/features/workspace/WorkspaceView.vue'
 import { draftFor } from '../../src/features/workspace/drafts'
+import { listAgents, quote } from '../../src/api/catalog'
 
 const body = {
   conversation_id: 'recovery', agent_id: 'agent',
@@ -36,9 +37,46 @@ function open() {
 function submit(wrapper: VueWrapper) { return (wrapper.vm as unknown as { submit(): Promise<void> }).submit() }
 const recoveryButton = (wrapper: VueWrapper) => wrapper.findAll('button').find(button => button.text() === '核对并重试原请求')
 beforeEach(() => {
+  vi.mocked(listAgents).mockResolvedValue([])
+  vi.mocked(quote).mockReset()
+  route.params.conversationId = 'recovery'
   const draft = draftFor('recovery')
   draft.confirmed = body; draft.pending = null; draft.uncertain = false
   refreshTask.mockClear(); reconnect.mockClear()
+})
+
+it('does not freeze another conversation while an earlier fee confirmation waits for a quote', async () => {
+  vi.mocked(listAgents).mockResolvedValue([{ agent_id: 'agent', version: 'a1', name: '文案', kind: 'copy', enabled: true,
+    input_support: { product_required_fields: ['name'], min_materials: 0, max_materials: 3, instruction_required: false },
+  } as Schema<'AgentVersion'>])
+  for (const id of ['recovery', 'independent']) {
+    const draft = draftFor(id)
+    draft.agentId = 'agent'; draft.pending = null; draft.confirmed = null
+    draft.agents = { agent: { specId: '', instruction: '', parameters: {} } }
+    draft.product = { product_id: 'product', version: 'pv1', created_at: '', product: { name: id } }
+    draft.materials = []
+  }
+  let finish!: (value: Schema<'Quote'>) => void
+  vi.mocked(quote).mockImplementationOnce(() => new Promise(resolve => { finish = resolve }))
+    .mockResolvedValue(body.confirmed_quote)
+  const wrapper = open()
+  await flushPromises()
+  const vm = wrapper.vm as unknown as { prepare(): Promise<void>; refreshQuote(): Promise<void> }
+  const first = vm.prepare()
+  await flushPromises()
+  expect(wrapper.get('.composer-form').attributes('disabled')).toBeDefined()
+  route.params.conversationId = 'independent'
+  await flushPromises()
+  await vm.refreshQuote()
+  await flushPromises()
+  expect(wrapper.get('.composer-form').attributes('disabled')).toBeUndefined()
+  await wrapper.get('.generate-button').trigger('click')
+  await flushPromises()
+  expect(draftFor('independent').confirmed?.conversation_id).toBe('independent')
+  finish(body.confirmed_quote)
+  await first
+  expect(draftFor('recovery').confirmed).toBeNull()
+  expect(draftFor('independent').confirmed?.conversation_id).toBe('independent')
 })
 afterEach(() => { wrappers.splice(0).forEach(wrapper => wrapper.unmount()); vi.unstubAllGlobals() })
 
@@ -74,6 +112,47 @@ it.each([
 it('ends the intent only for a structured, definitive admission rejection', async () => {
   vi.stubGlobal('fetch', vi.fn(async () => new Response('{"error":{"code":"INSUFFICIENT_CREDITS","message":"不足"}}', { status: 402 })))
   await submit(open())
+  expect(draftFor('recovery').pending).toBeNull()
+})
+
+it('unlocks the composer after a definitive concurrency rejection', async () => {
+  vi.stubGlobal('fetch', vi.fn(async () => new Response('{"error":{"code":"RATE_LIMITED","message":"请求无法完成。"}}', { status: 429 })))
+  const wrapper = open()
+  await submit(wrapper)
+  await flushPromises()
+  expect(draftFor('recovery').pending).toBeNull()
+  expect(recoveryButton(wrapper)).toBeUndefined()
+  expect(wrapper.get('.composer-form').attributes('disabled')).toBeUndefined()
+})
+
+it('explains insufficient storage after admission is rejected and preserves the editable input', async () => {
+  vi.stubGlobal('fetch', vi.fn(async () => new Response('{"error":{"code":"CAPACITY_INSUFFICIENT","message":"存储请求无法完成。"}}', { status: 409 })))
+  const draft = draftFor('recovery')
+  draft.product = { product_id: 'product', version: 'pv1', created_at: '', product: { name: '保留的商品资料' } }
+  const wrapper = open()
+  await submit(wrapper); await flushPromises()
+  expect(wrapper.get('[role="alert"]').text()).toContain('存储空间不足')
+  expect(draft.pending).toBeNull()
+  expect(draft.product.product.name).toBe('保留的商品资料')
+  expect(recoveryButton(wrapper)).toBeUndefined()
+  expect(wrapper.get('.composer-form').attributes('disabled')).toBeUndefined()
+})
+
+it('allows a second conversation to submit while the first POST is still pending', async () => {
+  let finish!: (response: Response) => void
+  const fetch = vi.fn().mockImplementationOnce(() => new Promise<Response>(resolve => { finish = resolve }))
+    .mockResolvedValueOnce(new Response('{"task":{"task_id":"second-task"}}'))
+  vi.stubGlobal('fetch', fetch)
+  const wrapper = open(), first = submit(wrapper)
+  route.params.conversationId = 'second-conversation'
+  draftFor('second-conversation').confirmed = { ...body, conversation_id: 'second-conversation' }
+  await flushPromises()
+  await submit(wrapper)
+  expect(fetch).toHaveBeenCalledTimes(2)
+  expect(draftFor('second-conversation').pending).toBeNull()
+  expect(draftFor('recovery').pending).toBeTruthy()
+  finish(new Response('{"task":{"task_id":"first-task"}}'))
+  await first
   expect(draftFor('recovery').pending).toBeNull()
 })
 

@@ -16,7 +16,7 @@ test('TEST_ONLY scoped controls recover originals and never turn uncertainty int
   const conversation=await conv.createConversation({title:'TEST_ONLY scoped scenarios'})
   const product=await conv.createProductVersion({product:{name:'TEST_ONLY cup'}})
   const input={product_version:product.version,product:product.product,instruction:'TEST_ONLY',parameters:{},material_versions:[]}
-  const confirmed_quote=await catalog.quote({spec_id:meta.specs.copy,input})
+  const confirmed_quote=await catalog.quote({agent_id:meta.agents.copy,input})
   const ids=[]
   for(let i=0;i<5;i++) ids.push((await tasks.submitTask(crypto.randomUUID(),{conversation_id:conversation.conversation_id,agent_id:meta.agents.copy,input,confirmed_quote})).task.task_id)
   return ids

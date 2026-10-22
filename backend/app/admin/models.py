@@ -2,11 +2,34 @@
 
 from datetime import datetime
 
-from sqlalchemy import Boolean, CheckConstraint, ForeignKey, Index, String
+from sqlalchemy import Boolean, CheckConstraint, ForeignKey, Index, Integer, LargeBinary, String
 from sqlalchemy.dialects.mysql import DATETIME
 from sqlalchemy.orm import Mapped, mapped_column
 
 from app.db import Base
+
+
+class TextServiceConnection(Base):
+    """Only the platform-to-textAgent connection; never stores model configurations."""
+
+    __tablename__ = "text_service_connections"
+    __table_args__ = (
+        CheckConstraint("slot = 'text'", name="ck_text_service_slot"),
+        CheckConstraint(
+            "(revision = 0 AND base_url IS NULL AND key_ciphertext IS NULL) OR "
+            "(revision > 0 AND base_url IS NOT NULL AND key_ciphertext IS NOT NULL)",
+            name="ck_text_service_configured",
+        ),
+        {"mysql_engine": "InnoDB", "mysql_charset": "utf8mb4", "mysql_collate": "utf8mb4_bin"},
+    )
+    slot: Mapped[str] = mapped_column(String(16), primary_key=True)
+    base_url: Mapped[str | None] = mapped_column(String(2048))
+    key_ciphertext: Mapped[bytes | None] = mapped_column(LargeBinary)
+    revision: Mapped[int] = mapped_column(Integer)
+    updated_at: Mapped[datetime | None] = mapped_column(DATETIME(fsp=6))
+    updated_by: Mapped[str | None] = mapped_column(ForeignKey("users.id"))
+    default_model_id: Mapped[str | None] = mapped_column(String(36))
+    default_revision: Mapped[int] = mapped_column(Integer, default=0)
 
 
 class ContentAccessGrant(Base):

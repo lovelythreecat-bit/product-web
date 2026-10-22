@@ -57,6 +57,117 @@ def reducer(runtime):
     return runtime[1]
 
 
+def test_repeated_poll_history_does_not_repeat_sql_under_the_account_lock(upstream):
+    from copy import deepcopy
+
+    from sqlalchemy import event, func
+
+    from app.agents.callbacks import CallbackService
+    from app.agents.models import UpstreamEvidence
+    from app.dispatch.consumer import LeaseManager
+    from app.ledger.service import now
+
+    factory, service, create, *_ = upstream
+    task_id = create()
+    submit(upstream, task_id)
+    assert service.poll_original_task(task_id).state == 'SAVING'
+    with factory() as session, session.begin():
+        original = session.scalar(select(UpstreamEvidence).where(
+            UpstreamEvidence.task_id == task_id, UpstreamEvidence.kind == 'observation',
+        ).order_by(UpstreamEvidence.created_at.desc(), UpstreamEvidence.id.desc()))
+        for _ in range(75):
+            session.add(UpstreamEvidence(
+                id=str(uuid4()), task_id=task_id, attempt_id=original.attempt_id,
+                kind='observation', payload=deepcopy(original.payload), created_at=now(),
+            ))
+        changed = deepcopy(original.payload)
+        changed['identity']['snapshot_digest'] = 'different-input'
+        session.add(UpstreamEvidence(
+            id=str(uuid4()), task_id=task_id, attempt_id=original.attempt_id,
+            kind='observation', payload=changed, created_at=now(),
+        ))
+
+    manager = LeaseManager(factory)
+    lease = manager.claim_task(task_id, 'TEST_ONLY_history')
+    engine = factory.kw['bind']
+    statements = []
+    def capture(*args):
+        statements.append(args[2])
+    event.listen(engine, 'before_cursor_execute', capture)
+    try:
+        CallbackService(service).import_observations(task_id, lease)
+    finally:
+        event.remove(engine, 'before_cursor_execute', capture)
+        manager.release(lease)
+    assert len(statements) < 40, 'Repeated poll history held the account lock across redundant SQL'
+    with factory() as session:
+        assert session.scalar(select(func.count()).select_from(UpstreamEvidence).where(
+            UpstreamEvidence.task_id == task_id, UpstreamEvidence.kind == 'callback_conflict',
+        )) == 1
+    assert service._view(task_id).state == 'SAVING'
+
+
+def test_product_save_can_run_while_poll_history_is_scanned(upstream, monkeypatch):
+    from copy import deepcopy
+    from datetime import timedelta
+
+    import app.agents.callbacks as module
+    from app.agents.models import UpstreamEvidence
+    from app.auth.models import AuthSession, User
+    from app.common.types import Principal
+    from app.conversations.schemas import ProductVersionCreate
+    from app.conversations.service import ConversationService
+    from app.dispatch.consumer import LeaseManager
+    from app.ledger.service import now
+
+    factory, service, create, *_ = upstream
+    task_id = create()
+    submit(upstream, task_id)
+    assert service.poll_original_task(task_id).state == "SAVING"
+    with factory() as session, session.begin():
+        task = session.get(GenerationTask, task_id)
+        user = session.get(User, task.user_id)
+        credential = AuthSession(
+            id=str(uuid4()), user_id=user.id, token_hash=uuid4().hex,
+            csrf_hash=uuid4().hex, auth_version=user.auth_version,
+            expires_at=now() + timedelta(hours=1),
+        )
+        session.add(credential)
+        principal = Principal(user_id=user.id, session_id=credential.id,
+                              auth_version=user.auth_version, role=user.role)
+        original = session.scalar(select(UpstreamEvidence).where(
+            UpstreamEvidence.task_id == task_id, UpstreamEvidence.kind == "observation",
+        ).limit(1))
+        # Durable source progress skips the already imported history. A genuinely
+        # new receipt must still be scanned without holding the account lock.
+        session.add(UpstreamEvidence(
+            id=str(uuid4()), task_id=task_id, attempt_id=original.attempt_id,
+            kind="observation", payload=deepcopy(original.payload), created_at=now(),
+        ))
+
+    saved = []
+    digest = module.content_digest
+
+    def save_during_history_scan(payload):
+        if not saved:
+            with factory() as session:
+                saved.append(ConversationService(session).create_product_version(
+                    principal, ProductVersionCreate(product={"name": "TEST_ONLY_concurrent_edit"}),
+                ))
+                session.rollback()
+        return digest(payload)
+
+    monkeypatch.setattr(module, "content_digest", save_during_history_scan)
+    manager = LeaseManager(factory)
+    lease = manager.claim_task(task_id, "TEST_ONLY_product_edit")
+    try:
+        module.CallbackService(service).import_observations(task_id, lease)
+    finally:
+        manager.release(lease)
+    assert len(saved) == 1
+    assert service._view(task_id).state == "SAVING"
+
+
 def test_forged_cross_agent_task(upstream, callbacks):
     task = upstream[2]()
     other = upstream[2](kind="image")
@@ -121,6 +232,270 @@ def test_same_event_changed_payload_is_durable_conflict(upstream, callbacks):
                 UpstreamEvidence.task_id == task, UpstreamEvidence.kind == "callback_conflict"
             )
         )
+
+
+def test_concurrent_changed_event_replays_have_one_conflict_per_variant(upstream, callbacks):
+    from concurrent.futures import ThreadPoolExecutor
+
+    from sqlalchemy import func
+
+    from app.agents.models import UpstreamEvidence
+
+    task = upstream[2]()
+    submit(upstream, task)
+    path, event = event_for(upstream, task)
+    assert post(callbacks, path, event).status_code == 202
+    conflict = changed(event, state="FAILED", result=None)
+    with ThreadPoolExecutor(max_workers=2) as pool:
+        results = list(pool.map(lambda _: post(callbacks, path, conflict).status_code, range(20)))
+    assert results == [409] * 20
+    with upstream[0]() as session:
+        assert session.scalar(select(func.count()).select_from(UpstreamEvidence).where(
+            UpstreamEvidence.task_id == task, UpstreamEvidence.kind == "callback_conflict",
+        )) == 1
+    assert post(callbacks, path, changed(event)).status_code == 409
+    with upstream[0]() as session:
+        assert session.scalar(select(func.count()).select_from(UpstreamEvidence).where(
+            UpstreamEvidence.task_id == task, UpstreamEvidence.kind == "callback_conflict",
+        )) == 2
+
+
+def test_import_conflict_and_source_disposition_rollback_and_restart_together(upstream):
+    from copy import deepcopy
+
+    from sqlalchemy import event, func
+
+    from app.agents.callbacks import CallbackService
+    from app.agents.models import ObservationImport, UpstreamEvidence
+    from app.dispatch.consumer import LeaseManager
+    from app.ledger.service import now
+
+    factory, service, create, *_ = upstream
+    task_id = create()
+    submit(upstream, task_id)
+    assert service.poll_original_task(task_id).state == "SAVING"
+    reference = str(uuid4())
+    with factory() as session, session.begin():
+        original = session.scalar(select(UpstreamEvidence).where(
+            UpstreamEvidence.task_id == task_id, UpstreamEvidence.kind == "observation",
+        ).order_by(UpstreamEvidence.created_at.desc(), UpstreamEvidence.id.desc()).limit(1))
+        payload = deepcopy(original.payload)
+        payload["outcome"]["result"]["warnings"] = ["TEST_ONLY changed metadata"]
+        session.add(UpstreamEvidence(
+            id=reference, task_id=task_id, attempt_id=original.attempt_id,
+            kind="observation", payload=payload, created_at=now(),
+        ))
+
+    def crash(mapper, connection, target):
+        if target.source_ref == reference:
+            raise RuntimeError("TEST_ONLY stop before disposition insert")
+
+    manager = LeaseManager(factory)
+    lease = manager.claim_task(task_id, "TEST_ONLY_import_rollback")
+    event.listen(ObservationImport, "before_insert", crash)
+    try:
+        with pytest.raises(RuntimeError, match="stop before disposition"):
+            CallbackService(service).import_observations(task_id, lease)
+    finally:
+        event.remove(ObservationImport, "before_insert", crash)
+    try:
+        with factory() as session:
+            assert session.scalar(select(ObservationImport).where(
+                ObservationImport.source_ref == reference,
+            )) is None
+            assert session.scalar(select(func.count()).select_from(UpstreamEvidence).where(
+                UpstreamEvidence.task_id == task_id,
+                UpstreamEvidence.kind == "callback_conflict",
+            )) == 0
+        for _ in range(3):
+            CallbackService(service).import_observations(task_id, lease)
+        with factory() as session:
+            receipt = session.scalar(select(ObservationImport).where(
+                ObservationImport.source_ref == reference,
+            ))
+            assert receipt.disposition == "CONFLICT"
+            assert session.scalar(select(func.count()).select_from(UpstreamEvidence).where(
+                UpstreamEvidence.task_id == task_id,
+                UpstreamEvidence.kind == "callback_conflict",
+            )) == 1
+    finally:
+        manager.release(lease)
+
+
+def test_fresh_callback_can_reduce_blocked_task_without_remote_query(
+    upstream, callbacks, monkeypatch,
+):
+    from app.agents.callbacks import CallbackService
+    from app.agents.models import AgentEventDecision
+    from app.dispatch.consumer import Lease, LeaseManager
+    from app.dispatch.models import OutboxEvent
+    from app.tasks.state_machine import TransitionError
+
+    factory, service, create, *_ = upstream
+    task_id = create()
+    submit(upstream, task_id)
+    original = CallbackService._manifest
+
+    def former_policy(*args):
+        raise TransitionError("RESULT_POLICY_UNAVAILABLE")
+
+    monkeypatch.setattr(CallbackService, "_manifest", former_policy)
+    assert service.poll_original_task(task_id).state == "INVESTIGATING"
+    monkeypatch.setattr(CallbackService, "_manifest", original)
+    before = calls(upstream, task_id)["query_id"]
+    path, ready = event_for(upstream, task_id)
+    assert post(callbacks, path, ready).status_code == 202
+    with factory() as session:
+        task = session.get(GenerationTask, task_id)
+        wake = session.scalar(select(OutboxEvent).where(
+            OutboxEvent.task_id == task_id, OutboxEvent.state_version == task.state_version,
+            OutboxEvent.operation == "recover",
+        ))
+        wake_id, version, generation = wake.event_id, wake.state_version, wake.dispatch_generation
+    manager = LeaseManager(factory)
+    lease = manager.claim_dispatch(
+        task_id, "TEST_ONLY_callback_unblock", wake_id, version, generation,
+    )
+    assert isinstance(lease, Lease)
+    try:
+        assert CallbackService(service).poll_original_task(task_id, lease=lease).state == "SAVING"
+    finally:
+        manager.release(lease)
+    assert calls(upstream, task_id)["query_id"] == before
+    with factory() as session:
+        decisions = session.scalars(select(AgentEventDecision).where(
+            AgentEventDecision.task_id == task_id,
+        )).all()
+        assert {row.disposition for row in decisions} == {"APPLIED", "CONFLICT"}
+
+
+@pytest.mark.parametrize("initial", ["SUBMITTING", "INVESTIGATING"])
+def test_running_callback_defers_new_version_remote_recovery(
+    upstream, callbacks, monkeypatch, initial,
+):
+    from app.dispatch.consumer import LeaseManager
+    from app.dispatch.models import OutboxEvent
+    from app.dispatch.recovery import RecoveryScheduler, database_now
+
+    factory, service, create, *_ = upstream
+    task_id = create("lost_response" if initial == "INVESTIGATING" else "normal")
+    if initial == "SUBMITTING":
+        original_apply = service._apply_observation
+        monkeypatch.setattr(service, "_apply_observation", lambda *args, **kwargs: None)
+    assert submit(upstream, task_id).state == initial
+    if initial == "SUBMITTING":
+        monkeypatch.setattr(service, "_apply_observation", original_apply)
+    path, running = event_for(upstream, task_id, 0)
+    assert post(callbacks, path, running).status_code == 202
+    assert service.poll_original_task(task_id).state == "RUNNING"
+    assert calls(upstream, task_id)["query_id"] == 0
+    assert calls(upstream, task_id)["query_external"] == 0
+    with factory() as session:
+        task = session.get(GenerationTask, task_id)
+        wake = session.scalar(select(OutboxEvent).where(
+            OutboxEvent.task_id == task_id, OutboxEvent.state_version == task.state_version,
+            OutboxEvent.operation == "recover",
+        ))
+        assert wake.ready_at > database_now(session)
+        assert wake.dispatch_generation > 1
+        identity = task.id, wake.event_id, wake.state_version, wake.dispatch_generation
+    task_id, event_id, version, generation = identity
+    manager = LeaseManager(factory)
+    assert manager.claim_dispatch(task_id, "TEST_ONLY_old_now", event_id, version,
+                                  generation - 1) == "rejected"
+    assert manager.claim_dispatch(task_id, "TEST_ONLY_not_due", event_id, version,
+                                  generation) == "busy"
+    scheduler = RecoveryScheduler(factory, task_ids=[task_id])
+    assert scheduler.recover_due_tasks().scheduled == ()
+
+
+@pytest.mark.parametrize("snapshot_race", [False, True])
+def test_new_id_duplicate_keeps_needs_input_after_restart_and_concurrent_commit(
+    upstream, callbacks, monkeypatch, snapshot_race,
+):
+    from concurrent.futures import ThreadPoolExecutor
+    from threading import Event
+
+    import app.agents.callbacks as module
+    from app.agents.callbacks import CallbackService
+    from app.agents.contracts import VerifiedEvent
+    from app.agents.models import AgentEvent, AgentEventDecision
+    from app.catalog.schemas import content_digest
+    from app.tasks.repository import locked_execution
+    from app.tasks.state_machine import TransitionEvidence, transition_task
+
+    factory, service, create, *_ = upstream
+    task_id = create()
+    submit(upstream, task_id)
+    path, running = event_for(upstream, task_id, 0)
+    assert post(callbacks, path, running).status_code == 202
+    assert service.poll_original_task(task_id).state == "RUNNING"
+    lease = service.leases.claim_task(task_id, "TEST_ONLY_manual_wait")
+    try:
+        with factory() as session, session.begin():
+            task = locked_execution(session, task_id, lease)
+            transition_task(session, task_id, task.state_version, "INVESTIGATING",
+                            TransitionEvidence(lease))
+            task.investigation_reason = "UPSTREAM_NEEDS_INPUT"
+    finally:
+        service.leases.release(lease)
+    with factory() as session:
+        task = session.get(GenerationTask, task_id)
+        binding = service.registry.bind_task(session, task)
+        original = session.scalar(select(AgentEvent).where(
+            AgentEvent.task_id == task_id, AgentEvent.source == "callback",
+            AgentEvent.sequence == 1,
+        ))
+        assert original is not None
+        assert session.get(AgentEventDecision, original.id).disposition == "APPLIED"
+        verified = VerifiedEvent.model_validate(original.payload["event"])
+        assert verified.status in {"VERIFIED", "DUPLICATE"}
+        assert verified.event_id is not None
+    # Internal trusted provider boundary: different event IDs may carry the same
+    # semantic event. HTTP mock-v1 nonce-shape validation is tested separately.
+    duplicate = verified.model_copy(update={"event_id": verified.event_id + ":another-id"})
+    assert duplicate.model_dump(exclude={"event_id"}) == verified.model_dump(exclude={"event_id"})
+
+    def commit_callback():
+        return CallbackService(service).apply_verified_agent_event(
+            binding, duplicate, raw_digest=content_digest(duplicate.model_dump(mode="json")),
+        )
+
+    monkeypatch.setattr(service, "recover_original_task", lambda *args, **kwargs: pytest.fail(
+        "Duplicate/stale inbox content must not query a task waiting for user input"))
+    resumed = CallbackService(service)
+    if snapshot_race:
+        snapshot_taken, inbox_committed = Event(), Event()
+        monkeypatch.setattr(resumed, "import_observations", lambda *args: None)
+
+        def pause_before_lock(session, current_task, current_lease):
+            session.scalar(select(GenerationTask.user_id).where(GenerationTask.id == current_task))
+            snapshot_taken.set()
+            assert inbox_committed.wait(5)
+            return locked_execution(session, current_task, current_lease)
+
+        monkeypatch.setattr(module, "locked_execution", pause_before_lock)
+        with ThreadPoolExecutor(max_workers=1) as pool:
+            future = pool.submit(resumed.poll_original_task, task_id)
+            assert snapshot_taken.wait(5)
+            try:
+                receipt = commit_callback()
+            finally:
+                inbox_committed.set()
+            result = future.result(timeout=10)
+    else:
+        receipt = commit_callback()
+        with factory() as session:
+            assert session.get(GenerationTask, task_id).investigation_reason == (
+                "CALLBACK_INBOX_PENDING:UPSTREAM_NEEDS_INPUT"
+            )
+        result = resumed.poll_original_task(task_id)
+    assert receipt.status == "ACCEPTED"
+    assert result.state == "INVESTIGATING"
+    assert result.investigation_reason == "UPSTREAM_NEEDS_INPUT"
+    with factory() as session:
+        assert session.get(AgentEventDecision, receipt.reference).disposition == "DUPLICATE"
+    assert calls(upstream, task_id)["query_id"] == 0
 
 
 def test_failed_notification_keeps_freeze_and_durable_evidence(upstream, callbacks):

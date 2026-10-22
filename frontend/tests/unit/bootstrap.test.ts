@@ -7,7 +7,7 @@ describe('development shell', () => {
   vi.stubGlobal('fetch',async()=>new Response('{}',{status:401}))
   await router.push('/workspace'); await router.isReady()
   const wrapper=mount(App,{global:{plugins:[router]}})
-  expect(wrapper.get('h1').text()).toBe('登录')
+  expect(wrapper.get('h1').text()).toBe('欢迎回来')
   expect(wrapper.find('input[type="password"]').exists()).toBe(true)
   expect(wrapper.find('[data-testid="available"]').exists()).toBe(false)
   wrapper.unmount()

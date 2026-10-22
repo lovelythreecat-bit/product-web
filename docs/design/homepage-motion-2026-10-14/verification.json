@@ -1,0 +1,46 @@
+{
+  "desktop": {
+    "overflow": false,
+    "video": [
+      {
+        "muted": true,
+        "ready": 4,
+        "paused": false,
+        "time": 2.300401,
+        "width": 640
+      },
+      {
+        "muted": true,
+        "ready": 4,
+        "paused": true,
+        "time": 0,
+        "width": 640
+      }
+    ],
+    "float": [
+      "running"
+    ]
+  },
+  "pause": true,
+  "offscreen": {
+    "allVideoPaused": true,
+    "floatPaused": true
+  },
+  "videoPause": true,
+  "videoResume": true,
+  "replay": {
+    "scroll": 0,
+    "playing": true
+  },
+  "reduced": {
+    "paused": true,
+    "animations": 0,
+    "controlDisabled": true
+  },
+  "mobile": {
+    "overflow": false,
+    "videoReady": 4,
+    "mainPadding": "0px"
+  },
+  "errors": []
+}

@@ -28,6 +28,7 @@ def test_task_view_cannot_serialize_private_diagnostics():
     with pytest.raises(ValidationError):
         TaskView(
             task_id=UUID("abd3b968-9170-46d7-befa-1a084f7d36e1"),
+            display_number="T20261016-000001",
             state="SAVING",
             state_version=1,
             settlement_state="FROZEN",

@@ -12,10 +12,16 @@ test('parent form: built-in mouse and keyboard close never submits; explicit act
           await page.getByRole('button', {name:'打开父表单弹层'}).click()
           const dialog = page.getByRole('dialog', {name:'父表单组合'})
           await expect(dialog).toBeVisible()
-          const button = location === 'header' ? dialog.locator('header button') : dialog.locator('footer').getByRole('button', {name:purpose === 'read' ? '关闭' : '取消', exact:true})
+          await page.keyboard.press('Escape')
+          await expect(dialog).toBeVisible()
+          if (variant === 'dialog') {
+            await page.locator('.el-overlay-dialog[aria-label="父表单组合"]').click({ position: { x: 2, y: 2 } })
+            await expect(dialog).toBeVisible()
+          }
+          const button = location === 'header' ? dialog.locator('.overlay-header button') : dialog.locator('.overlay-actions').getByRole('button', {name:purpose === 'read' ? '关闭' : '取消', exact:true})
           if (activation === 'click') await button.click()
           else { await button.focus(); await button.press(activation) }
-          await expect(dialog).not.toBeVisible()
+          await expect(dialog, `${variant}/${purpose}/${location}/${activation}`).not.toBeVisible()
           cases.push({variant, purpose, location, activation, submits:Number(await page.getByTestId('form-submits').textContent()), open:await page.getByTestId('form-open').textContent()})
         }
       }

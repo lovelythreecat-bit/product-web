@@ -34,7 +34,7 @@ def validate_thresholds(values):
         raise ValueError("invalid_thresholds")
 
 
-def project_metrics(session, *, free_bytes, thresholds):
+def project_metrics(session, *, free_bytes, thresholds, total_bytes=None):
     validate_thresholds(thresholds)
 
     def scalar(sql):
@@ -80,11 +80,25 @@ def project_metrics(session, *, free_bytes, thresholds):
         "capacity": [
             dict(row)
             for row in session.execute(
-                text("SELECT id,budget_bytes,reserved_bytes,actual_bytes FROM storage_pools")
+                text("SELECT id,reserved_bytes,actual_bytes FROM storage_pools")
             ).mappings()
         ],
         "disk_free_bytes": free_bytes,
+        "disk_total_bytes": total_bytes,
     }
+    reserved = sum(pool["reserved_bytes"] for pool in metrics["capacity"])
+    metrics["disk_reserved_bytes"] = reserved
+    metrics["disk_unreserved_bytes"] = max(0, free_bytes - reserved)
+    metrics["disk_used_ratio"] = (
+        (total_bytes - free_bytes) / total_bytes if total_bytes is not None and total_bytes > 0
+        else None
+    )
+    # Physical free space already excludes durable files. Add only outstanding
+    # reservations; the historical threshold name remains an alert, never a quota.
+    metrics["disk_committed_ratio"] = (
+        (total_bytes - free_bytes + reserved) / total_bytes
+        if total_bytes is not None and total_bytes > 0 else None
+    )
     for name in ("terminal_mean_seconds",):
         if metrics[name] is not None:
             metrics[name] = float(metrics[name])
@@ -101,11 +115,9 @@ def project_metrics(session, *, free_bytes, thresholds):
             alerts.append(name)
     if "disk_free_bytes_min" in thresholds and free_bytes < thresholds["disk_free_bytes_min"]:
         alerts.append("disk_free_bytes")
-    if "capacity_used_ratio_max" in thresholds and any(
-        (p["actual_bytes"] + p["reserved_bytes"]) / p["budget_bytes"]
-        > thresholds["capacity_used_ratio_max"]
-        for p in metrics["capacity"]
-    ):
+    if ("capacity_used_ratio_max" in thresholds
+            and metrics["disk_committed_ratio"] is not None
+            and metrics["disk_committed_ratio"] > thresholds["capacity_used_ratio_max"]):
         alerts.append("capacity")
     metrics["alerts"] = alerts
     for metric, limit, minimum in (

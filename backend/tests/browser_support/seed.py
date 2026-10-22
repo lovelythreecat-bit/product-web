@@ -6,7 +6,7 @@ from app.agents.mock_server import PROTOCOL
 from app.assist.provider import TEST_SCHEME
 from app.auth.models import User
 from app.auth.service import AuthService
-from app.catalog.schemas import AgentDraft, PriceDraft, SpecDraft, content_digest
+from app.catalog.schemas import AgentDraft, content_digest
 from app.catalog.service import CatalogService
 from app.ledger.models import RegistrationCreditHead
 from app.ledger.service import set_registration_credit_config
@@ -46,65 +46,26 @@ def seed(factory, settings, prefix, endpoint):
         service = CatalogService(s, mode="mock")
         agents, specs, result_rules, agent_rules = {}, {}, {}, {}
         for kind, credits in (("copy", 8), ("image", 20), ("video", 60)):
-            agent_id, spec_id = str(uuid4()), str(uuid4())
+            agent_id = str(uuid4())
             support = dict(
                 product_required_fields=["name"],
                 instruction_required=False,
                 min_materials=0 if kind == "copy" else 1,
                 max_materials=2,
             )
-            # This run's explicit TEST_ONLY contract. Optional fields preserve callers
-            # exercising empty parameters; UI consumes the actual published defaults.
-            fields = {
-                "copy": {
-                    "tone": dict(
-                        kind="string", required=False, choices=["自然", "专业"], default="自然"
-                    )
+            input_policy = policy(
+                s,
+                "D-03",
+                {
+                    "agents": {
+                        agent_id: dict(
+                            protocol_version=PROTOCOL,
+                            validation_ref="TEST_ONLY_browser",
+                            supported_inputs_ref="sha256:" + content_digest(support),
+                        )
+                    }
                 },
-                "image": {
-                    "purpose": dict(
-                        kind="string", required=False, choices=["场景图", "主图"], default="场景图"
-                    )
-                },
-                "video": {
-                    "aspect_ratio": dict(
-                        kind="string", required=False, choices=["9:16", "16:9"], default="9:16"
-                    ),
-                    "subtitles": dict(kind="boolean", required=False, default=True),
-                },
-            }[kind]
-            parameters = {"fields": fields, "combinations": []}
-            versions = {
-                "D-03": policy(
-                    s,
-                    "D-03",
-                    {
-                        "agents": {
-                            agent_id: dict(
-                                protocol_version=PROTOCOL,
-                                validation_ref="TEST_ONLY_browser",
-                                supported_inputs_ref="sha256:" + content_digest(support),
-                            )
-                        }
-                    },
-                ),
-                "D-02": policy(
-                    s,
-                    "D-02",
-                    {
-                        "specs": {
-                            spec_id: dict(
-                                agent_id=agent_id,
-                                agent_version="TEST_ONLY_v1",
-                                parameter_schema_ref="sha256:" + content_digest(parameters),
-                                validation_evidence_ref="TEST_ONLY_browser",
-                                delivery_kind="single",
-                            )
-                        }
-                    },
-                ),
-                "D-05": policy(s, "D-05", {"prices": {spec_id: {"credits": credits}}}),
-            }
+            )
             service.publish_agent_version(
                 actor,
                 AgentDraft(
@@ -119,37 +80,12 @@ def seed(factory, settings, prefix, endpoint):
                     protocol_version=PROTOCOL,
                     input_support=support,
                     endpoint=endpoint,
-                    policy_versions={"D-03": versions["D-03"]},
+                    policy_versions={"D-03": input_policy},
                 ),
             )
-            spec = service.publish_spec_version(
-                actor,
-                SpecDraft(
-                    spec_id=spec_id,
-                    agent_id=agent_id,
-                    agent_version="TEST_ONLY_v1",
-                    version="TEST_ONLY_v1",
-                    enabled=True,
-                    reason="TEST_ONLY browser",
-                    name="TEST_ONLY " + kind,
-                    parameter_schema=parameters,
-                    delivery_kind="single",
-                    policy_versions=versions,
-                ),
-            )
-            service.set_price_version(
-                actor,
-                PriceDraft(
-                    spec_id=spec_id,
-                    version="TEST_ONLY_v1",
-                    enabled=True,
-                    credits=credits,
-                    policy_version=versions["D-05"],
-                    reason="TEST_ONLY browser",
-                ),
-            )
-            agents[kind], specs[kind] = agent_id, spec_id
-            result_rules[spec_id] = dict(
+            spec, _ = service.single_context(agent_id)
+            agents[kind] = specs[kind] = agent_id
+            result_rules[agent_id] = dict(
                 protocol_version=PROTOCOL,
                 spec_version="TEST_ONLY_v1",
                 spec_digest=content_digest(spec.model_dump(mode="json")),
@@ -173,6 +109,17 @@ def seed(factory, settings, prefix, endpoint):
                     )
                 },
             )
+        from app.catalog.parameters import ParameterConfigUpdate, read_parameters, update_parameters
+
+        current = read_parameters(s, "mock")
+        update_parameters(
+            s,
+            "mock",
+            ParameterConfigUpdate(
+                expected_version=current.version, text_price=8, image_price=20, video_price=60
+            ),
+            actor.user_id,
+        )
         generation = {
             "D-01": policy(s, "D-01", {"agents": agent_rules, "result_specs": result_rules}),
             "D-05": policy(

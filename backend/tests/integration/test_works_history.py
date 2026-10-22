@@ -232,6 +232,65 @@ def test_copy_preview_play_download_filter(published, upstream, kind, mime):
         )
 
 
+@pytest.mark.parametrize("publish", [False, True])
+def test_delete_task_history_preserves_execution_works_and_ledger(published, upstream, publish):
+    client, create, login = published
+    original = create(publish=publish)
+    login(original["user_id"])
+    task_url = "/api/v1/tasks/" + original["task_id"]
+    before = client.get(task_url).json()
+    with upstream[0]() as s:
+        ledger_ids = list(s.scalars(select(CreditLedger.id).where(
+            CreditLedger.task_id == original["task_id"])))
+
+    response = client.delete(task_url)
+    assert response.status_code == 204, response.text
+    assert client.delete(task_url).status_code == 204
+    assert client.get("/api/v1/tasks").json()["items"] == []
+    assert client.get("/api/v1/tasks", params={
+        "conversation_id": original["conversation_id"]}).json()["items"] == []
+    assert client.get(task_url).json() == before
+    with upstream[0]() as s:
+        assert list(s.scalars(select(CreditLedger.id).where(
+            CreditLedger.task_id == original["task_id"]))) == ledger_ids
+    if publish:
+        assert client.get("/api/v1/works/" + original["work_id"]).status_code == 200
+    else:
+        from pathlib import Path
+        # Hiding a running task must not prevent the original execution finishing.
+        assert publisher(upstream, Path(client.app.state.settings.storage_root)).run(
+            original["task_id"]).state == "SUCCEEDED"
+        assert client.get("/api/v1/tasks").json()["items"] == []
+
+
+def test_delete_task_history_enforces_owner_and_csrf(published):
+    client, create, login = published
+    original = create(owner="a")
+    other = create(owner="b")
+    login(other["user_id"])
+    task_url = "/api/v1/tasks/" + original["task_id"]
+    assert client.delete(task_url).status_code == 404
+    login(original["user_id"])
+    assert len(client.get("/api/v1/tasks").json()["items"]) == 1
+    client.headers.pop("X-CSRF-Token")
+    assert client.delete(task_url).status_code == 403
+    assert len(client.get("/api/v1/tasks").json()["items"]) == 1
+
+
+def test_deleted_history_cursor_can_still_page_older_owned_tasks(published):
+    client, create, login = published
+    originals = [create(publish=False) for _ in range(3)]
+    login(originals[0]["user_id"])
+    first = client.get("/api/v1/tasks", params={"limit": 1}).json()
+    cursor = first["next_cursor"]
+    assert cursor == first["items"][0]["task_id"]
+    assert client.delete("/api/v1/tasks/" + cursor).status_code == 204
+    response = client.get("/api/v1/tasks", params={"limit": 10, "cursor": cursor})
+    assert response.status_code == 200, response.text
+    assert {item["task_id"] for item in response.json()["items"]} == {
+        row["task_id"] for row in originals if row["task_id"] != cursor}
+
+
 def test_stable_pagination_and_unpublished_exclusion(published, upstream):
     client, create, login = published
     rows = [create() for _ in range(3)]
@@ -443,56 +502,21 @@ def current_catalog_for_source(client, engine, user_id, source):
     from tests.integration.test_task_admission import admission
 
     class SourceCatalog(CatalogFixture):
-        def set_policies(self, credits=7, delivery="single", d04=False):
-            super().set_policies(credits, delivery, d04)
-            with upstream_session(self.engine) as s, s.begin():
-                payload = deepcopy(
-                    s.get(DecisionVersionRecord, ("D-02", self.policies["D-02"])).payload
-                )
-                payload["specs"][self.spec_id]["agent_version"] = "TEST_ONLY_v2"
-                version = "TEST_ONLY_" + uuid4().hex
-                PolicyService(s).add_draft(
-                    DecisionVersion(
-                        decision_id="D-02",
-                        version=version,
-                        mode="mock",
-                        test_only=True,
-                        payload=payload,
-                    )
-                )
-                self.policies["D-02"] = version
-
         def agent(self, enabled=True, version="TEST_ONLY_v2", expected=None):
             return super().agent(enabled, version, expected)
-
-        def spec(self):
-            return self.client.post(
-                "/api/v1/admin/specs",
-                json={
-                    "spec_id": self.spec_id,
-                    "version": "TEST_ONLY_v1",
-                    "expected_version": None,
-                    "agent_id": self.agent_id,
-                    "agent_version": "TEST_ONLY_v2",
-                    "name": "TEST_ONLY",
-                    "parameter_schema": self.parameter_schema,
-                    "delivery_kind": "single",
-                    "enabled": True,
-                    "policy_versions": self.policies,
-                    "reason": "TEST_ONLY new source quote",
-                },
-            )
 
     from sqlalchemy.orm import Session as upstream_session
 
     with upstream_session(engine) as s, s.begin():
         s.get(User, user_id).role = "admin"
     c = SourceCatalog(client, engine, user_id)
-    c.agent_id, c.spec_id = source["agent_id"], source["task"]["quote"]["spec_id"]
+    c.agent_id = c.spec_id = source["agent_id"]
     c.parameter_schema = {"fields": {}, "combinations": []}
     c.input = deepcopy(source["input"])
+    c.input["parameters"] = {}
     c = admission.__wrapped__(c)
     settings = client.app.state.settings
+    settings.generation_capacity_estimates[c.agent_id]["spec_version"] = "TEST_ONLY_v2"
     with upstream_session(engine) as s, s.begin():
         payload = deepcopy(
             s.get(

@@ -1,3 +1,4 @@
+from contextlib import nullcontext
 from pathlib import Path
 
 import pytest
@@ -71,6 +72,34 @@ def test_readiness_succeeds_with_real_mysql_and_declared_storage(mysql_settings,
         response = client.get("/api/v1/health/ready")
     assert response.status_code == 200
     assert response.json()["checks"] == {"storage": True, "database": True}
+
+
+@pytest.mark.parametrize("revision", [None, "0001_bootstrap", "unknown_future_revision"])
+def test_readiness_rejects_unmigrated_database(
+    mysql_engine, mysql_settings, revision, monkeypatch
+):
+    # Change only this connection's uncommitted view, then roll back. The shared
+    # test database remains at head and no business tables or rows are removed.
+    with mysql_engine.connect() as connection:
+        transaction = connection.begin()
+        try:
+            # Route probes the real MySQL connection inside the test transaction.
+            monkeypatch.setattr(mysql_engine, "connect", lambda: nullcontext(connection))
+            monkeypatch.setattr(mysql_engine, "dispose", lambda: None)
+            monkeypatch.setattr("app.main.create_db_engine", lambda settings: mysql_engine)
+            if revision is None:
+                connection.execute(text("DELETE FROM alembic_version"))
+            else:
+                connection.execute(
+                    text("UPDATE alembic_version SET version_num = :revision"),
+                    {"revision": revision},
+                )
+            with TestClient(create_app(mysql_settings)) as client:
+                response = client.get("/api/v1/health/ready")
+            assert response.status_code == 503
+            assert response.json()["checks"]["database"] is False
+        finally:
+            transaction.rollback()
 
 
 def test_redis_stream_roundtrip(redis_namespace):

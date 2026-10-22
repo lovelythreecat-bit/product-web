@@ -1,0 +1,66 @@
+[
+  {
+    "device": "desktop",
+    "path": "/",
+    "title": "电商 AI 创作平台",
+    "internalNotes": false,
+    "overflow": false,
+    "pageErrors": []
+  },
+  {
+    "device": "desktop",
+    "path": "/login",
+    "title": "电商 AI 创作平台",
+    "internalNotes": false,
+    "overflow": false,
+    "pageErrors": []
+  },
+  {
+    "device": "desktop",
+    "path": "/register",
+    "title": "电商 AI 创作平台",
+    "internalNotes": false,
+    "overflow": false,
+    "pageErrors": []
+  },
+  {
+    "device": "desktop",
+    "path": "/workspace",
+    "title": "电商 AI 创作平台",
+    "internalNotes": false,
+    "overflow": false,
+    "pageErrors": []
+  },
+  {
+    "device": "mobile",
+    "path": "/",
+    "title": "电商 AI 创作平台",
+    "internalNotes": false,
+    "overflow": false,
+    "pageErrors": []
+  },
+  {
+    "device": "mobile",
+    "path": "/login",
+    "title": "电商 AI 创作平台",
+    "internalNotes": false,
+    "overflow": false,
+    "pageErrors": []
+  },
+  {
+    "device": "mobile",
+    "path": "/register",
+    "title": "电商 AI 创作平台",
+    "internalNotes": false,
+    "overflow": false,
+    "pageErrors": []
+  },
+  {
+    "device": "mobile",
+    "path": "/workspace",
+    "title": "电商 AI 创作平台",
+    "internalNotes": false,
+    "overflow": false,
+    "pageErrors": []
+  }
+]

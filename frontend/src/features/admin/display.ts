@@ -1,0 +1,20 @@
+export const agentKinds: Record<string,string> = {copy:'文案',image:'图片',video:'视频'}
+export const environments: Record<string,string> = {mock:'模拟环境',staging:'联调环境',production:'生产环境'}
+export const deliveryKinds: Record<string,string> = {single:'单结果',multiple:'多个结果',detail_images:'详情图组'}
+export const ledgerKinds: Record<string,string> = {admin:'管理员发放',signup:'注册赠送',registration:'注册赠送',registration_grant:'注册赠送',admin_grant:'管理员发放',admin_deduct:'管理员扣减',freeze:'任务冻结',consume:'任务消费',release:'任务释放'}
+export const investigationStates: Record<string,string> = {open:'待核查',assigned:'已分配',resolved:'已处理',closed:'已关闭',pending:'待处理',recovered:'已恢复'}
+export const resolutionActions: Record<string,string> = {resume_original:'恢复原任务',confirm_failure:'确认失败并释放冻结',manual_close:'人工关闭',settle:'依据完整交付结算'}
+export const auditActions: Record<string,string> = {admin_user_update:'编辑用户',admin_password_reset:'重置密码',admin_user_delete:'删除用户',admin_credit_adjustment:'积分调整',generation_parameters:'参数配置',text_default_model:'默认文本模型',text_service_connection:'文本服务连接',text_model_config:'文本模型配置',registration_credit_config:'注册赠送配置',catalog_agent:'Agent 配置',catalog_spec:'规格配置',catalog_price:'价格配置',admin_credit_grant:'积分发放',site_content_update:'官网介绍修改',site_case_publish:'案例发布',site_case_withdraw:'案例撤回',site_case_cleanup:'公开副本清理',credit_grant:'积分发放',account_status:'账户状态修改',content_access_grant:'内容授权',content_access_revoke:'撤回内容授权',content_access_read:'访问授权内容',delete_material:'删除素材',delete_work:'删除作品','investigation.open':'登记核查','investigation.assign':'分配核查','investigation.resume_original':'恢复原任务','investigation.confirm_failure':'确认任务失败','investigation.manual_close':'人工关闭任务','investigation.settle':'任务结算','investigation.auto_assign':'自动分配核查','investigation.recovered':'恢复保存'}
+export const fieldLabels: Record<string,string> = {account_normalized:'账号',nickname:'昵称',shop_name:'店铺名称',category:'商品分类',email:'联系邮箱',phone:'联系电话',bio:'个人简介',role:'角色',business_key:'业务标识',delta:'调整积分',text_price:'文本价格',image_price:'图片价格',video_price:'视频价格',previous_version:'原计价记录',revision:'模型配置版本',before_version:'原版本',after_version:'新版本',previous_status:'原状态',exception_policy_version:'异常政策版本',inflight:'在途任务处理',evidence:'证据引用',old_owner:'原负责人',task_before_version:'原任务版本',resolution_id:'处置记录',content_sha256:'内容摘要',copy_count:'公开副本数量',state:'状态',expires_at:'授权到期时间',authority_source:'批准来源',id:'编号',ledger_id:'流水编号',kind:'类型',amount:'积分数量',created_at:'记录时间',reason:'原因',balances_before:'变更前余额',balances_after:'变更后余额',available:'可用积分',frozen:'冻结积分',consumed:'已消费积分',grant_id:'发放编号',reservation_id:'冻结记录编号',task_id:'任务编号',owner:'负责人',deadline_at:'截止时间',policy_version:'政策版本',status:'状态',user_reason:'核查说明',version:'版本',enabled:'是否启用',secret_configured:'凭据已配置',credits:'积分',old_status:'原状态',new_status:'新状态',auth_version:'账户版本',expected_version:'基线版本',action:'操作',actor_id:'操作人',scope:'授权范围',resource_type:'资源类型',resource_id:'资源编号',before:'变更前',after:'变更后',test_only:'仅用于测试',mode:'运行环境'}
+export function displayValue(value: unknown): string {
+ if(value===null || value===undefined || value==='')return '未提供'
+ if(typeof value==='boolean')return value?'是':'否'
+ if(typeof value==='string')return ledgerKinds[value] || investigationStates[value] || resolutionActions[value] || environments[value] || ({active:'正常',disabled:'停用',admin:'管理员',user:'普通用户'} as Record<string,string>)[value] || value
+ return String(value)
+}
+
+export const diagnosticCodes: Record<string,string> = {UPSTREAM_REVIEW_REQUIRED:'上游受理状态待核查',SAVE_RETRY_REQUIRED:'原结果保存待恢复',VERIFIED_FAILURE:'已核实失败',MANUAL_CLOSE:'人工关闭'}
+export const resourceTypes: Record<string,string> = {task:'任务',message:'消息',work:'作品',file:'文件',material:'素材',conversation:'会话',product_version:'商品资料版本'}
+
+const userIdentityFields = new Set(['user_id','userId','actor_id','actorId','approver_id','approverId','owner_id','ownerId','owner','old_owner','operator','revoked_by','created_by','updated_by','confirmed_by','investigation_owner','responsible_user_id','authorized_actor_ids'])
+export const isUserIdentityField = (key: string) => userIdentityFields.has(key)

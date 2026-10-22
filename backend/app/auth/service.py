@@ -2,7 +2,7 @@
 
 import secrets
 from dataclasses import dataclass
-from datetime import timedelta
+from datetime import UTC, timedelta
 from uuid import UUID, uuid4
 
 from fastapi import HTTPException
@@ -12,7 +12,7 @@ from sqlalchemy.exc import IntegrityError
 from app.auth.models import AuthSession, RegistrationReceipt, User
 from app.auth.schemas import ProfileView
 from app.auth.security import DUMMY_HASH, HASHER, digest, normalize_account, verify_password
-from app.common.types import Principal
+from app.common.types import FileVersionRef, Principal
 from app.ledger.models import CreditAccount
 from app.ledger.service import LedgerError, grant_credits, now, read_registration_credit_config
 
@@ -32,6 +32,18 @@ def profile(user):
         role=user.role,
         nickname=user.nickname,
         bio=user.bio,
+        shop_name=user.shop_name,
+        category=user.category,
+        email=user.email,
+        phone=user.phone,
+        avatar=(
+            FileVersionRef(file_id=user.avatar_file_id, version=user.avatar_file_version)
+            if user.avatar_file_id is not None
+            else None
+        ),
+        status=user.status,
+        created_at=user.created_at.replace(tzinfo=UTC),
+        last_login_at=user.last_login_at.replace(tzinfo=UTC) if user.last_login_at else None,
     )
 
 
@@ -143,31 +155,36 @@ class AuthService:
         valid = verify_password(user.password_hash if user else DUMMY_HASH, password)
         if user is None or not valid or user.status != "active":
             raise HTTPException(401)
+        # The route commits this with the issued session; failed transactions do
+        # not record a login. Registration/replay and profile reads never set it.
+        user.last_login_at = now()
         return self._issue(user)
 
-    def require_active_principal(self, cookie):
+    def require_active_principal(self, cookie, *, lock=None):
         if not cookie or len(cookie) > 128:
             raise HTTPException(401)
-        # First resolve opaque credential, then lock user before the session row.
+        if lock is None:
+            lock = not getattr(self.session, "info", {}).get("read_only_request", False)
+        # Resolve the opaque credential before checking user and session authority.
         credential = self.session.scalar(
             select(AuthSession).where(AuthSession.token_hash == digest(cookie))
         )
         if credential is None:
             raise HTTPException(401)
-        user = self.session.scalar(
-            select(User)
-            .where(User.id == credential.user_id)
-            .with_for_update()
-            .execution_options(populate_existing=True)
-        )
+        user_query = select(User).where(User.id == credential.user_id)
+        credential_query = select(AuthSession).where(AuthSession.id == credential.id)
+        # Reads check the database without holding an exclusive account lock across
+        # remote service I/O or streaming. Mutations retain user -> session ordering.
+        if lock:
+            user_query = user_query.with_for_update()
+            credential_query = credential_query.with_for_update()
+        user = self.session.scalar(user_query.execution_options(populate_existing=True))
         credential = self.session.scalar(
-            select(AuthSession)
-            .where(AuthSession.id == credential.id)
-            .with_for_update()
-            .execution_options(populate_existing=True)
+            credential_query.execution_options(populate_existing=True)
         )
         if (
             user is None
+            or credential is None
             or user.status != "active"
             or credential.revoked_at is not None
             or credential.expires_at <= now()
@@ -197,9 +214,50 @@ class AuthService:
     def get_profile(self, principal):
         return profile(self.session.get(User, str(principal.user_id)))
 
+    def change_password(self, principal, current_password, new_password):
+        from app.catalog.service import CatalogService
+
+        # Lock and recheck live identity before modifying the password/version together.
+        CatalogService(self.session)._principal(principal)
+        user = self.session.scalar(
+            select(User)
+            .where(User.id == str(principal.user_id))
+            .with_for_update()
+            .execution_options(populate_existing=True)
+        )
+        if not 10 <= len(new_password) <= 128:
+            raise HTTPException(422)
+        if not verify_password(user.password_hash, current_password):
+            # A credential typo must not be confused with an expired login.
+            raise HTTPException(400)
+        user.password_hash = HASHER.hash(new_password)
+        # Every existing session carries the old version and immediately fails authentication.
+        user.auth_version += 1
+        self.session.flush()
+
     def update_profile(self, principal, dto):
-        user = self.session.get(User, str(principal.user_id))
-        for field, value in dto.model_dump(exclude_unset=True).items():
+        from app.auth.avatar import update_avatar
+        from app.conversations.service import authenticate
+
+        authenticate(self.session, principal)
+        user = self.session.scalar(
+            select(User)
+            .where(User.id == str(principal.user_id))
+            .with_for_update()
+            .execution_options(populate_existing=True)
+        )
+        values = dto.model_dump(exclude_unset=True, exclude={"avatar"})
+        if "nickname" in values and values["nickname"] is None:
+            raise HTTPException(422)
+        # Existing long values remain readable and may be preserved exactly.
+        # Newly edited values follow the approved prototype input limits.
+        for field, limit in (("nickname", 40), ("bio", 300)):
+            value = values.get(field)
+            if value is not None and value != getattr(user, field) and len(value) > limit:
+                raise HTTPException(422)
+        if "avatar" in dto.model_fields_set:
+            update_avatar(self.session, user, dto.avatar)
+        for field, value in values.items():
             setattr(user, field, value)
         self.session.flush()
         return profile(user)

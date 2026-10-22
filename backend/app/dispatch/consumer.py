@@ -5,12 +5,19 @@ from dataclasses import dataclass
 from datetime import datetime, timedelta
 from time import monotonic
 
-from app.dispatch.models import OutboxEvent
-from app.dispatch.recovery import TERMINAL_STATES, database_now, recovery_action
-from app.operations.telemetry import event as operational_event
-from app.tasks.models import GenerationTask
 from redis.exceptions import RedisError, ResponseError
-from sqlalchemy import select, text, update
+from sqlalchemy import func, select, text, update
+
+from app.dispatch.models import OutboxEvent
+from app.dispatch.recovery import (
+    TERMINAL_STATES,
+    automatic_recovery_blocked,
+    database_now,
+    recovery_action,
+)
+from app.operations.telemetry import event as operational_event
+from app.operations.telemetry import stage_diagnostic
+from app.tasks.models import GenerationTask
 
 
 @dataclass(frozen=True)
@@ -28,6 +35,7 @@ class LeaseManager:
         self.session_factory, self.lease_seconds = session_factory, lease_seconds
 
     def claim_task(self, task_id, worker_id):
+        """Explicit administrative claim; automatic consumers use claim_dispatch."""
         if not worker_id or len(worker_id) > 128:
             raise ValueError("Invalid worker identity")
         with self.session_factory() as session, session.begin():
@@ -41,6 +49,43 @@ class LeaseManager:
                 or (task.lease_expires_at is not None and task.lease_expires_at > current)
             ):
                 return None
+            task.fencing_token += 1
+            task.lease_owner = worker_id
+            task.lease_expires_at = current + timedelta(seconds=self.lease_seconds)
+            return Lease(task.id, worker_id, task.fencing_token, task.lease_expires_at)
+
+    def claim_dispatch(self, task_id, worker_id, event_id, version, generation):
+        """Authorize a message and consume its generation in one DB transaction."""
+        if not worker_id or len(worker_id) > 128:
+            raise ValueError("Invalid worker identity")
+        with self.session_factory() as session, session.begin():
+            task = session.scalar(
+                select(GenerationTask).where(GenerationTask.id == str(task_id)).with_for_update()
+            )
+            event = session.scalar(
+                select(OutboxEvent).where(OutboxEvent.event_id == event_id).with_for_update()
+            )
+            current = database_now(session)
+            if (
+                task is None or event is None
+                or task.state in TERMINAL_STATES or automatic_recovery_blocked(task)
+                or (event.task_id, event.state_version) != (task_id, version)
+                or task.state_version != version
+                or event.dispatch_generation != generation
+                or event.claimed_generation >= generation
+            ):
+                return "rejected"
+            action = recovery_action(task)
+            allowed = {"save"} if action == "save_original" else {"recover"}
+            if action == "prepare_submission":
+                allowed.add("submit")
+            if action is None or event.operation not in allowed:
+                return "rejected"
+            if event.ready_at > current or (
+                task.lease_expires_at is not None and task.lease_expires_at > current
+            ):
+                return "busy"
+            event.claimed_generation = generation
             task.fencing_token += 1
             task.lease_owner = worker_id
             task.lease_expires_at = current + timedelta(seconds=self.lease_seconds)
@@ -72,7 +117,11 @@ class LeaseManager:
                 .values(
                     lease_owner=None,
                     lease_expires_at=None,
-                    recovery_due_at=database_now(session) + timedelta(seconds=retry_seconds),
+                    recovery_due_at=func.greatest(
+                        database_now(session) + timedelta(seconds=retry_seconds),
+                        func.coalesce(GenerationTask.submission_not_before,
+                                      database_now(session)),
+                    ),
                 )
             )
             return result.rowcount == 1
@@ -179,16 +228,23 @@ class TaskConsumer:
             }
             event_id, task_id = fields["event_id"], fields["task_id"]
             version = int(fields["state_version"])
-        except (KeyError, ValueError, UnicodeError, AttributeError):
-            return "rejected"
-        with self.session_factory() as session:
-            event = session.get(OutboxEvent, event_id)
-            if event is None or (event.task_id, event.state_version) != (task_id, version):
+            generation = int(fields["dispatch_generation"])
+            if version < 1 or generation < 1:
                 return "rejected"
-        lease = self.leases.claim_task(task_id, self.worker_id)
-        if lease is None:
-            return "busy"
-        started, outcome = monotonic(), "failed"
+        except (KeyError, ValueError, TypeError, UnicodeError, AttributeError):
+            return "rejected"
+        try:
+            lease = self.leases.claim_dispatch(
+                task_id, self.worker_id, event_id, version, generation
+            )
+        except Exception as exc:
+            stage_diagnostic(stage="consume", task_id=task_id, event_id=event_id,
+                             state_version=version, error=exc, code="STAGE_EXCEPTION",
+                             outcome="failed")
+            return "failed"
+        if not isinstance(lease, Lease):
+            return lease
+        started, outcome, action = monotonic(), "failed", None
         try:
             with self.session_factory() as session:
                 task = session.get(GenerationTask, task_id)
@@ -211,10 +267,22 @@ class TaskConsumer:
             handler(context)
             outcome = "handled"
             return "handled"
-        except Exception:
+        except Exception as exc:
             # Never disclose adapter errors/input/credentials or infer generation failure.
+            stage_diagnostic(stage="consume", task_id=task_id, event_id=event_id,
+                             state_version=version, action=action, lease=lease,
+                             error=exc, code="STAGE_EXCEPTION", outcome="failed")
             return "failed"
         finally:
             operational_event("task_stage", task_id=task_id, outcome=outcome,
                               elapsed_ms=(monotonic() - started) * 1000)
-            self.leases.release(lease)
+            try:
+                if not self.leases.release(lease):
+                    stage_diagnostic(stage="consume", task_id=task_id, event_id=event_id,
+                                     state_version=version, action=action, lease=lease,
+                                     code="LEASE_LOST", outcome="no_progress")
+            except Exception as exc:
+                # The durable generation remains spent; lease expiry/watchdog recovers it.
+                stage_diagnostic(stage="consume", task_id=task_id, event_id=event_id,
+                                 state_version=version, action=action, lease=lease,
+                                 error=exc, code="STAGE_EXCEPTION", outcome="failed")

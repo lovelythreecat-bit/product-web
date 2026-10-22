@@ -1,0 +1,96 @@
+[
+  {
+    "name": "desktop",
+    "viewport": [
+      1440,
+      1000
+    ],
+    "overflow": false,
+    "headerContainsNav": true,
+    "cardHeight": 62,
+    "taskNumbersVisible": false,
+    "leadWeight": "400",
+    "shortTargets": [
+      "创作工作台",
+      "我的作品",
+      "个人中心",
+      "新建任务",
+      "我的作品",
+      "充值积分",
+      "文案",
+      "图片",
+      "视频",
+      "编辑资料",
+      "选择图片",
+      "AI 帮我完善",
+      "任务详情",
+      "预览",
+      "复制文案",
+      "下载",
+      "重新生成"
+    ],
+    "focusOutline": "2px",
+    "invalidBorder": "rgb(165, 43, 40) 0px 0px 0px 1px inset",
+    "productFields": 14,
+    "copyPreserved": true,
+    "errors": [],
+    "posts": []
+  },
+  {
+    "name": "mobile",
+    "viewport": [
+      390,
+      844
+    ],
+    "overflow": false,
+    "headerContainsNav": true,
+    "cardHeight": 0,
+    "taskNumbersVisible": false,
+    "leadWeight": "400",
+    "shortTargets": [],
+    "focusOutline": "2px",
+    "invalidBorder": "rgb(165, 43, 40) 0px 0px 0px 1px inset",
+    "productFields": 14,
+    "copyPreserved": true,
+    "errors": [],
+    "posts": []
+  },
+  {
+    "name": "tablet",
+    "viewport": [
+      820,
+      1180
+    ],
+    "overflow": false,
+    "headerContainsNav": true,
+    "cardHeight": 62,
+    "taskNumbersVisible": false,
+    "leadWeight": "400",
+    "shortTargets": [],
+    "focusOutline": "2px",
+    "invalidBorder": "rgb(165, 43, 40) 0px 0px 0px 1px inset",
+    "productFields": 14,
+    "copyPreserved": true,
+    "errors": [],
+    "posts": []
+  },
+  {
+    "name": "landscape",
+    "viewport": [
+      844,
+      390
+    ],
+    "overflow": false,
+    "headerContainsNav": true,
+    "cardHeight": 62,
+    "taskNumbersVisible": false,
+    "leadWeight": "400",
+    "shortTargets": [],
+    "focusOutline": "2px",
+    "invalidBorder": "rgb(165, 43, 40) 0px 0px 0px 1px inset",
+    "productFields": 14,
+    "copyPreserved": true,
+    "errors": [],
+    "posts": []
+  }
+]

@@ -4,8 +4,8 @@ test('development shell loads without runtime errors or horizontal overflow', as
   const errors: string[] = []
   page.on('pageerror', error => errors.push(error.message))
   await page.goto('/')
-  await expect(page.getByRole('heading', { name: '登录', exact: true })).toBeVisible()
-  await expect(page.getByLabel('账号', { exact: true })).toBeVisible()
+  await expect(page.getByRole('heading', { name: '让好商品，亮眼登场。', exact: true })).toBeVisible()
+  await expect(page.getByRole('link', { name: /注册体验/ }).first()).toBeVisible()
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true)
   expect(errors).toEqual([])
   await page.screenshot({ path: testInfo.outputPath('bootstrap.png'), fullPage: true })

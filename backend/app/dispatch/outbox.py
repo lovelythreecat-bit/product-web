@@ -12,6 +12,10 @@ from app.tasks.models import GenerationTask
 
 
 def enqueue_outbox(session, task_id, operation):
+    return _arm_outbox(session, task_id, operation)
+
+
+def _arm_outbox(session, task_id, operation, *, rearm=False, ready_at=None):
     if operation not in ("submit", "recover", "save"):
         raise HTTPException(422)
     task = session.scalar(
@@ -35,11 +39,36 @@ def enqueue_outbox(session, task_id, operation):
             user_id=task.user_id,
             state_version=task.state_version,
             operation=operation,
-            ready_at=text("UTC_TIMESTAMP(6)"),
+            ready_at=ready_at if ready_at is not None else text("UTC_TIMESTAMP(6)"),
             attempts=0,
         )
         session.add(row)
         session.flush()
+    elif rearm:
+        row.dispatch_generation += 1
+        row.ready_at = ready_at if ready_at is not None else text("UTC_TIMESTAMP(6)")
+        row.dispatched_at = None
+    return row
+
+
+def rearm_outbox(session, task_id, operation, *, ready_at=None):
+    """Create a fresh claimable generation under the task/outbox lock order.
+
+    Other operations at this version are superseded. Old Redis messages cannot
+    spend the new generation, including messages sent during a dispatch race.
+    """
+    row = _arm_outbox(session, task_id, operation, rearm=True, ready_at=ready_at)
+    session.execute(
+        update(OutboxEvent)
+        .where(
+            OutboxEvent.task_id == row.task_id,
+            OutboxEvent.state_version == row.state_version,
+            OutboxEvent.event_id != row.event_id,
+        )
+        .values(claimed_generation=OutboxEvent.dispatch_generation,
+                dispatched_at=text("UTC_TIMESTAMP(6)"))
+    )
+    session.flush()
     return row
 
 
@@ -61,6 +90,7 @@ class OutboxDispatcher:
             query = select(OutboxEvent).where(
                 OutboxEvent.dispatched_at.is_(None),
                 OutboxEvent.ready_at <= text("UTC_TIMESTAMP(6)"),
+                OutboxEvent.claimed_generation < OutboxEvent.dispatch_generation,
             )
             if self.task_ids is not None:
                 query = query.where(OutboxEvent.task_id.in_(self.task_ids))
@@ -72,14 +102,16 @@ class OutboxDispatcher:
             messages = []
             for row in rows:
                 row.attempts += 1
-                messages.append((row.event_id, row.task_id, row.state_version, row.ready_at))
+                messages.append((row.event_id, row.task_id, row.state_version,
+                                 row.dispatch_generation))
         dispatched = failed = 0
-        for event_id, task_id, version, ready_at in messages:
+        for event_id, task_id, version, generation in messages:
             try:
                 # No DB lock or transaction spans Redis/network I/O. Duplicates are intentional.
                 self.redis.xadd(
                     self.stream,
-                    {"event_id": event_id, "task_id": task_id, "state_version": str(version)},
+                    {"event_id": event_id, "task_id": task_id, "state_version": str(version),
+                     "dispatch_generation": str(generation)},
                 )
             except RedisError:
                 failed += 1
@@ -89,7 +121,7 @@ class OutboxDispatcher:
                     update(OutboxEvent)
                     .where(
                         OutboxEvent.event_id == event_id,
-                        OutboxEvent.ready_at == ready_at,
+                        OutboxEvent.dispatch_generation == generation,
                         OutboxEvent.dispatched_at.is_(None),
                     )
                     .values(dispatched_at=text("UTC_TIMESTAMP(6)"))

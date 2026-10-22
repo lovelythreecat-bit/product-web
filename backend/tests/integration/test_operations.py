@@ -8,15 +8,16 @@ from pathlib import Path
 from uuid import uuid4
 
 import pytest
+from fastapi.testclient import TestClient
+from sqlalchemy import create_engine, text
+from sqlalchemy.engine import make_url
+from sqlalchemy.orm import Session
+
 from app.config import Settings
 from app.main import create_app
 from app.operations.metrics import project_metrics, validate_thresholds
 from app.operations.runtime import independent_roots
 from app.operations.telemetry import event
-from fastapi.testclient import TestClient
-from sqlalchemy import create_engine, text
-from sqlalchemy.engine import make_url
-from sqlalchemy.orm import Session
 
 SCRIPTS = Path(__file__).resolve().parents[3] / "infra" / "scripts"
 
@@ -141,7 +142,14 @@ def test_telemetry_drops_untrusted_identifiers(monkeypatch):
     assert "task_id" not in json.loads(captured[0])
 
 
-def test_metrics_outbox_investigation_capacity():
+@pytest.mark.parametrize(
+    "free_bytes,total_bytes,used_ratio,committed_ratio,unreserved,capacity_alert",
+    [(10, 100, 0.9, 1.1, 0, True), (50, 100, 0.5, 0.7, 30, False),
+     (0, 100, 1.0, 1.2, 0, True), (10, None, None, None, 0, False)],
+)
+def test_metrics_outbox_investigation_capacity(
+    free_bytes, total_bytes, used_ratio, committed_ratio, unreserved, capacity_alert
+):
     # SQLite executes the real aggregate SELECTs; only MySQL datetime spelling is adapted.
     engine = create_engine("sqlite://")
     now = "2026-10-12 12:00:00"
@@ -165,7 +173,7 @@ def test_metrics_outbox_investigation_capacity():
             "CREATE TABLE investigations (status TEXT,deadline_at TEXT)",
             "CREATE TABLE public_cases (state TEXT)",
             "CREATE TABLE storage_pools "
-            "(id TEXT,budget_bytes INT,reserved_bytes INT,actual_bytes INT)",
+            "(id TEXT,reserved_bytes INT,actual_bytes INT)",
             "INSERT INTO generation_tasks VALUES ('1','SUCCEEDED','2026-10-12 11:00:00',NULL)",
             "INSERT INTO generation_tasks VALUES ('2','FAILED','2026-10-12 11:00:00',NULL)",
             "INSERT INTO generation_tasks VALUES ('3','SAVE_RECOVERY',"
@@ -175,7 +183,7 @@ def test_metrics_outbox_investigation_capacity():
             "INSERT INTO dispatch_outbox VALUES (NULL,'2026-10-12 11:59:00')",
             "INSERT INTO investigations VALUES ('open','2026-10-12 11:00:00')",
             "INSERT INTO public_cases VALUES ('cleanup_pending')",
-            "INSERT INTO storage_pools VALUES ('test',100,20,70)",
+            "INSERT INTO storage_pools VALUES ('test',20,70)",
         ):
             connection.exec_driver_sql(sql)
         with Session(bind=connection) as session:
@@ -188,7 +196,8 @@ def test_metrics_outbox_investigation_capacity():
 
             metrics = project_metrics(
                 DialectAdapter(),
-                free_bytes=10,
+                free_bytes=free_bytes,
+                total_bytes=total_bytes,
                 thresholds={
                     "outbox_pending": 0,
                     "investigation_overdue": 0,
@@ -204,10 +213,20 @@ def test_metrics_outbox_investigation_capacity():
     assert metrics["supplier_cost_status"] == "unavailable"
     assert metrics["outbox_oldest_due_seconds"] == 60
     assert metrics["save_oldest_due_seconds"] == 300
-    assert set(metrics["alerts"]) == {
+    assert metrics["capacity"] == [{"id": "test", "reserved_bytes": 20, "actual_bytes": 70}]
+    assert metrics["disk_free_bytes"] == free_bytes
+    assert metrics["disk_total_bytes"] == total_bytes
+    assert metrics["disk_reserved_bytes"] == 20
+    assert metrics["disk_unreserved_bytes"] == unreserved
+    assert metrics["disk_used_ratio"] == used_ratio
+    assert metrics["disk_committed_ratio"] == committed_ratio
+    expected_alerts = {
         "outbox_pending",
         "investigation_overdue",
         "save_recovery",
-        "disk_free_bytes",
-        "capacity",
     }
+    if free_bytes < 20:
+        expected_alerts.add("disk_free_bytes")
+    if capacity_alert:
+        expected_alerts.add("capacity")
+    assert set(metrics["alerts"]) == expected_alerts

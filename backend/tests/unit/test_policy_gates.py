@@ -327,7 +327,6 @@ def test_generation_policy_matrix_checks_all_prerequisites_and_protocol_versions
             "upload",
             {
                 "max_file_bytes": 512,
-                "account_quota_bytes": 1024,
                 "allowed_types": ["image/png"],
                 "reservation_seconds": 120,
                 "reclamation_ref": "reclaim:v1",

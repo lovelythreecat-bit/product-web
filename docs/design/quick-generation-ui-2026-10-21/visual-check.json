@@ -1,0 +1,207 @@
+{
+  "date": "2026-10-21",
+  "scope": "Static preview only; no backend or generation calls",
+  "results": [
+    {
+      "screen": "desktop-product",
+      "width": 1440,
+      "pageOverflow": false,
+      "footerInView": true,
+      "dialogOverflow": false
+    },
+    {
+      "screen": "desktop-copy",
+      "width": 1440,
+      "pageOverflow": false,
+      "footerInView": true,
+      "dialogOverflow": false
+    },
+    {
+      "screen": "desktop-images",
+      "width": 1440,
+      "pageOverflow": false,
+      "footerInView": true,
+      "dialogOverflow": false
+    },
+    {
+      "screen": "desktop-video",
+      "width": 1440,
+      "pageOverflow": false,
+      "footerInView": true,
+      "dialogOverflow": false
+    },
+    {
+      "screen": "desktop-plan",
+      "width": 1440,
+      "pageOverflow": false,
+      "footerInView": true,
+      "dialogOverflow": false
+    },
+    {
+      "screen": "desktop-video-result",
+      "width": 1440,
+      "pageOverflow": false,
+      "footerInView": true,
+      "dialogOverflow": false
+    },
+    {
+      "screen": "desktop-summary",
+      "width": 1440,
+      "pageOverflow": false,
+      "footerInView": true,
+      "dialogOverflow": false
+    },
+    {
+      "screen": "desktop-copy-modal",
+      "width": 1440,
+      "pageOverflow": false,
+      "footerInView": true,
+      "dialogOverflow": false
+    },
+    {
+      "screen": "desktop-image-modal",
+      "width": 1440,
+      "pageOverflow": false,
+      "footerInView": true,
+      "dialogOverflow": false
+    },
+    {
+      "screen": "desktop-charge-modal",
+      "width": 1440,
+      "pageOverflow": false,
+      "footerInView": true,
+      "dialogOverflow": false
+    },
+    {
+      "screen": "desktop-plan-drawer",
+      "width": 1440,
+      "pageOverflow": false,
+      "footerInView": true,
+      "dialogOverflow": false
+    },
+    {
+      "screen": "desktop-edit-plan",
+      "width": 1440,
+      "pageOverflow": false,
+      "footerInView": true,
+      "dialogOverflow": false
+    },
+    {
+      "screen": "desktop-details",
+      "width": 1440,
+      "pageOverflow": false,
+      "footerInView": true,
+      "dialogOverflow": false
+    },
+    {
+      "screen": "desktop-preview",
+      "width": 1440,
+      "pageOverflow": false,
+      "footerInView": true,
+      "dialogOverflow": false
+    },
+    {
+      "screen": "desktop-empty",
+      "width": 1440,
+      "pageOverflow": false,
+      "footerInView": true,
+      "dialogOverflow": false
+    },
+    {
+      "screen": "desktop-loading",
+      "width": 1440,
+      "pageOverflow": false,
+      "footerInView": true,
+      "dialogOverflow": false
+    },
+    {
+      "screen": "desktop-error",
+      "width": 1440,
+      "pageOverflow": false,
+      "footerInView": true,
+      "dialogOverflow": false
+    },
+    {
+      "screen": "desktop-needs-input",
+      "width": 1440,
+      "pageOverflow": false,
+      "footerInView": true,
+      "dialogOverflow": false
+    },
+    {
+      "screen": "desktop-read-only",
+      "width": 1440,
+      "pageOverflow": false,
+      "footerInView": true,
+      "dialogOverflow": false
+    },
+    {
+      "screen": "desktop-image-select",
+      "width": 1440,
+      "pageOverflow": false,
+      "footerInView": true,
+      "dialogOverflow": false
+    },
+    {
+      "screen": "mobile-product",
+      "width": 390,
+      "pageOverflow": false,
+      "footerInView": false,
+      "dialogOverflow": false
+    },
+    {
+      "screen": "mobile-copy",
+      "width": 390,
+      "pageOverflow": false,
+      "footerInView": false,
+      "dialogOverflow": false
+    },
+    {
+      "screen": "mobile-images",
+      "width": 390,
+      "pageOverflow": false,
+      "footerInView": false,
+      "dialogOverflow": false
+    },
+    {
+      "screen": "mobile-video",
+      "width": 390,
+      "pageOverflow": false,
+      "footerInView": false,
+      "dialogOverflow": false
+    },
+    {
+      "screen": "mobile-summary",
+      "width": 390,
+      "pageOverflow": false,
+      "footerInView": false,
+      "dialogOverflow": false
+    },
+    {
+      "screen": "mobile-copy-modal",
+      "width": 390,
+      "pageOverflow": false,
+      "footerInView": false,
+      "dialogOverflow": false
+    },
+    {
+      "screen": "mobile-image-modal",
+      "width": 390,
+      "pageOverflow": false,
+      "footerInView": false,
+      "dialogOverflow": false
+    },
+    {
+      "screen": "mobile-plan-drawer",
+      "width": 390,
+      "pageOverflow": false,
+      "footerInView": false,
+      "dialogOverflow": false
+    }
+  ],
+  "escapePreserved": true,
+  "readonly": {
+    "textareasReadOnly": true,
+    "regenerateActions": 0
+  }
+}

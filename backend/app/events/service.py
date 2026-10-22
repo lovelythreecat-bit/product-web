@@ -22,12 +22,16 @@ class TaskEventPayload(DTO):
     task_id: UUID
     state: TaskState
     state_version: PositiveInt
+    media_revision: PositiveInt | None = None
+    conversation_id: UUID | None = None
 
 
 def payload_digest(event_type, payload):
-    return sha256(
-        f"{event_type}|{payload['task_id']}|{payload['state']}|{payload['state_version']}".encode()
-    ).hexdigest()
+    value = f"{event_type}|{payload['task_id']}|{payload['state']}|{payload['state_version']}"
+    # Permanent receipts predate media notifications: preserve their original digest.
+    if payload.get("media_revision") is not None:
+        value += f"|media:{payload['media_revision']}"
+    return sha256(value.encode()).hexdigest()
 
 
 def event_head(session, user_id):
@@ -69,7 +73,7 @@ def prune_events(session, user_id, retention_seconds):
 
 
 def append_durable_event(session, user_id, event_type, payload, *, event_key):
-    payload = TaskEventPayload.model_validate(payload).model_dump(mode="json")
+    payload = TaskEventPayload.model_validate(payload).model_dump(mode="json", exclude_none=True)
     if not event_key or len(event_key) > 160 or event_type != "task.updated":
         raise HTTPException(422)
     user_id = str(user_id)
@@ -83,6 +87,8 @@ def append_durable_event(session, user_id, event_type, payload, *, event_key):
     )
     if task is None:
         raise HTTPException(404)
+    # Scope notifications without exposing input or forcing unrelated detail requests.
+    payload["conversation_id"] = task.conversation_id
     previous = session.scalar(
         select(EventReceipt)
         .where(EventReceipt.user_id == user_id, EventReceipt.event_key == event_key)

@@ -4,16 +4,20 @@ All transport calls happen outside database transactions. Only trusted compositi
 installs these durable verifiers. TEST_ONLY scope proofs never authorize production.
 """
 
+from concurrent.futures import ThreadPoolExecutor, TimeoutError
+from datetime import timedelta
 from uuid import uuid4
 
-from sqlalchemy import select
+from sqlalchemy import and_, or_, select
 from sqlalchemy.exc import IntegrityError
 
 from app.agents.contracts import QueryOutcome, SubmitOutcome
+from app.agents.media_http import MediaServiceError
 from app.agents.models import UpstreamAttempt, UpstreamEvidence
 from app.catalog.schemas import content_digest
 from app.dispatch.consumer import LeaseManager
 from app.dispatch.recovery import database_now
+from app.operations.telemetry import stage_diagnostic
 from app.tasks.models import GenerationTask
 from app.tasks.repository import locked_execution, original_submission_snapshot, task_view
 from app.tasks.state_machine import (
@@ -24,6 +28,8 @@ from app.tasks.state_machine import (
     VerifiedTransition,
     transition_task,
 )
+
+SUBMIT_LEASE_REFRESH_SECONDS = 20
 
 
 def same_scope(first, second):
@@ -50,6 +56,18 @@ class UpstreamService:
     def __init__(self, session_factory, registry):
         self.factory, self.registry = session_factory, registry
         self.leases = LeaseManager(session_factory)
+        from app.agents.execution_pool import MediaExecutionPool, TextExecutionPool
+
+        settings = getattr(registry, "settings", None)
+        self.text_pool = TextExecutionPool(
+            session_factory, getattr(settings, "text_generation_concurrency", 6),
+        )
+        self.media_pools = {
+            "image-agent-v1": MediaExecutionPool(
+                session_factory, getattr(settings, "image_generation_concurrency", 6)),
+            "video-agent-v1": MediaExecutionPool(
+                session_factory, getattr(settings, "video_generation_concurrency", 1)),
+        }
 
     def _latest(self, session, task_id):
         return session.scalar(
@@ -88,11 +106,11 @@ class UpstreamService:
         row, binding = self._verify_row(session, task, reference, "observation")
         outcome = self._parse(row)
         if (
-            outcome.status not in {"ACCEPTED", "FOUND"}
+            outcome.status not in {"ACCEPTED", "FOUND", "COMPLETED", "NEEDS_INPUT"}
             or not outcome.upstream_task_id
             or outcome.external_submission_id != task.external_submission_id
             or outcome.protocol_version != binding.protocol_version
-            or not outcome.test_only
+            or outcome.test_only != binding.adapter.test_only
         ):
             raise TransitionError("EVIDENCE_MISMATCH")
         other = session.scalar(
@@ -145,6 +163,9 @@ class UpstreamService:
         )
 
     def _safe_retry(self, session, task, target, reference):
+        source = session.get(UpstreamEvidence, reference)
+        if source is not None and source.kind in {"observation", "concurrency_rejection_audit"}:
+            return self._text_rejection_retry(session, task, reference)
         row, binding = self._verify_row(session, task, reference, "safe_retry")
         payload = row.payload
         latest = self._latest(session, task.id)
@@ -239,6 +260,94 @@ class UpstreamService:
             safe_retry=retry,
         )
 
+    def _text_rejection_retry(self, session, task, reference):
+        """Every previous POST must have a durable, explicit pre-admission rejection."""
+        from app.agents.image import ImageAgentAdapter
+        from app.agents.text import TextAgentAdapter
+
+        source = session.get(UpstreamEvidence, reference)
+        kind = ("concurrency_rejection_audit" if source is not None
+                and source.kind == "concurrency_rejection_audit" else "observation")
+        row, binding = self._verify_row(session, task, reference, kind)
+        latest = self._latest(session, task.id)
+        attempts = session.scalars(select(UpstreamAttempt).where(
+            UpstreamAttempt.task_id == task.id,
+        )).all()
+        if (not isinstance(binding.adapter, (TextAgentAdapter, ImageAgentAdapter))
+                or task.upstream_id
+                or (kind == "concurrency_rejection_audit"
+                    and not isinstance(binding.adapter, TextAgentAdapter))
+                or latest is None or row.attempt_id != latest.id
+                or row.payload.get("operation") != "submit"
+                or self._parse(row).status != "RATE_LIMITED"):
+            raise TransitionError("EVIDENCE_REQUIRED")
+        identity = self._identity(session, task, binding)
+        for attempt in attempts:
+            replies = session.scalars(select(UpstreamEvidence).where(
+                UpstreamEvidence.attempt_id == attempt.id,
+                UpstreamEvidence.kind == "observation",
+            )).all()
+            audits = session.scalars(select(UpstreamEvidence).where(
+                UpstreamEvidence.attempt_id == attempt.id,
+                UpstreamEvidence.kind == "concurrency_rejection_audit",
+            )).all()
+            audited = isinstance(binding.adapter, TextAgentAdapter) and any(
+                audit.task_id == task.id and audit.payload.get("identity") == identity
+                and audit.payload.get("verified_by") == "text-agent-v1.database_audit"
+                and audit.payload.get("upstream_record_absent") is True
+                and audit.payload.get("http_status") == 429
+                and audit.payload.get("error_code") == "concurrency_limit"
+                and audit.created_at >= attempt.created_at + timedelta(seconds=600)
+                and audit.created_at <= database_now(session)
+                for audit in audits
+            )
+            submits = [reply for reply in replies if reply.payload.get("operation") == "submit"]
+            if (not submits or attempt.scope != binding.adapter.retry_scope()
+                    or any(getattr(attempt, key) != value for key, value in identity.items())
+                    or any(reply.payload.get("identity") != identity
+                           or (self._parse(reply).status != "RATE_LIMITED"
+                               and not (audited and self._parse(reply).status == "UNKNOWN"))
+                           or self._parse(reply).external_submission_id
+                           != task.external_submission_id for reply in submits)
+                    or any(self._parse(reply).status in {
+                        "ACCEPTED", "COMPLETED", "FOUND", "NEEDS_INPUT",
+                    } for reply in replies)):
+                raise TransitionError("EVIDENCE_REQUIRED")
+        retry = SafeRetryEvidence(binding.protocol_version, "proven_not_accepted", row.id,
+                                  binding.protocol_version + ".admission_rejection", row.created_at)
+        return VerifiedTransition(task.id, task.agent_id, task.agent_version,
+                                  task.external_submission_id, "safe_retry", row.id,
+                                  binding.protocol_version, safe_retry=retry)
+
+    def _text_retry_reference(self, session, task):
+        latest = self._latest(session, task.id)
+        if latest is None:
+            return None
+        rows = session.scalars(select(UpstreamEvidence).where(
+            UpstreamEvidence.attempt_id == latest.id,
+            UpstreamEvidence.kind.in_({"observation", "concurrency_rejection_audit"}),
+        ).order_by(UpstreamEvidence.created_at.desc(), UpstreamEvidence.id.desc())).all()
+        for row in rows:
+            if (row.payload.get("operation") == "submit"
+                    and self._parse(row).status == "RATE_LIMITED"):
+                self._text_rejection_retry(session, task, row.id)
+                return row.id
+        return None
+
+    def _queue(self, task_id, lease, *, reference=None, seconds=1):
+        from app.dispatch.outbox import rearm_outbox
+
+        with self.factory() as session, session.begin():
+            task = locked_execution(session, task_id, lease)
+            if task.state != "QUEUED":
+                self._change(session, task, lease, "QUEUED", reference)
+            task.investigation_reason = None
+            due = database_now(session) + timedelta(seconds=seconds)
+            task.submission_not_before = due
+            task.recovery_due_at = due
+            rearm_outbox(session, task.id, "recover", ready_at=due)
+        return self._view(task_id)
+
     def _install(self, session):
         session.info["transition_verifiers"] = TransitionVerifiers(
             {"accepted": self._accepted, "safe_retry": self._safe_retry}
@@ -267,37 +376,65 @@ class UpstreamService:
     def _observe(self, task_id, identity, attempt_id, operation, outcome):
         # Append transport facts even if the sender has since lost its lease.
         with self.factory() as session, session.begin():
+            payload = dict(identity=identity, operation=operation,
+                           outcome=outcome.model_dump(mode="json"))
+            if outcome.status == "RATE_LIMITED" and outcome.protocol_version == "image-agent-v1":
+                from app.agents.media_execution import MediaExecution
+
+                state = session.get(MediaExecution, task_id)
+                if state is not None:
+                    payload["transport_rejection"] = state.state.get("submission_rejection")
             row = UpstreamEvidence(
                 id=str(uuid4()),
                 task_id=task_id,
                 attempt_id=attempt_id,
                 kind="observation",
                 created_at=database_now(session),
-                payload=dict(
-                    identity=identity, operation=operation, outcome=outcome.model_dump(mode="json")
-                ),
+                payload=payload,
             )
             session.add(row)
             return row.id
 
-    def _apply_observation(self, task_id, lease, reference):
+    def _apply_observation(self, task_id, lease, reference, *, explicit=False):
         try:
             with self.factory() as session, session.begin():
                 task = locked_execution(session, task_id, lease)
+                if self._manual_wait(task) and not explicit:
+                    return
                 row = session.get(UpstreamEvidence, reference)
                 outcome = self._parse(row)
+                if outcome.status == "RATE_LIMITED":
+                    self._text_rejection_retry(session, task, reference)
+                    delay = outcome.retry_after_seconds
+                    self._change(session, task, lease, "QUEUED", reference)
+                    task.investigation_reason = None
+                    from app.dispatch.outbox import rearm_outbox
+
+                    due = database_now(session) + timedelta(seconds=max(1, delay))
+                    task.submission_not_before = due
+                    task.recovery_due_at = due
+                    rearm_outbox(session, task.id, "recover", ready_at=due)
+                    return
                 if task.state in {"SUBMITTED", "QUEUED"}:
                     # An old intent routed through QUEUED must reconcile, never submit blindly.
                     self._change(session, task, lease, "SUBMITTING")
                 if task.state not in {"SUBMITTING", "RUNNING", "INVESTIGATING"}:
                     return
-                if outcome.status in {"ACCEPTED", "FOUND"}:
+                if outcome.status in {"ACCEPTED", "FOUND", "COMPLETED", "NEEDS_INPUT"}:
                     proof = self._accepted(session, task, "RUNNING", reference)
                     if task.upstream_id and task.upstream_id != proof.upstream_id:
                         raise TransitionError("UPSTREAM_IDENTITY_CONFLICT")
-                    if task.state != "RUNNING":
+                    if task.state != "RUNNING" and (
+                        outcome.status != "NEEDS_INPUT" or not task.upstream_id
+                    ):
                         self._change(session, task, lease, "RUNNING", reference)
-                    task.investigation_reason = None
+                    if outcome.status == "NEEDS_INPUT":
+                        self._investigate(session, task, lease, "UPSTREAM_NEEDS_INPUT")
+                        stage_diagnostic(stage="upstream", task_id=task.id,
+                                         state_version=task.state_version, lease=lease,
+                                         code="UPSTREAM_NEEDS_INPUT", outcome="wait")
+                    else:
+                        task.investigation_reason = None
                     # T10 consumes this same durable observation for result/failure processing.
                 else:
                     self._investigate(session, task, lease, "UPSTREAM_ACCEPTANCE_UNCONFIRMED")
@@ -317,19 +454,74 @@ class UpstreamService:
                 )
                 self._investigate(session, task, lease, "UPSTREAM_IDENTITY_CONFLICT")
 
+    @staticmethod
+    def _manual_wait(task):
+        # A pending callback permits local inbox reduction, not remote recovery.
+        # Only the reducer can clear the original blocker after genuine progress.
+        return task.investigation_reason in {
+            "UPSTREAM_NEEDS_INPUT", "CALLBACK_EVENT_CONFLICT",
+            "CALLBACK_INBOX_PENDING:UPSTREAM_NEEDS_INPUT",
+            "CALLBACK_INBOX_PENDING:CALLBACK_EVENT_CONFLICT",
+        }
+
     def submit_original_task(self, task_id, lease):
+        retry = None
         with self.factory() as session:
             task = session.get(GenerationTask, task_id)
+            if (task.state == "QUEUED" and task.submission_not_before is not None
+                    and task.submission_not_before > database_now(session)):
+                return task_view(session, task)
+            if task.state == "QUEUED" and not task.upstream_id:
+                reference = self._text_retry_reference(session, task)
+                if reference:
+                    retry = self._text_rejection_retry(session, task, reference).safe_retry
             needs_recovery = (
                 task.upstream_id
                 or task.state not in {"SUBMITTED", "QUEUED"}
                 or self._latest(session, task_id) is not None
             )
+        if retry is not None:
+            return self._submit(task_id, lease, retry)
         if needs_recovery:
             return self.recover_original_task(task_id, lease=lease)
         return self._submit(task_id, lease)
 
     def _submit(self, task_id, lease, evidence=None):
+        from app.agents.execution_pool import execution_scope, text_scope
+        from app.agents.text import TextAgentAdapter
+
+        with self.factory() as session:
+            task = session.get(GenerationTask, task_id)
+            adapter = self.registry.bind_task(session, task).adapter
+        if adapter.protocol_version in self.media_pools:
+            scope = execution_scope(adapter.protocol_version, adapter.profile.base_url)
+            pool = self.media_pools[adapter.protocol_version]
+            if pool.acquire(scope, task_id, lease=lease, protocol=adapter.protocol_version,
+                            base_url=adapter.profile.base_url) is None:
+                return self._queue(task_id, lease,
+                                   reference=evidence.reference if evidence else None)
+            result = self._submit_with_slot(task_id, lease, evidence)
+            if result.state == "QUEUED":
+                pool.release(scope, task_id, lease=lease)
+            return result
+        if not isinstance(adapter, TextAgentAdapter):
+            return self._submit_with_slot(task_id, lease, evidence)
+        scope = text_scope(adapter.profile.base_url)
+        token = self.text_pool.acquire(scope)
+        if token is None:
+            return self._queue(task_id, lease, reference=evidence.reference if evidence else None)
+        try:
+            result = self._submit_with_slot(task_id, lease, evidence)
+        except BaseException:
+            # A crash/unknown transport outcome can leave upstream work running.
+            # Keep the slot until its deadline (longer than the 600s HTTP maximum).
+            raise
+        else:
+            if result.state != "INVESTIGATING":
+                self.text_pool.release(scope, token)
+            return result
+
+    def _submit_with_slot(self, task_id, lease, evidence=None):
         with self.factory() as session:
             task = session.get(GenerationTask, task_id)
             binding = self.registry.bind_task(session, task)
@@ -347,7 +539,11 @@ class UpstreamService:
                 if proof.safe_retry != evidence:
                     raise TransitionError("EVIDENCE_MISMATCH")
                 row = session.get(UpstreamEvidence, evidence.reference)
-                if scope is None or not same_scope(scope, row.payload["scope"]):
+                retry_scope = (latest.scope if row.kind in {
+                    "observation", "concurrency_rejection_audit",
+                }
+                               else row.payload["scope"])
+                if scope is None or not same_scope(scope, retry_scope):
                     self._investigate(session, task, lease, "UPSTREAM_SCOPE_UNCONFIRMED")
                     return task_view(session, task)
                 # QUEUED is not permission to skip durable retry validation.
@@ -363,6 +559,7 @@ class UpstreamService:
             self._change(
                 session, task, lease, "SUBMITTING", evidence.reference if evidence else None
             )
+            task.submission_not_before = None
             snapshot = original_submission_snapshot(session, task_id)
             identity = self._identity(session, task, binding)
             attempt = UpstreamAttempt(
@@ -377,10 +574,74 @@ class UpstreamService:
             session.add(attempt)
             attempt_id, external = attempt.id, task.external_submission_id
         # Both intent and SUBMITTING are now committed; no external I/O inside a DB transaction.
-        outcome = binding.adapter.submit_scoped(snapshot, external, scope)
+        outcome = self._submit_transport(binding.adapter, snapshot, external, scope, lease)
         reference = self._observe(task_id, identity, attempt_id, "submit", outcome)
         self._apply_observation(task_id, lease, reference)
         return self._view(task_id)
+
+    def _submit_transport(self, adapter, snapshot, external, scope, lease):
+        from app.agents.image import ImageAgentAdapter
+        from app.agents.text import TextAgentAdapter
+        from app.agents.video import VideoAgentAdapter
+
+        if not isinstance(adapter, (TextAgentAdapter, ImageAgentAdapter, VideoAgentAdapter)):
+            return adapter.submit_scoped(snapshot, external, scope)
+        return self._leased_transport(adapter.submit_scoped, (snapshot, external, scope), lease)
+
+    def _leased_transport(self, operation, args, lease):
+        if self.leases.renew(lease) is None:
+            raise TransitionError("LEASE_LOST")
+        # Long synchronous model workflows must not outlive their fencing lease.
+        # Lost ownership never cancels/repeats the request: persist its observation,
+        # then let the normal lease check decide who may apply it.
+        with ThreadPoolExecutor(max_workers=1, thread_name_prefix="agent-transport") as pool:
+            pending = pool.submit(operation, *args)
+            owned = True
+            while True:
+                try:
+                    return pending.result(timeout=SUBMIT_LEASE_REFRESH_SECONDS)
+                except TimeoutError:
+                    if pending.done():
+                        # The operation itself may raise TimeoutError. A finished
+                        # failed future is not a heartbeat timeout to poll forever.
+                        return pending.result()
+                    if owned:
+                        try:
+                            owned = self.leases.renew(lease) is not None
+                        except Exception as error:
+                            stage_diagnostic(stage="upstream", lease=lease, error=error,
+                                             code="LEASE_LOST", outcome="error")
+                            owned = False
+
+    def _recover_image_rejection(self, task_id, binding, lease):
+        """Recover a refusal committed by the adapter before its outcome receipt."""
+        if binding.protocol_version != "image-agent-v1":
+            return
+        from app.agents.media_execution import MediaTaskStore
+
+        with self.factory() as session:
+            task = session.get(GenerationTask, task_id)
+            latest = self._latest(session, task_id)
+            if task.upstream_id or latest is None:
+                return
+            seen = session.scalars(select(UpstreamEvidence).where(
+                UpstreamEvidence.attempt_id == latest.id,
+                UpstreamEvidence.kind == "observation",
+            )).all()
+            if any(row.payload.get("operation") == "submit" for row in seen):
+                return
+            identity = self._identity(session, task, binding)
+            external, attempt_id = task.external_submission_id, latest.id
+        marker = MediaTaskStore(self.factory, task_id, "image", lease).submission_rejection(
+            binding.adapter.retry_scope(), external,
+        )
+        if marker is not None:
+            delay = marker.get("retry_after_seconds", 5)
+            self._observe(task_id, identity, attempt_id, "submit", SubmitOutcome(
+                status="RATE_LIMITED", protocol_version="image-agent-v1",
+                external_submission_id=external,
+                retry_after_seconds=delay if type(delay) is int and 1 <= delay <= 3600 else 5,
+            ))
 
     def recover_original_task(self, task_id, evidence=None, *, lease=None):
         owned = lease is None
@@ -390,6 +651,8 @@ class UpstreamService:
         try:
             with self.factory() as session, session.begin():
                 task = locked_execution(session, task_id, lease)
+                if self._manual_wait(task) and not owned:
+                    return task_view(session, task)
                 if task.state not in {
                     "SUBMITTED",
                     "QUEUED",
@@ -411,42 +674,62 @@ class UpstreamService:
                 latest = self._latest(session, task_id)
                 attempt_id = latest.id if latest else None
                 upstream_id, external = task.upstream_id, task.external_submission_id
-                pending = None
-                if not upstream_id:
-                    observations = session.scalars(
-                        select(UpstreamEvidence)
-                        .where(
-                            UpstreamEvidence.task_id == task_id,
-                            UpstreamEvidence.kind == "observation",
-                        )
-                        .order_by(UpstreamEvidence.created_at.desc(), UpstreamEvidence.id.desc())
-                    ).all()
-                    pending = next(
-                        (
-                            row.id
-                            for row in observations
-                            if self._parse(row).status in {"ACCEPTED", "FOUND"}
-                        ),
-                        None,
-                    )
+            # History may grow through repeated unavailable observations. Scan it
+            # without holding the account/task lock; application revalidates the
+            # selected immutable evidence and the current fencing lease.
+            if not upstream_id:
+                self._recover_image_rejection(task_id, binding, lease)
+            pending = self._pending_observation(task_id, lease) if not upstream_id else None
             if pending:
-                self._apply_observation(task_id, lease, pending)
+                self._apply_observation(task_id, lease, pending, explicit=owned)
                 result = self._view(task_id)
-                if result.state == "RUNNING":
+                if result.state in {"RUNNING", "QUEUED"} or self._manual_wait(result):
                     return result
-            outcome = (
-                binding.adapter.query(upstream_id)
-                if upstream_id
-                else binding.adapter.query_by_external(external)
-            )
+            from app.agents.media_execution import saved_media_task_id
+
+            original_id = upstream_id or saved_media_task_id(binding.adapter, external)
+            operation = binding.adapter.query if original_id else binding.adapter.query_by_external
+            outcome = self._leased_transport(operation, (original_id or external,), lease)
             reference = self._observe(task_id, identity, attempt_id, "query", outcome)
-            self._apply_observation(task_id, lease, reference)
-            if not upstream_id and outcome.status != "FOUND" and evidence is not None:
+            self._apply_observation(task_id, lease, reference, explicit=owned)
+            if (not upstream_id and outcome.status not in {"FOUND", "NEEDS_INPUT"}
+                    and evidence is not None):
                 return self._submit(task_id, lease, evidence)
             return self._view(task_id)
         finally:
             if owned:
                 self.leases.release(lease)
+
+    def _pending_observation(self, task_id, lease):
+        cursor = None
+        while True:
+            if self.leases.renew(lease) is None:
+                raise TransitionError("LEASE_LOST")
+            with self.factory() as session:
+                query = select(UpstreamEvidence).where(
+                    UpstreamEvidence.task_id == task_id,
+                    UpstreamEvidence.kind.in_({"observation", "concurrency_rejection_audit"}),
+                )
+                if cursor:
+                    query = query.where(or_(
+                        UpstreamEvidence.created_at < cursor[0],
+                        and_(UpstreamEvidence.created_at == cursor[0],
+                             UpstreamEvidence.id < cursor[1]),
+                    ))
+                rows = session.scalars(query.order_by(
+                    UpstreamEvidence.created_at.desc(), UpstreamEvidence.id.desc(),
+                ).limit(100)).all()
+                for row in rows:
+                    try:
+                        if self._parse(row).status in {"ACCEPTED", "FOUND", "COMPLETED",
+                                                       "NEEDS_INPUT", "RATE_LIMITED"}:
+                            return row.id
+                    except (ValueError, KeyError, TypeError) as error:
+                        stage_diagnostic(stage="upstream", task_id=task_id, lease=lease,
+                                         error=error, code="STAGE_EXCEPTION", outcome="error")
+                if len(rows) < 100:
+                    return None
+                cursor = rows[-1].created_at, rows[-1].id
 
     def collect_retry_evidence(self, task_id, *, kind):
         """Trusted service operation, never an HTTP proof constructor or client boolean."""
@@ -461,6 +744,12 @@ class UpstreamService:
                 return None
             attempt_id, external = latest.id, task.external_submission_id
         scope = binding.adapter.retry_scope()
+        # The text API's finite idempotency retention is not a durable absence
+        # proof. Until a lookup-by-key protocol exists, never automatically POST again.
+        from app.agents.text import TextAgentAdapter
+
+        if isinstance(binding.adapter, TextAgentAdapter):
+            return None
         if scope is None:
             return None
         source_reference, absence = None, None
@@ -529,13 +818,26 @@ class UpstreamService:
 
     def handle(self, context):
         try:
+            if context.action != "prepare_submission":
+                from app.agents.video_commands import resume_queued_video_command
+
+                if resume_queued_video_command(self, context.task_id, context.lease):
+                    return
             if context.action == "prepare_submission":
                 self.submit_original_task(context.task_id, context.lease)
             else:
                 self.poll_original_task(context.task_id, lease=context.lease)
-        except LookupError:
+        except (LookupError, ValueError, MediaServiceError) as error:
+            if isinstance(error, MediaServiceError) and getattr(error, "command_rejected", False):
+                return
+            stage_diagnostic(stage="upstream", task_id=context.task_id, action=context.action,
+                             lease=context.lease, error=error,
+                             http_status=getattr(error, "status_code", None),
+                             code="UPSTREAM_BINDING_UNAVAILABLE", outcome="error")
             with self.factory() as session, session.begin():
                 task = locked_execution(session, context.task_id, context.lease)
+                if self._manual_wait(task):
+                    return
                 if task.state in {"SUBMITTED", "QUEUED"}:
                     self._change(session, task, context.lease, "SUBMITTING")
                 self._investigate(session, task, context.lease, "UPSTREAM_BINDING_UNAVAILABLE")

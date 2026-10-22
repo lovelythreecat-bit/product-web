@@ -1,0 +1,474 @@
+{
+  "date": "2026-10-13",
+  "version": "V2 approved and implemented",
+  "status": "authorized_scope_implemented_narrowly_verified",
+  "userScopeConfirmed": true,
+  "productImplementationStarted": true,
+  "generationMode": "built_in_imagegen",
+  "allSamples": "design_examples_not_runtime_or_production_facts",
+  "styleSource": "docs/design/high-fidelity-2026-10-11/visual-reference.md",
+  "palette": {
+    "background": "#F8F3ED",
+    "sidebar": "#F1E7DA",
+    "panel": "#FFFDFA",
+    "primary": "#A94E32",
+    "text": "#322823",
+    "muted": "#706259",
+    "border": "#E7D9CA",
+    "successBackground": "#F0E9DF",
+    "successText": "#66503B"
+  },
+  "sheetAuthority": "视觉稿供构图与质感评阅，字段顺序、按钮、流程、政策仍以当前原型与本文件明确核对为准；漏画不代表删减，任何C项不因视觉批准自动获改造授权",
+  "sheets": [
+    {
+      "id": "account",
+      "title": "个人中心、头像菜单与编辑资料",
+      "file": "account-v2.png",
+      "note": "包含首页已登录入口。账号详情与流水详情按原型保留完整只读字段；未画状态不代表删减。头像为本轮新增功能。"
+    },
+    {
+      "id": "workspace",
+      "title": "创作工作台",
+      "file": "workspace-v2.png",
+      "note": "沿用已确认三列构图，文案和视频复用共享结构。实现补齐侧栏「我的作品」；作品按真实比例完整显示。结算文案为「完整成果保存后消费；确定失败释放」。"
+    },
+    {
+      "id": "works",
+      "title": "我的作品与预览、删除确认",
+      "file": "works-v2.png",
+      "note": "实现补齐视频卡「更多→删除」和预览的「关闭」；文案按钮按原型为「复制文案」。危险操作使用语义红，并遵守实际删除政策。"
+    },
+    {
+      "id": "auth",
+      "title": "登录与注册",
+      "file": "auth-v1.png",
+      "note": "密码保留当前真实接口的 10–128 位要求；原型演示的 8 位差异未被视为降低安全限制的授权。"
+    },
+    {
+      "id": "recharge",
+      "title": "充值说明",
+      "file": "recharge-v1.png",
+      "note": "仅有说明和返回工作台，不增加支付订单、充值档位或支付入口。装饰商品与文案为设计示例。"
+    },
+    {
+      "id": "admin-users",
+      "title": "后台用户、任务与异常",
+      "file": "admin-users-tasks-v2.png",
+      "note": "图中外部提交标识误用了价格版本，实际必须独立显示；实现按原型补齐注册时间、冻结积分、状态与时间线等字段。图中总数与时间为局部示例，不能用作真实查询结果。"
+    },
+    {
+      "id": "admin-config",
+      "title": "后台积分、Agent、规格与价格",
+      "file": "admin-config-v2.png",
+      "note": "图中「服务地址留空不覆盖现有」与正式必填契约冲突，待提供改造计划。接收用户按原型下拉选择；赠送配置与发放确认仍保留。规格和价格联合编辑尚未确认。图中文字错字以原型为准。"
+    },
+    {
+      "id": "admin-monitoring",
+      "title": "后台用量、官网与操作日志",
+      "file": "admin-monitoring-v2.png",
+      "note": "成功率暂保留真实接口的「成功÷终态」；原型的「成功÷全部」冲突待决定。官网既有 Agent 描述、流程、政策、授权案例与发布状态不能因图未画而删除。"
+    },
+    {
+      "id": "mobile",
+      "title": "手机工作台、作品、个人中心与编辑抽屉",
+      "file": "mobile-v2.png",
+      "note": "保持原型单列顺序、可横向滚动的流水表和全屏编辑抽屉。图中文字与未画的错误／空状态仍按原型及准确字段清单实现。"
+    }
+  ],
+  "issues": [
+    {
+      "id": 1,
+      "request": "首页登录后进入工作台",
+      "status": "changed_narrowly_verified",
+      "result": "首页已登录显示独立进入工作台入口，刷新恢复真实会话；实际浏览器通过"
+    },
+    {
+      "id": 2,
+      "request": "用户头像",
+      "status": "changed_narrowly_verified",
+      "result": "PNG/JPEG/WebP真实上传、本人文件版本绑定与读取、头像占位已实现；单测、真实上传及MySQL所有权约束通过"
+    },
+    {
+      "id": 3,
+      "request": "头像与主流右上角交互",
+      "status": "changed_narrowly_verified",
+      "result": "头像＋昵称菜单提供工作台/个人中心/退出，支持外部关闭、Escape焦点恢复和方向键；手机右上角与实际退出通过"
+    },
+    {
+      "id": 4,
+      "request": "个人中心按原型补齐字段",
+      "status": "changed_narrowly_verified",
+      "result": "按原型补齐店铺/类目/邮箱/电话/简介及账号详情状态和时间；保存取消、最近登录与旧长内容兼容通过"
+    },
+    {
+      "id": 5,
+      "request": "增加管理员账号",
+      "status": "changed_narrowly_verified",
+      "result": "local-admin已存在且active/admin，登录及后台访问通过，注册积分账户和一次bootstrap审计已核对；凭据不写入仓库"
+    },
+    {
+      "id": 6,
+      "request": "后台检查并补遗漏",
+      "status": "changed_narrowly_verified",
+      "result": "已补A1—A5：全库用户/账本/任务/审计汇总与搜索，任务安全投影和用量分组；真实DB权限/汇总/搜索通过，当前无真实任务行，诊断字段由窄单测覆盖；C项保留限制"
+    },
+    {
+      "id": 7,
+      "request": "非首页统一样式先设计后实现",
+      "status": "changed_narrowly_verified",
+      "result": "9张稿先生成后经用户确认实现；用户页与8后台模块统一暖色，桌面手机截图核对；手机头部/抽屉/数字排版及统计空态已修正"
+    }
+  ],
+  "profile": {
+    "fields": [
+      {
+        "key": "nickname",
+        "label": "昵称",
+        "type": "text",
+        "required": true,
+        "maxLength": 40
+      },
+      {
+        "key": "shop_name",
+        "label": "店铺名称",
+        "type": "text",
+        "required": false,
+        "maxLength": 80
+      },
+      {
+        "key": "category",
+        "label": "主营类目",
+        "type": "text",
+        "required": false,
+        "maxLength": 80
+      },
+      {
+        "key": "email",
+        "label": "联系邮箱",
+        "type": "email",
+        "required": false,
+        "maxLength": 120
+      },
+      {
+        "key": "phone",
+        "label": "联系电话",
+        "type": "tel",
+        "required": false,
+        "maxLength": 40
+      },
+      {
+        "key": "bio",
+        "label": "个人简介",
+        "type": "textarea",
+        "required": false,
+        "maxLength": 300
+      }
+    ],
+    "avatar": "本轮新增提案，不是原型已有上传功能",
+    "editNotice": "联系方式选填，不用于注册或登录验证。",
+    "saveTrimsAllFields": true,
+    "actions": [
+      "取消",
+      "保存资料"
+    ],
+    "readonlyOrder": [
+      "用户编号",
+      "账号",
+      "角色",
+      "状态",
+      "注册时间",
+      "最近登录"
+    ],
+    "sources": [
+      "docs/prototype/app.js:145",
+      "docs/prototype/app.js:162",
+      "docs/prototype/app.js:256"
+    ]
+  },
+  "header": {
+    "authenticated": [
+      "头像",
+      "昵称",
+      "下拉菜单"
+    ],
+    "homepageShortcut": "进入工作台",
+    "menu": [
+      "进入工作台",
+      "个人中心",
+      "退出登录"
+    ],
+    "interaction": [
+      "点击打开",
+      "点击外部关闭",
+      "Escape关闭并恢复触发焦点",
+      "键盘可操作",
+      "手机触控",
+      "跟随有效会话恢复与退出同步"
+    ],
+    "fallback": "无头像显示默认占位"
+  },
+  "requirementsNotOmitted": [
+    "个人账号详情完整字段",
+    "积分流水详情与来源任务",
+    "工作台侧栏我的作品入口",
+    "图片预览按真实比例完整显示",
+    "文案复制按钮=复制文案",
+    "每种作品均有更多/删除",
+    "预览关闭操作",
+    "危险删除使用语义红",
+    "状态与结算分别显示",
+    "积分说明含累计入账",
+    "后台所有8模块",
+    "用户原型表列顺序:账号/用户ID,昵称/店铺,角色/状态,注册/最近登录,任务/可用/冻结,操作",
+    "任务详情状态/结算/开始/更新/耗时/错误/授权边界",
+    "注册赠送配置抽屉",
+    "发放接收用户下拉与二次确认",
+    "官网现有Agent描述/流程/政策/授权案例/发布状态不得删"
+  ],
+  "mobile": {
+    "order": [
+      "历史会话与新建",
+      "商品资料/素材/指令/辅助/设置/费用生成",
+      "任务结果"
+    ],
+    "accountOrder": [
+      "资料卡",
+      "积分账户与流水"
+    ],
+    "drawer": "全屏，内容滚动、保存取消固定",
+    "ledger": "保持原表列，仅容器横向滚动"
+  },
+  "gaps": [
+    {
+      "id": "A1",
+      "module": "用户管理",
+      "kind": "no_ddl_read_projection",
+      "missing": [
+        "账号/昵称/用户ID全局搜索",
+        "真实状态与角色汇总",
+        "已有任务量与积分投影",
+        "关联任务"
+      ],
+      "source": [
+        "frontend/src/features/admin/UsersView.vue:89",
+        "backend/app/admin/routes.py:40",
+        "docs/prototype/admin.js:54"
+      ],
+      "status": "implemented_narrowly_verified"
+    },
+    {
+      "id": "A2",
+      "module": "积分管理",
+      "kind": "no_ddl_read_projection",
+      "missing": [
+        "平台可用与冻结汇总",
+        "跨用户积分流水",
+        "账户/原因搜索",
+        "真实流水总量"
+      ],
+      "source": [
+        "docs/prototype/admin.js:60"
+      ],
+      "status": "implemented_narrowly_verified"
+    },
+    {
+      "id": "A3",
+      "module": "任务与异常",
+      "kind": "no_ddl_read_projection",
+      "missing": [
+        "任务/用户/账号搜索",
+        "Agent筛选",
+        "固定费用与规格价格版本",
+        "会话、外部ID、上游ID",
+        "关联成果与任务时间线"
+      ],
+      "privacy": "只投影必要非正文信息，禁止原样暴露上游错误或用户内容",
+      "source": [
+        "frontend/src/features/admin/TasksView.vue:38",
+        "backend/app/admin/schemas.py:106",
+        "docs/prototype/admin.js:48"
+      ],
+      "status": "implemented_narrowly_verified"
+    },
+    {
+      "id": "A4",
+      "module": "用量统计",
+      "kind": "no_ddl_read_projection",
+      "missing": [
+        "按Agent分组",
+        "按任务状态分组",
+        "未结算汇总"
+      ],
+      "source": [
+        "frontend/src/features/admin/UsageView.vue:11",
+        "backend/app/admin/statistics.py:16"
+      ],
+      "status": "implemented_narrowly_verified"
+    },
+    {
+      "id": "A5",
+      "module": "操作日志",
+      "kind": "no_ddl_read_projection",
+      "missing": [
+        "对象/操作人/原因关键词查询",
+        "真实类型计数"
+      ],
+      "source": [
+        "frontend/src/features/admin/AuditView.vue:15",
+        "backend/app/admin/routes.py:296",
+        "docs/prototype/admin.js:73"
+      ],
+      "status": "implemented_narrowly_verified"
+    },
+    {
+      "id": "B1",
+      "module": "个人中心与头像",
+      "kind": "ddl_permission_required",
+      "proposal": {
+        "usersNullableColumns": {
+          "shop_name": "VARCHAR(80)",
+          "category": "VARCHAR(80)",
+          "email": "VARCHAR(120)",
+          "phone": "VARCHAR(40)",
+          "avatar_file_id": "VARCHAR(36)",
+          "avatar_file_version": "VARCHAR(36)",
+          "last_login_at": "DATETIME(6)"
+        },
+        "constraints": [
+          "头像ID和版本同时为空或同时非空",
+          "(avatar_file_id,avatar_file_version,id)复合外键引用本人files(id,version,user_id)",
+          "file_refs用途允许avatar，ref_id为用户UUID"
+        ],
+        "rules": [
+          "仅在本地ecommerce_ai_dev新增上述字段与约束",
+          "保留既有nickname80/bio500列，不截断既有内容",
+          "最近登录只记录迁移后成功密码登录，不由过期时间推算、不回填历史",
+          "绑定头像必须鉴权、验证本人持久化图像文件与版本",
+          "当前头像须受普通素材软删除保护",
+          "移除绑定不代表物理删除；未绑定上传和旧头像回收需已确认政策"
+        ],
+        "status": "executed_only_ecommerce_ai_dev_0022"
+      },
+      "source": [
+        "backend/app/auth/models.py:12",
+        "backend/app/auth/schemas.py:18",
+        "backend/app/storage/models.py:115"
+      ],
+      "status": "approved_local_migration_and_real_avatar_verified"
+    },
+    {
+      "id": "C1",
+      "kind": "user_remediation_plan_required",
+      "topic": "密码重置与账户恢复",
+      "reason": "D-07核验、权限与审计未确认；不能启用按钮",
+      "status": "existing_limit_retained"
+    },
+    {
+      "id": "C2",
+      "kind": "user_remediation_plan_required",
+      "topic": "用户删除、停用与头像旧文件清理",
+      "reason": "保留现有D-09门槛；用户删除无现有事实或服务；不承诺取消上传自动释放额度",
+      "status": "existing_limit_retained"
+    },
+    {
+      "id": "C3",
+      "kind": "user_remediation_plan_required",
+      "topic": "用量成功率口径",
+      "reason": "原型成功/全部任务；正式接口成功/终态任务，图暂采用正式口径但不等于用户确认",
+      "status": "existing_limit_retained"
+    },
+    {
+      "id": "C4",
+      "kind": "user_remediation_plan_required",
+      "topic": "规格与价格联合保存",
+      "reason": "现有两个CAS发布接口，不能前端串联冒充原子保存",
+      "status": "existing_limit_retained"
+    },
+    {
+      "id": "C5",
+      "kind": "user_remediation_plan_required",
+      "topic": "Agent服务地址与简化配置",
+      "reason": "地址目前SecretStr且响应隐藏；重新提供必填，不实施图中留空保留方案",
+      "status": "existing_limit_retained"
+    },
+    {
+      "id": "C6",
+      "kind": "user_remediation_plan_required",
+      "topic": "后台联系人字段",
+      "reason": "联系人不是联系电话，个人原型未要求额外联系人列",
+      "status": "existing_limit_retained"
+    },
+    {
+      "id": "C7",
+      "kind": "user_remediation_plan_required",
+      "topic": "已有更长昵称/简介",
+      "reason": "保留原有80/500列，不改未编辑的旧长值；新编辑采用40/300限制，单测覆盖，无截断",
+      "status": "compatibility_implemented"
+    },
+    {
+      "id": "C8",
+      "kind": "user_remediation_plan_required",
+      "topic": "积分发放数量",
+      "reason": "原型正整数，当前DTO允许0，不能未声明就改正式语义",
+      "status": "existing_limit_retained"
+    },
+    {
+      "id": "C9",
+      "kind": "user_remediation_plan_required",
+      "topic": "重新生成会话起点",
+      "reason": "原型恢复当前会话草稿，真实实现新建会话；均核对输入、新报价再手动确认，不能误称原型直接收费",
+      "status": "existing_limit_retained"
+    }
+  ],
+  "verification": {
+    "agents": [
+      "/root/audit_user_pages",
+      "/root/audit_admin_backend",
+      "/root/implement_header_avatar"
+    ],
+    "frontend": {
+      "affected_test_files": 9,
+      "passed_tests": 58,
+      "final_three_file_recheck": 31,
+      "typecheck": "passed",
+      "build": "passed",
+      "contracts": "current"
+    },
+    "backend": {
+      "affected_test_files": 3,
+      "passed_tests": 35,
+      "limited_ruff": "passed",
+      "openapi": "current",
+      "real_mysql_safety": "passed_explicit_outer_transaction_rollback"
+    },
+    "browser": {
+      "desktop": "1440x1000",
+      "mobile": "390x844",
+      "original_route_checks": 28,
+      "final_targeted_checks": 4,
+      "uncaught_errors": 0,
+      "whole_page_overflow": false,
+      "profile_restore": {
+        "status": 200,
+        "matched": true
+      }
+    },
+    "screenshots": "implemented/index.html",
+    "limitations": [
+      "No existing task rows for real diagnostic projection",
+      "No upload decoder or physical file bytes tested by this DB metadata probe",
+      "No concurrent transaction stress test",
+      "真实Agent仍延后；不把空列表或设计案例认定为真实生成验收",
+      "本地TEST_ONLY上传配置仅供开发，不是生产存储政策",
+      "未执行全量测试或并发压力测试"
+    ],
+    "gitCommandsRun": 0,
+    "schemaChanges": "Only user-approved local Alembic0022; no fixture migrations or other databases",
+    "markdownFilesWritten": 0
+  },
+  "approval": {
+    "visual": "approved_user_and_all_three_admin_boards",
+    "minimumLocalMigration": "approved_and_executed_only_ecommerce_ai_dev_0022",
+    "backendCItems": "retain_existing_limits_user_plan_required"
+  }
+}

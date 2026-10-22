@@ -32,8 +32,12 @@ router = APIRouter(
 def service(request):
     settings = request.app.state.settings
     factory = sessionmaker(request.app.state.engine, expire_on_commit=False)
+    from app.storage.local_store import LocalStore
+
+    store = (LocalStore(settings.storage_root)
+             if settings.storage_persistent and settings.storage_root is not None else None)
     upstream = UpstreamService(
-        factory, AgentRegistry(mode=settings.mode, test_only=settings.test_only)
+        factory, AgentRegistry.from_settings(settings, session_factory=factory, store=store)
     )
     return InvestigationService(factory, upstream=upstream, mode=settings.mode)
 

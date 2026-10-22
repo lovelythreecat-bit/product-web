@@ -1,0 +1,30 @@
+Edit this existing high-fidelity multi-category ecommerce AI platform homepage mockup. The client has approved the lighter, engaging COPY DIRECTION. Perform a carefully controlled TYPOGRAPHY/COPY UPDATE ONLY. Preserve the current entire full-page layout, section order, sneaker/apparel/skincare/headphone imagery, cream #F8F3ED and terracotta #A94E32 palette, copper technology device/light trails, primary brand identity, spacing, professional modern Chinese sans-serif typography. No new sections, no brand redesign, no coffee/tea/cups/beverages, no added claims or metrics, no shopping cart or purchase UI. Keep legible high-quality text and responsive-looking line wraps within the existing layout.
+
+Replace the major visible Chinese marketing strings with the following EXACT Chinese text:
+- Top product label remains “电商 AI 创作平台”.
+- Navigation remains “创作能力”, “应用场景”, “工作方式”, “登录”, “注册体验”.
+- Hero eyebrow: “为电商而生，让创意上场”
+- Hero large headline: “让好商品，\n亮眼登场。” Two strong lines, final phrase terracotta, same bold modern sans-serif treatment. Preserve hero scale and visual balance, do not leave an awkward large empty area.
+- Hero supporting copy, wrap naturally in 3-4 readable lines: “想写文案、做图片，还是来支视频？带上商品素材，选你需要的，让 AI 帮你把灵感做成作品，把商品亮点秀出来。”
+- Primary hero CTA remains “注册体验”, secondary link becomes “看看能创作什么”.
+- Keep source labels “商品素材”, “鞋服”, “美妆”, “数码”. Keep output tiles “电商文案”, “商品图片”, “产品视频” and their “设计示例” badges. Do not change imagery.
+- Capability section heading becomes “好商品，不止一种出场方式。”
+- First capability title “文案创作”, tagline “把亮点，写到心动处。”
+- Second capability title “图片创作”, tagline “给商品，一个亮眼的画面。”
+- Third capability title “视频创作”, tagline “让商品故事，动起来。”
+- Multi-category showcase heading becomes “卖什么，都有创意可聊。”
+- Showcase subtitle: “一双鞋、一瓶护肤品、一副耳机……不同商品，都值得有自己的精彩。”
+- Keep the three category panels and their imagery as 鞋服 / 美妆 / 数码, all marked 设计示例.
+- Mechanism heading: “带上商品素材，让灵感有个着落。”
+- Mechanism subtitle: “写文案、做图片、创视频，按需选择，分别创作。你定方向，AI 帮你把想法做出来。”
+- Mechanism diagram must remain source materials on left with THREE INDEPENDENT branches to 文案 / 图片 / 视频. No arrow between output categories; never imply automatic chained multi-agent generation.
+- Process heading: “从‘有个想法’，到‘有份作品’。”
+- Step labels: 01 “带上商品素材”, 02 “选个创作方向”, 03 “看清费用再开始”, 04 “收下你的新作品”.
+- Under step 04, small natural supporting text: “打开作品库，随时查看、下载。” This is supporting text, not the hero.
+- Bottom dark warm-brown CTA section headline: “你的商品，\n下一次怎么出场？”
+- Bottom CTA small supporting copy: “带上一个想法，开启下一份创作。”
+- Bottom primary button remains “注册体验”.
+- Footer product name remains “电商 AI 创作平台”.
+- Footer note exact: “视觉与内容为设计示例，真实生成能力仍在调试。”
+
+Keep any small product example cards as explicitly labeled design examples; do not invent any performance claims, numeric promises, customer proof, free-credit claims or actual product sales guarantees. If other small decorative wording conflicts with this approved copy, remove it or keep it minimal. User wants warm, lively and appealing but polished, not childish or exaggerated. Maintain clear deliberate commercial marketing hierarchy. This is the same design with refined text, not a new visual direction.

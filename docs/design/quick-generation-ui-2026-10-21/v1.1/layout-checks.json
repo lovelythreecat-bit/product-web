@@ -1,0 +1,162 @@
+[
+  {
+    "screen": "product",
+    "mobile": false,
+    "width": 1440,
+    "overflow": false,
+    "footerInView": true,
+    "stepSubtitles": 0,
+    "titleCaptionInline": true,
+    "overlayInView": true
+  },
+  {
+    "screen": "copy",
+    "mobile": false,
+    "width": 1440,
+    "overflow": false,
+    "footerInView": true,
+    "stepSubtitles": 0,
+    "titleCaptionInline": true,
+    "overlayInView": true
+  },
+  {
+    "screen": "images",
+    "mobile": false,
+    "width": 1440,
+    "overflow": false,
+    "footerInView": true,
+    "stepSubtitles": 0,
+    "titleCaptionInline": true,
+    "overlayInView": true
+  },
+  {
+    "screen": "video",
+    "mobile": false,
+    "width": 1440,
+    "overflow": false,
+    "footerInView": true,
+    "stepSubtitles": 0,
+    "titleCaptionInline": true,
+    "overlayInView": true
+  },
+  {
+    "screen": "summary",
+    "mobile": false,
+    "width": 1440,
+    "overflow": false,
+    "footerInView": true,
+    "stepSubtitles": 0,
+    "titleCaptionInline": true,
+    "overlayInView": true
+  },
+  {
+    "screen": "plan-drawer",
+    "mobile": false,
+    "width": 1440,
+    "overflow": false,
+    "footerInView": true,
+    "stepSubtitles": 0,
+    "titleCaptionInline": true,
+    "overlayInView": true
+  },
+  {
+    "screen": "edit-plan",
+    "mobile": false,
+    "width": 1440,
+    "overflow": false,
+    "footerInView": true,
+    "stepSubtitles": 0,
+    "titleCaptionInline": true,
+    "overlayInView": true
+  },
+  {
+    "screen": "originals",
+    "mobile": false,
+    "statusAligned": true,
+    "overflow": false
+  },
+  {
+    "screen": "product",
+    "mobile": true,
+    "width": 390,
+    "overflow": false,
+    "footerInView": null,
+    "stepSubtitles": 0,
+    "titleCaptionInline": true,
+    "overlayInView": true
+  },
+  {
+    "screen": "copy",
+    "mobile": true,
+    "width": 390,
+    "overflow": false,
+    "footerInView": null,
+    "stepSubtitles": 0,
+    "titleCaptionInline": true,
+    "overlayInView": true
+  },
+  {
+    "screen": "images",
+    "mobile": true,
+    "width": 390,
+    "overflow": false,
+    "footerInView": null,
+    "stepSubtitles": 0,
+    "titleCaptionInline": true,
+    "overlayInView": true
+  },
+  {
+    "screen": "video",
+    "mobile": true,
+    "width": 390,
+    "overflow": false,
+    "footerInView": null,
+    "stepSubtitles": 0,
+    "titleCaptionInline": true,
+    "overlayInView": true
+  },
+  {
+    "screen": "summary",
+    "mobile": true,
+    "width": 390,
+    "overflow": false,
+    "footerInView": null,
+    "stepSubtitles": 0,
+    "titleCaptionInline": true,
+    "overlayInView": true
+  },
+  {
+    "screen": "plan-drawer",
+    "mobile": true,
+    "width": 390,
+    "overflow": false,
+    "footerInView": null,
+    "stepSubtitles": 0,
+    "titleCaptionInline": true,
+    "overlayInView": true
+  },
+  {
+    "screen": "edit-plan",
+    "mobile": true,
+    "width": 390,
+    "overflow": false,
+    "footerInView": null,
+    "stepSubtitles": 0,
+    "titleCaptionInline": true,
+    "overlayInView": true
+  },
+  {
+    "screen": "originals",
+    "mobile": true,
+    "statusAligned": true,
+    "overflow": false
+  },
+  {
+    "screen": "gallery-close",
+    "selectedThumbnailFollows": true
+  },
+  {
+    "screen": "edit-confirm-final",
+    "version": "方案版本 2"
+  }
+]

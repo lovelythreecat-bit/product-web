@@ -1,0 +1,23 @@
+import { expect, test } from '@playwright/test'
+
+test('V3 homepage keeps independent navigation, responsive content and clear sample labels', async ({ page }) => {
+  await page.route('**/api/v1/site/content', route => route.fulfill({ json: { content: null } }))
+  await page.route('**/api/v1/site/cases', route => route.fulfill({ json: [] }))
+  await page.goto('/')
+  await expect(page.getByRole('heading', { level: 1 })).toHaveText('让好商品，亮眼登场。')
+  await expect(page.locator('.home-creation')).toHaveCount(3)
+  await expect(page.locator('.home-scenario')).toHaveCount(3)
+  await expect(page.locator('.home-process li')).toHaveCount(4)
+  await expect(page.getByText('商品与创作内容仅作示例展示。')).toBeVisible()
+  await expect(page.getByText(/暂定|设计示例|仍在调试|开发说明/)).toHaveCount(0)
+  await expect(page.locator('.home-hero-art')).toBeVisible()
+  expect(await page.locator('.home-hero-art').evaluate((img: HTMLImageElement) => img.complete && img.naturalWidth > 0)).toBe(true)
+  expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true)
+  await page.getByRole('navigation', { name: '首页导航' }).getByRole('link', { name: '应用场景' }).click()
+  await expect(page).toHaveURL(/#scenarios$/)
+  await page.locator('.home-header').getByRole('link', { name: '注册体验' }).click()
+  await expect(page).toHaveURL(/\/register$/)
+  await page.goto('/')
+  await page.locator('.home-header').getByRole('link', { name: '登录', exact: true }).click()
+  await expect(page).toHaveURL(/\/login$/)
+})

@@ -27,7 +27,7 @@ def test_durable_result_before_crash_survives_later_query_failure(upstream, monk
     submit(upstream, task)
     original = service._apply_observation
 
-    def crash(*args):
+    def crash(*args, **kwargs):
         raise SystemExit("TEST_ONLY before reduction")
 
     monkeypatch.setattr(service, "_apply_observation", crash)

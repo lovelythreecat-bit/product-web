@@ -9,7 +9,9 @@ provider protocol and must not be enabled in production.
 
 import hashlib
 from dataclasses import dataclass
-from uuid import UUID, uuid4
+from datetime import timedelta
+from time import monotonic
+from uuid import NAMESPACE_URL, UUID, uuid4, uuid5
 
 from fastapi import APIRouter, HTTPException, Request
 from sqlalchemy import select
@@ -22,8 +24,9 @@ from app.agents.registry import AgentRegistry
 from app.auth.models import User
 from app.catalog.models import AgentRecord
 from app.catalog.schemas import content_digest
-from app.dispatch.outbox import enqueue_outbox
+from app.dispatch.outbox import rearm_outbox
 from app.dispatch.recovery import TERMINAL_STATES, database_now
+from app.operations.telemetry import stage_diagnostic
 from app.tasks.models import GenerationTask, TaskSnapshot
 from app.tasks.repository import locked_execution
 from app.tasks.state_machine import (
@@ -33,6 +36,11 @@ from app.tasks.state_machine import (
     VerifiedTransition,
     transition_task,
 )
+
+PENDING_CALLBACK_BLOCKERS = {
+    "CALLBACK_INBOX_PENDING:UPSTREAM_NEEDS_INPUT": "UPSTREAM_NEEDS_INPUT",
+    "CALLBACK_INBOX_PENDING:CALLBACK_EVENT_CONFLICT": "CALLBACK_EVENT_CONFLICT",
+}
 
 
 @dataclass(frozen=True)
@@ -73,16 +81,28 @@ class CallbackService:
             .execution_options(populate_existing=True)
         )
 
-    def _conflict(self, session, task, reason, reference=None, digest=None):
+    def _conflict(self, session, task, reason, reference=None, digest=None, *, context=None):
+        # Every caller holds the account/task lock. The deterministic key and
+        # primary key fence concurrent identical variants without editing history.
+        key = str(uuid5(NAMESPACE_URL, content_digest(dict(
+            task_id=task.id, reason=reason, reference=reference, digest=digest, context=context,
+        ))))
+        if session.get(UpstreamEvidence, key, with_for_update=True) is not None:
+            return key
         session.add(
             UpstreamEvidence(
-                id=str(uuid4()),
+                id=key,
                 task_id=task.id,
                 kind="callback_conflict",
                 payload=dict(reason=reason, reference=reference, digest=digest),
                 created_at=database_now(session),
             )
         )
+        session.flush()
+        stage_diagnostic(stage="reducer", task_id=task.id, event_id=reference,
+                         state_version=getattr(task, "state_version", None),
+                         code=reason, outcome="wait")
+        return key
 
     def receive_callback(self, agent_id, agent_version, raw, headers):
         with self.factory() as session:
@@ -124,6 +144,10 @@ class CallbackService:
 
     def _persist(self, session, task, binding, event, source, raw_digest, source_ref=None):
         identity = self.upstream._identity(session, task, binding)
+        conflict_context = content_digest(dict(
+            identity=identity, event=event.model_dump(mode="json", exclude={"status"}),
+            source=source,
+        ))
         # Original persisted submit intent is required, even before upstream ID binding.
         attempt = self.upstream._latest(session, task.id)
         if (
@@ -131,13 +155,14 @@ class CallbackService:
             or any(getattr(attempt, k) != v for k, v in identity.items())
             or event.agent_id != binding.wire_agent_id
             or event.protocol_version != binding.protocol_version
-            or not event.test_only
+            or event.test_only != binding.adapter.test_only
             or event.external_submission_id != task.external_submission_id
             or not event.upstream_task_id
             or task.upstream_id
             and task.upstream_id != event.upstream_task_id
         ):
-            self._conflict(session, task, "IDENTITY_MISMATCH", digest=raw_digest)
+            self._conflict(session, task, "IDENTITY_MISMATCH", digest=raw_digest,
+                           context=conflict_context)
             return EventReceipt("CONFLICT")
         other = session.scalar(
             select(GenerationTask.id).where(
@@ -147,7 +172,8 @@ class CallbackService:
             )
         )
         if other:
-            self._conflict(session, task, "UPSTREAM_IDENTITY_CONFLICT", digest=raw_digest)
+            self._conflict(session, task, "UPSTREAM_IDENTITY_CONFLICT", digest=raw_digest,
+                           context=conflict_context)
             return EventReceipt("CONFLICT")
         semantic = event.model_dump(mode="json", exclude={"status", "timestamp", "event_id"})
         digest = content_digest(semantic)
@@ -158,11 +184,13 @@ class CallbackService:
                 AgentEvent.source == source,
                 AgentEvent.event_id == event.event_id,
             )
+            .with_for_update()
         )
         if previous:
             if previous.raw_digest == raw_digest and previous.semantic_digest == digest:
                 return EventReceipt("DUPLICATE", previous.id)
-            self._conflict(session, task, "EVENT_REPLAY_CONFLICT", previous.id, raw_digest)
+            self._conflict(session, task, "EVENT_REPLAY_CONFLICT", previous.id, raw_digest,
+                           context=conflict_context)
             return EventReceipt("CONFLICT", previous.id)
         row = AgentEvent(
             id=str(uuid4()),
@@ -185,44 +213,94 @@ class CallbackService:
             self._decision(session, task, row, "TERMINAL_LATE", None)
             self._conflict(session, task, "TERMINAL_LATE", row.id, digest)
         else:
-            outbox = enqueue_outbox(session, task.id, "recover")
-            outbox.ready_at, outbox.dispatched_at = database_now(session), None
+            if source == "callback" and task.investigation_reason in {
+                "CALLBACK_EVENT_CONFLICT", "UPSTREAM_NEEDS_INPUT",
+            }:
+                # Authorize only this newly verified local inbox receipt. The
+                # reducer reinstates blockers on rejection; local progression
+                # never grants an immediate remote query in poll_original_task.
+                task.investigation_reason = "CALLBACK_INBOX_PENDING:" + task.investigation_reason
+            rearm_outbox(session, task.id, "recover")
         return EventReceipt("ACCEPTED", row.id)
 
-    def import_observations(self, task_id, lease):
-        with self.factory() as session, session.begin():
-            task = locked_execution(session, task_id, lease)
-            binding = self.registry.bind_task(session, task)
-            rows = session.scalars(
-                select(UpstreamEvidence)
-                .where(UpstreamEvidence.task_id == task.id, UpstreamEvidence.kind == "observation")
-                .order_by(UpstreamEvidence.created_at, UpstreamEvidence.id)
-            ).all()
-            for row in rows:
-                outcome = self.upstream._parse(row)
-                if outcome.status not in {"FOUND", "COMPLETED"}:
-                    continue
-                try:
-                    self.upstream._verify_row(session, task, row.id, "observation")
-                except TransitionError:
-                    self._conflict(session, task, "OBSERVATION_IDENTITY", row.id)
-                    continue
-                state = getattr(outcome, "state", None) or "RESULT_READY"
-                sequence = 1 if state == "RUNNING" else 2
-                event = VerifiedEvent(
-                    status="VERIFIED",
-                    agent_id=binding.wire_agent_id,
-                    protocol_version=outcome.protocol_version,
-                    test_only=outcome.test_only,
-                    external_submission_id=outcome.external_submission_id,
-                    upstream_task_id=outcome.upstream_task_id,
-                    event_id=f"{outcome.upstream_task_id}:{sequence}",
-                    sequence=sequence,
-                    state=state,
-                    result=outcome.result,
-                )
-                digest = content_digest(event.model_dump(mode="json"))
-                self._persist(session, task, binding, event, "poll", digest, row.id)
+    def import_observations(self, task_id, lease, *, rule_version=None):
+        from app.agents.observation_imports import (
+            RULE_VERSION,
+            context_digest,
+            pending_sources,
+            previous_variant,
+            record_sources,
+        )
+
+        rule_version = rule_version or RULE_VERSION
+        renew_at = monotonic() + 20
+
+        def renew_if_due():
+            nonlocal lease, renew_at
+            if monotonic() >= renew_at:
+                lease = self.upstream.leases.renew(lease)
+                if lease is None:
+                    raise TransitionError("LEASE_LOST")
+                renew_at = monotonic() + 20
+
+        # Scan/hash outside the account lock. Keep only one payload per variant
+        # plus source references; no write transaction spans a history scan.
+        with self.factory() as source:
+            task = source.get(GenerationTask, task_id)
+            binding = self.registry.bind_task(source, task)
+            context = context_digest(self.upstream, source, task, binding, rule_version)
+            groups = {}
+            for row in source.scalars(pending_sources(task_id, context)):
+                renew_if_due()
+                fingerprint = content_digest(row.payload)
+                if fingerprint not in groups:
+                    groups[fingerprint] = (row, [])
+                groups[fingerprint][1].append(row.id)
+        for fingerprint, (row, references) in groups.items():
+            # Bound write transactions even when one historical variant has a
+            # very large number of source receipts. Reuse durable dispositions.
+            for offset in range(0, len(references), 100):
+                renew_if_due()
+                with self.factory() as session, session.begin():
+                    task = locked_execution(session, task_id, lease)
+                    binding = self.registry.bind_task(session, task)
+                    current = context_digest(self.upstream, session, task, binding, rule_version)
+                    if current != context:
+                        raise TransitionError("EVIDENCE_MISMATCH")
+                    previous = previous_variant(session, task_id, context, fingerprint)
+                    if previous is not None:
+                        receipt = EventReceipt(previous.disposition, previous.event_ref)
+                    else:
+                        receipt = self._import_observation(session, task, binding, row, fingerprint)
+                    record_sources(
+                        session, task_id, references[offset:offset + 100], context, fingerprint,
+                        rule_version, receipt, database_now(session),
+                    )
+                    session.flush()
+
+    def _import_observation(self, session, task, binding, row, fingerprint):
+        try:
+            self.upstream._verify_row(session, task, row.id, "observation")
+        except TransitionError as exc:
+            if str(exc) == "LEASE_LOST":
+                raise
+            self._conflict(session, task, "OBSERVATION_IDENTITY", row.id, fingerprint)
+            return EventReceipt("CONFLICT")
+        outcome = self.upstream._parse(row)
+        if outcome.status not in {"FOUND", "COMPLETED"}:
+            return EventReceipt("IGNORED")
+        state = getattr(outcome, "state", None) or "RESULT_READY"
+        sequence = 1 if state == "RUNNING" else 2
+        event = VerifiedEvent(
+            status="VERIFIED", agent_id=binding.wire_agent_id,
+            protocol_version=outcome.protocol_version, test_only=outcome.test_only,
+            external_submission_id=outcome.external_submission_id,
+            upstream_task_id=outcome.upstream_task_id,
+            event_id=f"{outcome.upstream_task_id}:{sequence}", sequence=sequence,
+            state=state, result=outcome.result,
+        )
+        digest = content_digest(event.model_dump(mode="json"))
+        return self._persist(session, task, binding, event, "poll", digest, row.id)
 
     def _event(self, session, task, reference):
         row = session.get(AgentEvent, reference)
@@ -255,7 +333,7 @@ class CallbackService:
             event.external_submission_id != task.external_submission_id
             or event.agent_id != binding.wire_agent_id
             or event.protocol_version != binding.protocol_version
-            or not event.test_only
+            or event.test_only != binding.adapter.test_only
             or task.upstream_id
             and task.upstream_id != event.upstream_task_id
         ):
@@ -263,6 +341,14 @@ class CallbackService:
         return row, event, binding
 
     def _manifest(self, session, task, event, binding):
+        from app.agents.text import PROTOCOL as TEXT_PROTOCOL
+
+        if binding.protocol_version in {TEXT_PROTOCOL, "image-agent-v1", "video-agent-v1"}:
+            from app.results.manifest import result_rule, validate_manifest
+
+            return validate_manifest(
+                event.result, result_rule(session, task, binding), binding, event.upstream_task_id
+            )
         manifest = event.result
         snapshot = session.get(TaskSnapshot, task.id)
         if snapshot.spec_snapshot.get("delivery_kind", "single") != "single":
@@ -351,23 +437,27 @@ class CallbackService:
 
     def reduce_pending(self, task_id, lease):
         self.import_observations(task_id, lease)
+        progressed = False
         with self.factory() as session, session.begin():
             task = locked_execution(session, task_id, lease)
+            prior_blocker = PENDING_CALLBACK_BLOCKERS.get(task.investigation_reason)
             self.install_verifiers(session)
             rows = session.scalars(
                 select(AgentEvent)
                 .where(AgentEvent.task_id == task.id)
                 .order_by(AgentEvent.created_at, AgentEvent.id)
+                .with_for_update()
             ).all()
             applied = []
             for row in rows:
-                decision = session.get(AgentEventDecision, row.id)
+                decision = session.get(AgentEventDecision, row.id, with_for_update=True)
                 if decision and decision.disposition in {"APPLIED", "FAILURE_PENDING"}:
                     applied.append(row)
             for row in rows:
-                if session.get(AgentEventDecision, row.id):
+                if session.get(AgentEventDecision, row.id, with_for_update=True):
                     continue
                 disposition = "APPLIED"
+                conflict_reason = "EVENT_REPLAY_CONFLICT"
                 latest = max(applied, key=lambda r: r.sequence) if applied else None
                 if latest and row.sequence == latest.sequence:
                     disposition = (
@@ -408,6 +498,7 @@ class CallbackService:
                                 "SAVING",
                                 TransitionEvidence(lease, row.id),
                             )
+                            task.investigation_reason = None
                         elif event.state == "FAILED":
                             transition_task(
                                 session,
@@ -421,14 +512,51 @@ class CallbackService:
                         else:
                             task.investigation_reason = None
                         applied.append(row)
+                        progressed = True
                     except TransitionError as exc:
                         if str(exc) == "LEASE_LOST":
                             raise
                         disposition = "CONFLICT"
+                        conflict_reason = str(exc) if str(exc) in {
+                            "EVIDENCE_MISMATCH", "RESULT_MANIFEST_MISMATCH",
+                            "RESULT_POLICY_UNAVAILABLE", "UPSTREAM_IDENTITY_CONFLICT",
+                        } else "EVIDENCE_MISMATCH"
                 if disposition in {"CONFLICT", "TERMINAL_LATE"}:
-                    self._conflict(session, task, disposition, row.id, row.semantic_digest)
+                    self._conflict(session, task,
+                                   "TERMINAL_LATE" if disposition == "TERMINAL_LATE"
+                                   else conflict_reason, row.id, row.semantic_digest)
                 self._decision(session, task, row, disposition, lease)
                 session.flush()
+            # Historical rejection decisions remain immutable. Stop automatic
+            # transport retries while allowing fresh receipts, save and failure
+            # settlement, and explicitly selected historical repair to proceed.
+            if task.state not in TERMINAL_STATES | {"SAVING", "SAVE_RECOVERY"} and not any(
+                session.get(AgentEventDecision, row.id, with_for_update=True).disposition
+                == "FAILURE_PENDING"
+                for row in rows
+            ):
+                conflict = session.scalar(select(UpstreamEvidence.id).where(
+                    UpstreamEvidence.task_id == task.id,
+                    UpstreamEvidence.kind == "callback_conflict",
+                ).limit(1))
+                if conflict is not None:
+                    if task.state in {"RUNNING", "SUBMITTING"}:
+                        transition_task(session, task.id, task.state_version, "INVESTIGATING",
+                                        TransitionEvidence(lease))
+                    task.investigation_reason = "CALLBACK_EVENT_CONFLICT"
+            if prior_blocker and not progressed and task.state not in (
+                TERMINAL_STATES | {"SAVING", "SAVE_RECOVERY"}
+            ):
+                task.investigation_reason = prior_blocker
+            if progressed and task.state == "RUNNING":
+                # Match the existing lease-release/scheduler retry interval.
+                # A RUNNING transition enqueues an immediately-ready new version;
+                # fence that generation before commit so local callback progress
+                # cannot indirectly trigger an immediate remote query.
+                ready_at = database_now(session) + timedelta(seconds=30)
+                task.recovery_due_at = ready_at
+                rearm_outbox(session, task.id, "recover", ready_at=ready_at)
+        return progressed
 
     def original_result(self, task_id):
         with self.factory() as session:
@@ -476,9 +604,15 @@ class CallbackService:
         if lease is None:
             return self.upstream._view(task_id)
         try:
-            self.reduce_pending(task_id, lease)
+            progressed = self.reduce_pending(task_id, lease)
             view = self.upstream._view(task_id)
             if view.state in {"SAVING", "SAVE_RECOVERY"} or self.pending_failure(task_id):
+                return view
+            reason = getattr(view, "investigation_reason", None)
+            if (view.state in TERMINAL_STATES or reason in PENDING_CALLBACK_BLOCKERS
+                    or reason in {"CALLBACK_EVENT_CONFLICT", "UPSTREAM_NEEDS_INPUT"}):
+                return view
+            if progressed:
                 return view
             self.upstream.recover_original_task(task_id, lease=lease)
             self.reduce_pending(task_id, lease)
@@ -536,7 +670,7 @@ async def receive_callback(agent_id: UUID, version: str, request: Request):
     service = CallbackService(
         UpstreamService(
             sessionmaker(request.app.state.engine, expire_on_commit=False),
-            AgentRegistry(mode=settings.mode, test_only=settings.test_only),
+            AgentRegistry.from_settings(settings),
         )
     )
     receipt = service.receive_callback(str(agent_id), version, bytes(raw), request.headers)

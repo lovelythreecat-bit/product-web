@@ -1,0 +1,121 @@
+[
+  {
+    "viewport": [
+      1440,
+      1000
+    ],
+    "scrollWidth": 1440,
+    "productFields": [
+      "商品名称",
+      "商品类型",
+      "商品品类",
+      "产地",
+      "面料成分",
+      "尺寸",
+      "颜色",
+      "版型",
+      "适用季节",
+      "洗护方式",
+      "商品卖点与说明",
+      "核心卖点",
+      "适用人群",
+      "实际售价"
+    ],
+    "taskCount": 11,
+    "taskDisplay": "grid",
+    "taskHeight": 62,
+    "shortButtons": [
+      {
+        "label": "新建任务",
+        "height": 40
+      },
+      {
+        "label": "我的作品",
+        "height": 36
+      },
+      {
+        "label": "充值积分",
+        "height": 30
+      },
+      {
+        "label": "文案",
+        "height": 36
+      },
+      {
+        "label": "图片",
+        "height": 36
+      },
+      {
+        "label": "视频",
+        "height": 36
+      },
+      {
+        "label": "编辑资料",
+        "height": 28
+      },
+      {
+        "label": "选择图片",
+        "height": 32
+      },
+      {
+        "label": "AI 帮我完善",
+        "height": 32
+      },
+      {
+        "label": "任务详情",
+        "height": 28
+      },
+      {
+        "label": "预览",
+        "height": 32
+      },
+      {
+        "label": "复制文案",
+        "height": 32
+      },
+      {
+        "label": "下载",
+        "height": 32
+      },
+      {
+        "label": "重新生成",
+        "height": 32
+      }
+    ],
+    "generateY": 959,
+    "name": "desktop",
+    "errors": [],
+    "copyPreserved": true
+  },
+  {
+    "viewport": [
+      390,
+      844
+    ],
+    "scrollWidth": 390,
+    "productFields": [
+      "商品名称",
+      "商品类型",
+      "商品品类",
+      "产地",
+      "面料成分",
+      "尺寸",
+      "颜色",
+      "版型",
+      "适用季节",
+      "洗护方式",
+      "商品卖点与说明",
+      "核心卖点",
+      "适用人群",
+      "实际售价"
+    ],
+    "taskCount": 11,
+    "taskDisplay": "grid",
+    "taskHeight": 0,
+    "shortButtons": [],
+    "generateY": 1841.234375,
+    "name": "mobile",
+    "errors": [],
+    "copyPreserved": true
+  }
+]

@@ -16,6 +16,7 @@ from sqlalchemy import (
 from sqlalchemy.dialects.mysql import DATETIME
 from sqlalchemy.orm import Mapped, mapped_column
 
+from app.common.display_numbers import display_number_default
 from app.db import Base
 
 
@@ -44,6 +45,9 @@ class GenerationTask(Base):
         ),
     )
     id: Mapped[str] = mapped_column(String(36), primary_key=True)
+    display_number: Mapped[str] = mapped_column(
+        String(32), unique=True, default=display_number_default("T"),
+    )
     user_id: Mapped[str] = mapped_column(ForeignKey("users.id"), index=True)
     conversation_id: Mapped[str] = mapped_column(String(36), index=True)
     idempotency_key: Mapped[str] = mapped_column(String(128, collation="utf8mb4_bin"))
@@ -63,7 +67,9 @@ class GenerationTask(Base):
         DATETIME(fsp=6), server_default=text("CURRENT_TIMESTAMP(6)")
     )
     investigation_reason: Mapped[str | None] = mapped_column(String(500))
+    submission_not_before: Mapped[datetime | None] = mapped_column(DATETIME(fsp=6))
     created_at: Mapped[datetime] = mapped_column(DATETIME(fsp=6))
+    history_deleted_at: Mapped[datetime | None] = mapped_column(DATETIME(fsp=6))
 
 
 class TaskSnapshot(Base):
@@ -86,6 +92,7 @@ class TaskSnapshot(Base):
     quote: Mapped[dict] = mapped_column(JSON)
     policy_versions: Mapped[dict] = mapped_column(JSON)
     capacity_estimate: Mapped[dict] = mapped_column(JSON)
+    routing_snapshot: Mapped[dict | None] = mapped_column(JSON, nullable=True)
 
 
 class TaskStateEvent(Base):

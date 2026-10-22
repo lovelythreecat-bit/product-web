@@ -1,9 +1,8 @@
 """Authenticated public catalog and DB-authorized administration; no credential output."""
 
-from uuid import UUID
-
 from fastapi import APIRouter, Depends, Request
 
+from app.agents.video_options import VideoOptionsView, read_video_options
 from app.auth.routes import DB, PrincipalDep, require_csrf
 from app.catalog import schemas as s
 from app.catalog.service import CatalogService
@@ -25,11 +24,10 @@ def agents(request: Request, session: DB, principal: PrincipalDep):
     return service(request, session).list_agents()
 
 
-@router.get(
-    "/agents/{agent_id}/specs", response_model=list[s.SpecVersion], operation_id="list_agent_specs"
-)
-def specs(agent_id: UUID, request: Request, session: DB, principal: PrincipalDep):
-    return service(request, session).list_specs(agent_id)
+@router.get("/video-options", response_model=VideoOptionsView, operation_id="video_options")
+def video_options(request: Request, session: DB, principal: PrincipalDep):
+    service(request, session)._principal(principal)
+    return read_video_options(session, request.app.state.settings)
 
 
 @router.post(
@@ -39,7 +37,7 @@ def specs(agent_id: UUID, request: Request, session: DB, principal: PrincipalDep
     dependencies=[Depends(require_csrf)],
 )
 def quote(dto: s.QuoteRequest, request: Request, session: DB, principal: PrincipalDep):
-    return service(request, session).quote_generation(principal, dto.input, dto.spec_id)
+    return service(request, session).quote_agent(principal, dto.input, dto.agent_id)
 
 
 @router.get("/admin/agents", response_model=list[s.AgentVersion], operation_id="admin_agents")
@@ -47,20 +45,6 @@ def admin_agents(request: Request, session: DB, principal: PrincipalDep):
     catalog = service(request, session)
     catalog._principal(principal, admin=True)
     return catalog.list_agents(admin=True)
-
-
-@router.get("/admin/specs", response_model=list[s.SpecVersion], operation_id="admin_specs")
-def admin_specs(request: Request, session: DB, principal: PrincipalDep):
-    catalog = service(request, session)
-    catalog._principal(principal, admin=True)
-    return catalog.list_specs(admin=True)
-
-
-@router.get("/admin/prices", response_model=list[s.PriceVersion], operation_id="admin_prices")
-def admin_prices(request: Request, session: DB, principal: PrincipalDep):
-    catalog = service(request, session)
-    catalog._principal(principal, admin=True)
-    return catalog.list_prices()
 
 
 @router.post(
@@ -72,31 +56,5 @@ def admin_prices(request: Request, session: DB, principal: PrincipalDep):
 )
 def publish_agent(dto: s.AgentDraft, request: Request, session: DB, principal: PrincipalDep):
     result = service(request, session).publish_agent_version(principal, dto)
-    session.commit()
-    return result
-
-
-@router.post(
-    "/admin/specs",
-    response_model=s.SpecVersion,
-    status_code=201,
-    operation_id="publish_spec",
-    dependencies=[Depends(require_csrf)],
-)
-def publish_spec(dto: s.SpecDraft, request: Request, session: DB, principal: PrincipalDep):
-    result = service(request, session).publish_spec_version(principal, dto)
-    session.commit()
-    return result
-
-
-@router.post(
-    "/admin/prices",
-    response_model=s.PriceVersion,
-    status_code=201,
-    operation_id="publish_price",
-    dependencies=[Depends(require_csrf)],
-)
-def publish_price(dto: s.PriceDraft, request: Request, session: DB, principal: PrincipalDep):
-    result = service(request, session).set_price_version(principal, dto)
     session.commit()
     return result

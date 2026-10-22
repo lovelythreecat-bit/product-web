@@ -37,7 +37,8 @@ def owned_conversation(session, user_id, conversation_id):
 
 def conversation_view(row):
     return ConversationSummary(
-        conversation_id=row.id, title=row.title, created_at=row.created_at.replace(tzinfo=UTC)
+        conversation_id=row.id, display_number=row.display_number, title=row.title,
+        created_at=row.created_at.replace(tzinfo=UTC),
     )
 
 

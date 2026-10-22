@@ -26,7 +26,7 @@ from app.catalog.models import (
     SpecIdentity,
     SpecRecord,
 )
-from app.common.types import InputSnapshot, Principal, Quote
+from app.common.types import MAX_REFERENCE_IMAGES, InputSnapshot, Principal, Quote
 from app.policies import schemas as ps
 from app.policies.models import DecisionVersionRecord
 from app.policies.service import PolicyGateError
@@ -48,17 +48,14 @@ class CatalogService:
     def _principal(self, actor, admin=False):
         if not isinstance(actor, Principal):
             raise HTTPException(401)
-        user = self.session.scalar(
-            select(User)
-            .where(User.id == str(actor.user_id))
-            .with_for_update()
-            .execution_options(populate_existing=True)
-        )
+        user_query = select(User).where(User.id == str(actor.user_id))
+        credential_query = select(AuthSession).where(AuthSession.id == str(actor.session_id))
+        if not getattr(self.session, "info", {}).get("read_only_request", False):
+            user_query = user_query.with_for_update()
+            credential_query = credential_query.with_for_update()
+        user = self.session.scalar(user_query.execution_options(populate_existing=True))
         credential = self.session.scalar(
-            select(AuthSession)
-            .where(AuthSession.id == str(actor.session_id))
-            .with_for_update()
-            .execution_options(populate_existing=True)
+            credential_query.execution_options(populate_existing=True)
         )
         if (
             user is None
@@ -157,6 +154,31 @@ class CatalogService:
             raise PolicyGateError() from None
 
     def _agent_gate(self, agent, policy_reader=None):
+        from app.agents.media_runtime import managed_media_agent_id, managed_media_input_support
+        from app.agents.text import PROTOCOL as TEXT_PROTOCOL
+        from app.agents.text_runtime import managed_agent_id, managed_input_support
+
+        if agent.agent_id == managed_agent_id(self.mode):
+            expected_inputs = s.InputSupport(**managed_input_support())
+            if (
+                agent.kind != "copy"
+                or agent.protocol_version != TEXT_PROTOCOL
+                or agent.version != TEXT_PROTOCOL
+                or agent.mode != self.mode
+                or s.support_ref(agent.input_support) != s.support_ref(expected_inputs)
+            ):
+                raise PolicyGateError()
+            return
+        if agent.kind in {"image", "video"} and agent.agent_id == managed_media_agent_id(
+            self.mode, agent.kind
+        ):
+            protocol = {"image": "image-agent-v1", "video": "video-agent-v1"}[agent.kind]
+            if (agent.protocol_version != protocol or agent.version != protocol
+                    or agent.mode != self.mode
+                    or s.support_ref(agent.input_support) != s.support_ref(
+                        s.InputSupport(**managed_media_input_support(agent.kind)))):
+                raise PolicyGateError()
+            return
         read_policy = policy_reader or self._policy
         inputs = read_policy(
             "D-03", agent.policy_versions, ("agents", str(agent.agent_id)), ps.InputPolicy
@@ -232,6 +254,15 @@ class CatalogService:
     def publish_agent_version(self, actor, draft):
         self._principal(actor, admin=True)
         draft = s.AgentDraft.model_validate(draft.model_dump())
+        from app.agents.media_runtime import managed_media_agent_id
+        from app.agents.text import PROTOCOL as TEXT_PROTOCOL
+        from app.agents.text_runtime import managed_agent_id
+
+        if (draft.protocol_version in {TEXT_PROTOCOL, "image-agent-v1", "video-agent-v1"}
+                or draft.agent_id == managed_agent_id(self.mode)
+                or any(draft.agent_id == managed_media_agent_id(self.mode, kind)
+                       for kind in ("image", "video"))):
+            raise CatalogError("INPUT_INVALID", 422)
         if draft.mode != self.mode:
             raise PolicyGateError()
         current = self._head(AgentHead, "agent_id", draft.agent_id, write=True)
@@ -244,7 +275,7 @@ class CatalogService:
         if not endpoint or len(endpoint) > 2048 or (secret is not None and len(secret) > 1024):
             raise CatalogError()
         value = s.AgentVersion(
-            **draft.model_dump(exclude={"endpoint", "secret_ref", "reason", "expected_version"}),
+            **draft.model_dump(exclude={"endpoint", "secret_ref", "expected_version"}),
             secret_configured=bool(secret),
         )
         self._append(
@@ -262,7 +293,7 @@ class CatalogService:
             "agent",
             draft.agent_id,
             draft.version,
-            draft.reason,
+            "发布 Agent 配置",
             value.enabled,
             secret_configured=bool(secret),
         )
@@ -278,7 +309,7 @@ class CatalogService:
         if draft.enabled:
             self._agent_gate(agent)
             self._spec_gate(draft)
-        value = s.SpecVersion(**draft.model_dump(exclude={"reason", "expected_version"}))
+        value = s.SpecVersion(**draft.model_dump(exclude={"expected_version"}))
         try:
             with self.session.begin_nested():
                 if draft.expected_version is None:
@@ -308,7 +339,7 @@ class CatalogService:
                     "spec",
                     draft.spec_id,
                     draft.version,
-                    draft.reason,
+                    "发布生成规格",
                     value.enabled,
                 )
         except IntegrityError:
@@ -330,7 +361,7 @@ class CatalogService:
                 )
             )
             self._price_gate(draft)
-        value = s.PriceVersion(**draft.model_dump(exclude={"reason", "expected_version"}))
+        value = s.PriceVersion(**draft.model_dump(exclude={"expected_version"}))
         self._append(PriceRecord, PriceHead, "spec_id", draft.spec_id, draft, value)
         audit_catalog(
             self.session,
@@ -338,7 +369,7 @@ class CatalogService:
             "price",
             draft.spec_id,
             draft.version,
-            draft.reason,
+            "发布生成价格",
             value.enabled,
             credits=value.credits,
         )
@@ -386,10 +417,17 @@ class CatalogService:
             or any(not input.product.get(key) for key in support.product_required_fields)
             or (support.instruction_required and not input.instruction.strip())
             or not support.min_materials <= len(input.material_versions) <= support.max_materials
+            or len(input.material_versions) > MAX_REFERENCE_IMAGES
             or not spec.parameter_schema.accepts(input.parameters)
         ):
             raise CatalogError()
-        agent_decisions = ("D-03",) if self.mode == "mock" else ("D-01", "D-03")
+        from app.agents.text_runtime import managed_agent_id
+
+        agent_decisions = (
+            ()
+            if agent.agent_id == managed_agent_id(self.mode)
+            else (("D-03",) if self.mode == "mock" else ("D-01", "D-03"))
+        )
         spec_decisions = ("D-02",) if spec.delivery_kind == "single" else ("D-02", "D-04")
         versions = {k: agent.policy_versions[k] for k in agent_decisions}
         versions.update({k: spec.policy_versions[k] for k in spec_decisions})
@@ -409,6 +447,81 @@ class CatalogService:
         spec, agent, price = self._available(spec_id)
         return self._quote(input, spec, agent, price)
 
+    def _current_agent(self, agent_id):
+        version = self._head(AgentHead, "agent_id", agent_id)
+        agent = self.read_agent_version(agent_id, version) if version else None
+        if agent is None or not agent.enabled:
+            raise CatalogError("SPEC_DISABLED")
+        self._agent_gate(agent)
+        return agent
+
+    def single_context(self, agent_id):
+        """Code-owned execution envelope, never an administrator-authored spec."""
+        agent = self._current_agent(agent_id)
+        spec = s.single_spec(agent)
+        return spec, agent
+
+    def _agent_quote(self, input, agent_id):
+        from app.catalog.parameters import read_parameters
+
+        spec, agent = self.single_context(agent_id)
+        config = read_parameters(self.session, self.mode)
+        credits = getattr(
+            config,
+            {"copy": "text_price", "image": "image_price", "video": "video_price"}[agent.kind],
+        )
+        if credits is None or config.version is None:
+            raise CatalogError("FEATURE_NOT_ENABLED", 403)
+        support = agent.input_support
+        input = InputSnapshot.model_validate(input.model_dump())
+        if (
+            not input.product_version.strip()
+            or any(not input.product.get(key) for key in support.product_required_fields)
+            or support.instruction_required
+            and not input.instruction.strip()
+            or not support.min_materials <= len(input.material_versions) <= support.max_materials
+            or len(input.material_versions) > MAX_REFERENCE_IMAGES
+        ):
+            raise CatalogError()
+        from app.agents.media_execution import validate_media_input
+
+        try:
+            if agent.protocol_version in {"image-agent-v1", "video-agent-v1"}:
+                validate_media_input(agent.kind, input)
+            elif agent.protocol_version == "text-agent-v1":
+                from app.agents.text_parameters import validate_text_parameters
+
+                validate_text_parameters(input.parameters)
+            elif input.parameters:
+                raise ValueError()
+        except (ValueError, TypeError):
+            raise CatalogError() from None
+        if agent.kind == "image" and input.parameters.get("output_type") == "detail_page":
+            # One accepted detail-page task delivers three images. Freeze and
+            # settle the complete set at the configured price for each image.
+            credits *= 3
+        price = s.PriceVersion(
+            spec_id=agent.agent_id,
+            version=str(config.version),
+            credits=credits,
+            enabled=True,
+            policy_version="platform-parameters",
+        )
+        quote = Quote(
+            spec_id=agent.agent_id,
+            spec_version=agent.version,
+            agent_version=agent.version,
+            price_version=price.version,
+            credits=credits,
+            input_digest=s.content_digest(input.model_dump(mode="json")),
+            policy_versions=agent.policy_versions | {"platform-pricing": price.version},
+        )
+        return s.ValidatedQuote(quote=quote, agent=agent, spec=spec, price=price)
+
+    def quote_agent(self, principal, input, agent_id):
+        self._principal(principal)
+        return self._agent_quote(input, agent_id).quote
+
     def validate_confirmed_quote(self, quote, input):
         """T07: call after current user auth, before any task/credit mutation, same Session.
 
@@ -416,14 +529,19 @@ class CatalogService:
         recomputed from MySQL and canonical input, never trusted from the caller.
         """
         quote = Quote.model_validate(quote.model_dump())
+        # Already admitted legacy intents replay before reaching this function.
+        # A new intent must use current per-kind prices, never historical spec prices.
+        if "platform-pricing" not in quote.policy_versions:
+            raise CatalogError("QUOTE_STALE", 409, current_quotes=[], current_specs=[])
         try:
-            spec, agent, price = self._available(quote.spec_id)
-            current = self._quote(input, spec, agent, price)
+            validated = self._agent_quote(input, quote.spec_id)
         except (CatalogError, PolicyGateError):
-            self._stale(quote, input)
-        if current != quote:
-            self._stale(quote, input)
-        return s.ValidatedQuote(quote=current, spec=spec, agent=agent, price=price)
+            raise CatalogError("QUOTE_STALE", 409, current_quotes=[], current_specs=[]) from None
+        if validated.quote != quote:
+            raise CatalogError(
+                "QUOTE_STALE", 409, current_quotes=[validated.quote], current_specs=[]
+            )
+        return validated
 
     def _stale(self, quote, input):
         old = self.read_spec_version(quote.spec_id, quote.spec_version)

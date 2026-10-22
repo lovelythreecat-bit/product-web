@@ -2,7 +2,7 @@
 
 from datetime import datetime
 
-from sqlalchemy import BigInteger, CheckConstraint, ForeignKey, String
+from sqlalchemy import BigInteger, CheckConstraint, ForeignKey, ForeignKeyConstraint, String
 from sqlalchemy.dialects.mysql import DATETIME
 from sqlalchemy.orm import Mapped, mapped_column
 
@@ -15,6 +15,17 @@ class User(Base):
         CheckConstraint("role IN ('user','admin')", name="ck_user_role"),
         CheckConstraint("status IN ('active','disabled')", name="ck_user_status"),
         CheckConstraint("auth_version >= 0", name="ck_user_auth_version"),
+        CheckConstraint(
+            "(avatar_file_id IS NULL AND avatar_file_version IS NULL) OR "
+            "(avatar_file_id IS NOT NULL AND avatar_file_version IS NOT NULL)",
+            name="ck_user_avatar_identity",
+        ),
+        ForeignKeyConstraint(
+            ["avatar_file_id", "avatar_file_version", "id"],
+            ["files.id", "files.version", "files.user_id"],
+            name="fk_user_avatar_owner_version",
+            use_alter=True,
+        ),
     )
     id: Mapped[str] = mapped_column(String(36), primary_key=True)
     account_normalized: Mapped[str] = mapped_column(String(64), unique=True)
@@ -24,6 +35,13 @@ class User(Base):
     auth_version: Mapped[int] = mapped_column(BigInteger, default=0)
     nickname: Mapped[str | None] = mapped_column(String(80))
     bio: Mapped[str | None] = mapped_column(String(500))
+    shop_name: Mapped[str | None] = mapped_column(String(80))
+    category: Mapped[str | None] = mapped_column(String(80))
+    email: Mapped[str | None] = mapped_column(String(120))
+    phone: Mapped[str | None] = mapped_column(String(40))
+    avatar_file_id: Mapped[str | None] = mapped_column(String(36))
+    avatar_file_version: Mapped[str | None] = mapped_column(String(36))
+    last_login_at: Mapped[datetime | None] = mapped_column(DATETIME(fsp=6))
     created_at: Mapped[datetime] = mapped_column(DATETIME(fsp=6))
 
 

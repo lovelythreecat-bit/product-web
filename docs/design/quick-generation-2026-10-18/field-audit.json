@@ -1,0 +1,95 @@
+{
+  "status": "existing-fields-only",
+  "sources": [
+    "frontend/src/features/workspace/productTypes.ts",
+    "frontend/src/features/workspace/display.ts",
+    "frontend/src/features/workspace/TextChoices.vue",
+    "frontend/src/features/workspace/MediaChoices.vue",
+    "frontend/src/features/workspace/VideoTaskPanel.vue",
+    "frontend/src/features/workspace/PromptEditor.vue"
+  ],
+  "productTypes": 10,
+  "textFields": [
+    [
+      "copy_type",
+      "文案类型"
+    ],
+    [
+      "platform",
+      "目标平台"
+    ],
+    [
+      "audience",
+      "目标人群"
+    ],
+    [
+      "tone",
+      "语气"
+    ],
+    [
+      "max_chars",
+      "最大字符数"
+    ],
+    [
+      "extra_instructions",
+      "额外协作要求"
+    ]
+  ],
+  "imagePlatforms": [
+    [
+      "amazon",
+      "Amazon"
+    ],
+    [
+      "taobao",
+      "淘宝"
+    ],
+    [
+      "tmall",
+      "天猫"
+    ],
+    [
+      "jd",
+      "京东"
+    ],
+    [
+      "pinduoduo",
+      "拼多多"
+    ],
+    [
+      "shopee",
+      "Shopee"
+    ],
+    [
+      "lazada",
+      "Lazada"
+    ],
+    [
+      "shein",
+      "SHEIN"
+    ],
+    [
+      "temu",
+      "Temu"
+    ]
+  ],
+  "videoParameters": [
+    "first_frame_file_id"
+  ],
+  "instruction": "instruction",
+  "removed": [
+    "数码电子商品摘要中的独立颜色字段",
+    "生成成果直接作为视频首帧选项",
+    "自造的视频方案字段：首帧、画面安排、创作依据、节奏要求、声音"
+  ],
+  "renamed": {
+    "屏幕规格": "屏幕参数",
+    "电池 / 续航": "电池与续航",
+    "兼容性": "兼容设备",
+    "促销信息": "优惠信息",
+    "售后政策": "售后保障",
+    "图片创作要求": "创作指令",
+    "视频创作要求": "创作指令"
+  },
+  "scope": "Prototype only; workflow controls and reviewed-copy confirmation belong to the requested new flow."
+}

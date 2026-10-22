@@ -379,7 +379,7 @@ def test_duplicate_message_rechecks_stage_and_handler_runs_outside_locks(task_fa
 
     consumer.handlers["prepare_submission"] = prepare
     report = consumer.consume_once(1000)
-    assert (report.handled, report.unhandled, report.failed) == (1, 1, 0)
+    assert (report.handled, report.rejected, report.failed) == (1, 1, 0)
     with factory() as s:
         assert s.get(GenerationTask, task_id).state == "SUBMITTING"
     assert facts(factory, task_id) == original
@@ -396,6 +396,126 @@ def test_cross_task_message_cannot_claim(task_factory, runtime):
     assert consumer.process_message(fields) == "rejected"
     with factory() as s:
         assert s.get(GenerationTask, second).fencing_token == 0
+
+
+def test_same_generation_duplicates_query_once_and_next_generation_recovers(task_factory, runtime):
+    factory, redis, stream, dispatcher, scheduler, consumer = runtime
+    task_id = task_factory("RUNNING", "TEST_ONLY_original")
+    # Recovery supersedes the fixture's admission hint at this task version.
+    assert task_id in scheduler.recover_due_tasks().scheduled
+    assert dispatcher.dispatch_pending().dispatched == 1
+    fields = redis.xrange(stream)[0][1]
+    seen = []
+    consumer.handlers["query_original"] = seen.append
+    assert consumer.process_message(fields) == "handled"
+    assert consumer.process_message(fields) == "rejected"
+    assert len(seen) == 1
+    assert task_id not in scheduler.recover_due_tasks().scheduled
+    with factory() as s, s.begin():
+        s.get(GenerationTask, task_id).recovery_due_at = database_now(s) - timedelta(seconds=1)
+    assert task_id in scheduler.recover_due_tasks().scheduled
+    assert consumer.process_message(fields) == "rejected"
+    assert dispatcher.dispatch_pending().dispatched == 1
+    fresh_fields = redis.xrange(stream)[-1][1]
+    assert fresh_fields[b"event_id"] == fields[b"event_id"]
+    assert int(fresh_fields[b"dispatch_generation"]) > int(fields[b"dispatch_generation"])
+    assert consumer.process_message(fresh_fields) == "handled"
+    assert len(seen) == 2
+
+
+def test_two_dispatch_claimers_spend_one_generation(task_factory, runtime):
+    factory, redis, stream, dispatcher, _, consumer = runtime
+    task_id = task_factory()
+    dispatcher.dispatch_pending()
+    fields = redis.xrange(stream)[0][1]
+    event_id = fields[b"event_id"].decode()
+    generation = int(fields[b"dispatch_generation"])
+    with ThreadPoolExecutor(max_workers=2) as pool:
+        claims = list(pool.map(
+            lambda worker: consumer.leases.claim_dispatch(task_id, worker, event_id, 1, generation),
+            ["one", "two"],
+        ))
+    from app.dispatch.consumer import Lease
+
+    assert sum(isinstance(claim, Lease) for claim in claims) == 1
+    with factory() as s:
+        assert s.get(OutboxEvent, event_id).claimed_generation == generation
+        assert s.get(GenerationTask, task_id).fencing_token == 1
+
+
+@pytest.mark.parametrize("reason", ["UPSTREAM_NEEDS_INPUT", "CALLBACK_EVENT_CONFLICT"])
+def test_manual_wait_is_not_rearmed(task_factory, runtime, reason):
+    factory, _, _, _, scheduler, _ = runtime
+    task_id = task_factory("INVESTIGATING", "TEST_ONLY_original")
+    with factory() as s, s.begin():
+        s.get(GenerationTask, task_id).investigation_reason = reason
+    assert task_id not in scheduler.recover_due_tasks().scheduled
+
+
+def test_future_generation_and_legacy_message_wait_for_scheduler(task_factory, runtime):
+    from app.dispatch.outbox import rearm_outbox
+
+    factory, redis, stream, dispatcher, scheduler, consumer = runtime
+    task_id = task_factory()
+    dispatcher.dispatch_pending()
+    old = redis.xrange(stream)[0][1]
+    legacy = {key: value for key, value in old.items() if key != b"dispatch_generation"}
+    assert consumer.process_message(legacy) == "rejected"
+    with factory() as s, s.begin():
+        event = rearm_outbox(s, task_id, "submit",
+                             ready_at=database_now(s) + timedelta(seconds=60))
+        future = dict(old, dispatch_generation=str(event.dispatch_generation))
+        future.pop(b"dispatch_generation")
+    assert consumer.process_message(future) == "busy"
+    assert consumer.process_message(old) == "rejected"
+    assert task_id not in scheduler.recover_due_tasks().scheduled
+    with factory() as s, s.begin():
+        row = s.get(OutboxEvent, old[b"event_id"].decode())
+        row.ready_at = database_now(s) - timedelta(seconds=1)
+    assert task_id in scheduler.recover_due_tasks().scheduled
+    assert dispatcher.dispatch_pending().dispatched == 1
+    assert consumer.process_message(redis.xrange(stream)[-1][1]) == "unhandled"
+
+
+def test_obsolete_future_operation_cannot_starve_current_stage(task_factory, runtime):
+    factory, _, _, _, scheduler, _ = runtime
+    task_id = task_factory("SAVING", "TEST_ONLY_original")
+    with factory() as s, s.begin():
+        stale = s.scalar(select(OutboxEvent).where(OutboxEvent.task_id == task_id))
+        stale.ready_at = database_now(s) + timedelta(days=1)
+    assert task_id in scheduler.recover_due_tasks().scheduled
+    with factory() as s:
+        current = s.scalar(select(OutboxEvent).where(
+            OutboxEvent.task_id == task_id, OutboxEvent.operation == "save"))
+        assert current.ready_at <= database_now(s)
+
+
+def test_dispatch_mark_cannot_hide_a_concurrently_rearmed_generation(
+    task_factory, runtime, monkeypatch
+):
+    from app.dispatch.outbox import rearm_outbox
+
+    factory, redis, stream, dispatcher, _, consumer = runtime
+    task_id = task_factory()
+    original_xadd = redis.xadd
+
+    def rearm_after_send(*args, **kwargs):
+        result = original_xadd(*args, **kwargs)
+        with factory() as s, s.begin():
+            rearm_outbox(s, task_id, "submit")
+        return result
+
+    monkeypatch.setattr(redis, "xadd", rearm_after_send)
+    assert dispatcher.dispatch_pending().dispatched == 1
+    stale = redis.xrange(stream)[0][1]
+    with factory() as s:
+        row = s.get(OutboxEvent, stale[b"event_id"].decode())
+        assert row.dispatched_at is None
+        assert row.dispatch_generation == int(stale[b"dispatch_generation"]) + 1
+    assert consumer.process_message(stale) == "rejected"
+    monkeypatch.setattr(redis, "xadd", original_xadd)
+    assert dispatcher.dispatch_pending().dispatched == 1
+    assert consumer.process_message(redis.xrange(stream)[-1][1]) == "unhandled"
 
 
 def test_redis_success_then_db_mark_crash_replays_same_intent(task_factory, runtime):

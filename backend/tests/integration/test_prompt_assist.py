@@ -47,11 +47,9 @@ def assist(admission):
     c.body = {
         "agent_id": c.agent_id,
         "agent_version": "TEST_ONLY_v1",
-        "spec_id": c.spec_id,
-        "spec_version": "TEST_ONLY_v1",
         "original": "",
         "product": {"name": "cup"},
-        "parameters": {"tone": "plain"},
+        "parameters": {},
         "material_versions": [],
     }
     return c
@@ -115,16 +113,31 @@ def test_no_invented_facts(assist):
     response = post(assist)
     assert response.status_code == 200, response.text
     result = response.json()
-    assert {"material", "efficacy", "price", "promotion"} <= set(result["missing_facts"])
+    assert not {"material", "efficacy", "price", "promotion"} & set(result["missing_facts"])
     assert all(word not in result["proposed"] for word in ("陶瓷", "抗菌", "99元", "五折"))
 
 
-def test_d05_unconfirmed_blocks_live(assist):
+def test_mock_provider_does_not_enable_live_assistance(assist, monkeypatch):
+    from app.assist.provider import MockPromptAssistProvider
+
+    calls = []
+
+    async def forbidden(self, request):
+        calls.append(request)
+        raise AssertionError("Production must not fall back to the deterministic mock")
+
+    monkeypatch.setattr(MockPromptAssistProvider, "prepare", forbidden)
+    before = facts(assist)
     assist.client.app.state.settings = assist.client.app.state.settings.model_copy(
         update={"mode": "production", "test_only": False}
     )
     response = post(assist)
-    assert response.status_code == 403, response.text
+    # Live assistance requires its independently configured database model;
+    # the mock-only D-05 fixture and provider flag cannot enable it.
+    assert response.status_code == 503, response.text
+    assert response.json()["error"]["message"].startswith("AI 辅助服务暂时不可用")
+    assert calls == []
+    assert facts(assist) == before
 
 
 def test_real_mysql_identity(assist):
@@ -138,7 +151,6 @@ def test_real_mysql_identity(assist):
     "field,value,status",
     [
         ("agent_version", "stale", 409),
-        ("spec_version", "stale", 409),
         ("agent_id", "00000000-0000-0000-0000-000000000001", 422),
         ("parameters", {"tone": "unsupported"}, 422),
         (
@@ -159,7 +171,7 @@ def test_incomplete_form_is_a_draft(assist):
     response = post(assist)
     assert response.status_code == 200, response.text
     assert "name" in response.json()["missing_facts"]
-    assert "parameters.tone" in response.json()["missing_facts"]
+    assert not any(key.startswith("parameters.") for key in response.json()["missing_facts"])
     assert response.json()["parameters"] == {}
 
 
@@ -195,9 +207,23 @@ def test_incomplete_or_unimplemented_policy_rejected(assist, payload):
     assert post(assist).status_code == 403
 
 
-def test_provider_not_configured(assist):
+def test_provider_not_configured(assist, monkeypatch):
+    from app.assist.provider import MockPromptAssistProvider
+
+    calls = []
+
+    async def forbidden(self, request):
+        calls.append(request)
+        raise AssertionError("Missing configuration must not invoke a provider")
+
+    monkeypatch.setattr(MockPromptAssistProvider, "prepare", forbidden)
+    before = facts(assist)
     assist.client.app.state.settings.assist_provider = None
-    assert post(assist).status_code == 403
+    response = post(assist)
+    assert response.status_code == 503, response.text
+    assert response.json()["error"]["message"].startswith("AI 辅助服务暂时不可用")
+    assert calls == []
+    assert facts(assist) == before
 
 
 def test_basic_rate_limit(assist):
@@ -247,7 +273,9 @@ def test_provider_outside_transaction_and_authoritative_recheck(assist, monkeypa
                     {"u": assist.user},
                 )
             else:
-                conn.execute(text("DELETE FROM spec_heads WHERE spec_id=:s"), {"s": assist.spec_id})
+                conn.execute(
+                    text("DELETE FROM agent_heads WHERE agent_id=:s"), {"s": assist.agent_id}
+                )
         return await original(self, request)
 
     monkeypatch.setattr(MockPromptAssistProvider, "prepare", change_during_wait)
@@ -385,8 +413,11 @@ def test_completed_retry_skips_provider_and_rate_budget(assist, monkeypatch):
     assert post(assist).status_code == 429
 
 
-@pytest.mark.parametrize("kind,focus", [("image", "构图"), ("video", "镜头")])
-def test_draft_uses_selected_agent_capability(assist, monkeypatch, kind, focus):
+@pytest.mark.parametrize(
+    "kind,focus,other_focus",
+    [("image", "突出主体", "镜头"), ("video", "镜头", "简洁背景")],
+)
+def test_draft_uses_selected_agent_capability(assist, monkeypatch, kind, focus, other_focus):
     # Publish another real Agent instead of mutating the provider's kind in memory.
     from test_catalog_quotes import CatalogFixture
 
@@ -401,10 +432,11 @@ def test_draft_uses_selected_agent_capability(assist, monkeypatch, kind, focus):
     monkeypatch.setattr(c.client, "post", publish_kind)
     c.publish()
     body = deepcopy(assist.body)
-    body.update(agent_id=c.agent_id, spec_id=c.spec_id)
+    body.update(agent_id=c.agent_id)
     response = post(assist, body)
     assert response.status_code == 200, response.text
     assert focus in response.json()["proposed"]
+    assert other_focus not in response.json()["proposed"]
     assert "脚本产品" not in response.json()["proposed"]
 
 

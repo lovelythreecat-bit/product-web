@@ -13,8 +13,9 @@ from sqlalchemy import select
 
 from app.conversations.models import Message
 from app.dispatch.consumer import LeaseManager
-from app.dispatch.recovery import database_now
-from app.ledger.service import lock_task_resources, release_credits, settle_credits
+from app.dispatch.recovery import TERMINAL_STATES, automatic_recovery_blocked, database_now
+from app.ledger.service import lock_task_resources, settle_credits
+from app.operations.telemetry import stage_diagnostic
 from app.results.models import ResultManifestRecord
 from app.storage.capacity import finalize_capacity
 from app.storage.models import File, FileRef
@@ -98,6 +99,7 @@ class ResultPublisher:
         return {
             "work_ids": [work_id],
             "manifest_id": delivery.manifest_id,
+            **({"warnings": list(delivery.warnings)} if delivery.warnings else {}),
             "items": [
                 dict(
                     item_key=i.item_key,
@@ -317,6 +319,27 @@ class ResultPublisher:
                 self.leases.release(lease)
 
     def handle(self, context):
+        # Snapshot scalar state without taking account/resource locks. A handler
+        # returning None may have progressed, or may only have observed a wait.
+        with self.factory() as session:
+            task = session.get(GenerationTask, context.task_id)
+            before = task.state, task.state_version
+        result = self._handle(context)
+        with self.factory() as session:
+            task = session.get(GenerationTask, context.task_id)
+            if task.state not in TERMINAL_STATES:
+                if automatic_recovery_blocked(task):
+                    stage_diagnostic(stage="publish", task_id=task.id,
+                                     state_version=task.state_version, action=context.action,
+                                     lease=context.lease, code=task.investigation_reason,
+                                     outcome="wait")
+                elif before == (task.state, task.state_version):
+                    stage_diagnostic(stage="publish", task_id=task.id,
+                                     state_version=task.state_version, action=context.action,
+                                     lease=context.lease, code="NO_PROGRESS", outcome="no_progress")
+        return result
+
+    def _handle(self, context):
         upstream = self.persistence.upstream
         reference = upstream.pending_failure(context.task_id)
         if not reference and context.action != "save_original":
@@ -332,8 +355,11 @@ class ResultPublisher:
         if reference:
             with self.factory() as session, session.begin():
                 self.install_verifiers(session)
-                return release_credits(
-                    session, context.task_id, TransitionEvidence(context.lease, reference)
+                task, _, _ = lock_task_resources(session, context.task_id)
+                task.investigation_reason = None
+                return transition_task(
+                    session, task.id, task.state_version, "FAILED",
+                    TransitionEvidence(context.lease, reference),
                 )
         with self.factory() as session:
             state = session.get(GenerationTask, context.task_id).state

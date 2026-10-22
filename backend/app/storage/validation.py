@@ -20,6 +20,11 @@ TYPES = {
     "MP4": ("video/mp4", {".mp4"}),
 }
 
+# Covers the supported 30-second, 30-fps full-HD video in either orientation.
+# Image animation limits stay separate. Native decoding remains time/memory
+# bounded in _decoder.py, with per-frame and frame-count limits below.
+MAX_VIDEO_DECODED_PIXELS = 2_000_000_000
+
 
 class FileValidationError(HTTPException):
     def __init__(self, reason="format"):
@@ -103,7 +108,7 @@ def decode_content(path, display_name, declared_mime, allowed_types):
                     for frame in packet.decode():
                         frames += 1
                         total_pixels += getattr(frame, "width", 0) * getattr(frame, "height", 0)
-                        if total_pixels > 200_000_000:
+                        if total_pixels > MAX_VIDEO_DECODED_PIXELS:
                             raise ValueError()
                         # Decoder resource guard, independent from configurable business bytes.
                         if frames > 36000 or (

@@ -23,4 +23,6 @@ class OutboxEvent(Base):
     operation: Mapped[str] = mapped_column(String(32))
     ready_at: Mapped[datetime] = mapped_column(DATETIME(fsp=6), index=True)
     attempts: Mapped[int] = mapped_column(BigInteger, default=0)
+    dispatch_generation: Mapped[int] = mapped_column(BigInteger, default=1, server_default="1")
+    claimed_generation: Mapped[int] = mapped_column(BigInteger, default=0, server_default="0")
     dispatched_at: Mapped[datetime | None] = mapped_column(DATETIME(fsp=6))

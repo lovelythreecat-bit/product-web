@@ -9,6 +9,14 @@ from sqlalchemy.orm import Mapped, mapped_column
 from app.db import Base
 
 
+class UpstreamExecutionPool(Base):
+    """Shared, crash-expiring synchronous execution slots; tasks remain the queue."""
+
+    __tablename__ = "upstream_execution_pools"
+    scope_key: Mapped[str] = mapped_column(String(64), primary_key=True)
+    holders: Mapped[dict] = mapped_column(JSON, nullable=False)
+
+
 class UpstreamAttempt(Base):
     __tablename__ = "upstream_attempts"
     __table_args__ = (Index("ix_upstream_attempt_task", "task_id", "created_at"),)
@@ -30,7 +38,10 @@ class UpstreamAttempt(Base):
 
 class UpstreamEvidence(Base):
     __tablename__ = "upstream_evidence"
-    __table_args__ = (Index("ix_upstream_evidence_task", "task_id", "created_at"),)
+    __table_args__ = (
+        Index("ix_upstream_evidence_task", "task_id", "created_at"),
+        Index("ix_upstream_evidence_task_kind_time", "task_id", "kind", "created_at"),
+    )
     id: Mapped[str] = mapped_column(String(36), primary_key=True)
     task_id: Mapped[str] = mapped_column(ForeignKey("generation_tasks.id"))
     attempt_id: Mapped[str | None] = mapped_column(ForeignKey("upstream_attempts.id"))
@@ -67,4 +78,21 @@ class AgentEventDecision(Base):
     task_id: Mapped[str] = mapped_column(ForeignKey("generation_tasks.id"), index=True)
     disposition: Mapped[str] = mapped_column(String(32))
     fencing_token: Mapped[int | None] = mapped_column(BigInteger)
+    created_at: Mapped[datetime] = mapped_column(DATETIME(fsp=6))
+
+
+class ObservationImport(Base):
+    """Append-only disposition of one immutable source under one verifier context."""
+
+    __tablename__ = "observation_imports"
+    __table_args__ = (
+        Index("ix_observation_import_variant", "task_id", "context_digest", "fingerprint"),
+    )
+    source_ref: Mapped[str] = mapped_column(ForeignKey("upstream_evidence.id"), primary_key=True)
+    context_digest: Mapped[str] = mapped_column(String(64), primary_key=True)
+    task_id: Mapped[str] = mapped_column(ForeignKey("generation_tasks.id"))
+    fingerprint: Mapped[str] = mapped_column(String(64))
+    rule_version: Mapped[str] = mapped_column(String(64))
+    disposition: Mapped[str] = mapped_column(String(32))
+    event_ref: Mapped[str | None] = mapped_column(ForeignKey("agent_events.id"))
     created_at: Mapped[datetime] = mapped_column(DATETIME(fsp=6))

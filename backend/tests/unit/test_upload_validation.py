@@ -3,6 +3,8 @@
 import asyncio
 import io
 import os
+import shutil
+import subprocess
 from pathlib import Path
 from uuid import uuid4
 
@@ -62,6 +64,33 @@ def test_complete_video_decoding_and_truncated_container_rejection(tmp_path):
     path.write_bytes(data)
     assert validate_content(path, "video.mp4", "video/mp4", ["video/mp4"]) == "video/mp4"
     path.write_bytes(data[:-20])
+    with pytest.raises(HTTPException):
+        validate_content(path, "video.mp4", "video/mp4", ["video/mp4"])
+
+
+def full_hd_video(tmp_path, width, height, seconds):
+    ffmpeg = shutil.which("ffmpeg")
+    if ffmpeg is None:
+        pytest.skip("FFmpeg is required for actual full-HD video validation")
+    path = tmp_path / "full-hd.mp4"
+    subprocess.run(
+        [ffmpeg, "-v", "error", "-f", "lavfi", "-i",
+         f"color=c=white:s={width}x{height}:r=30:d={seconds}", "-an",
+         "-c:v", "libx264", "-preset", "ultrafast", "-crf", "35",
+         "-threads", "1", "-pix_fmt", "yuv420p", "-y", str(path)],
+        capture_output=True, check=True, timeout=30,
+    )
+    return path
+
+
+@pytest.mark.parametrize("width,height,seconds", [(1080, 1920, 5), (1920, 1080, 30)])
+def test_supported_full_hd_video_is_completely_decoded(tmp_path, width, height, seconds):
+    path = full_hd_video(tmp_path, width, height, seconds)
+    assert validate_content(path, "video.mp4", "video/mp4", ["video/mp4"]) == "video/mp4"
+
+
+def test_video_above_the_decoded_pixel_budget_is_still_rejected(tmp_path):
+    path = full_hd_video(tmp_path, 1920, 1080, 35)
     with pytest.raises(HTTPException):
         validate_content(path, "video.mp4", "video/mp4", ["video/mp4"])
 

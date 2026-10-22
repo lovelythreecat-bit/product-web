@@ -12,3 +12,20 @@ def isolate_app_environment(monkeypatch):
     for name in tuple(os.environ):
         if name.upper().startswith("APP_"):
             monkeypatch.delenv(name)
+
+
+@pytest.fixture
+def operations_log_capture(caplog):
+    """Capture operations logs even after application logging disables propagation."""
+    from app.operations.telemetry import logger
+
+    original_handlers = list(logger.handlers)
+    original_propagate = logger.propagate
+    try:
+        logger.addHandler(caplog.handler)
+        # Capture directly once, regardless of the root logger's pytest handlers.
+        logger.propagate = False
+        yield caplog
+    finally:
+        logger.handlers[:] = original_handlers
+        logger.propagate = original_propagate

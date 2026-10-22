@@ -204,12 +204,12 @@ def read_registration_credit_config(session, mode):
 
 
 def set_registration_credit_config(
-    session, *, mode, expected_version, amount, policy_version, reason, actor=None
+    session, *, mode, expected_version, amount, policy_version, actor=None, reason=None
 ):
     """Internal repository operation; T19 must authorize its management caller."""
     amount_valid(amount)
-    if not reason.strip() or len(reason) > 500:
-        raise HTTPException(422)
+    # Retain historical storage/audit columns without requiring an editable reason.
+    reason = "更新注册赠送配置"
     policies = PolicyService(session)
     policies.require_feature("registration", mode, {"D-05": policy_version})
     policy = policies._read("D-05", policy_version)

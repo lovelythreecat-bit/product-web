@@ -1,6 +1,6 @@
 import { expect, test } from '@playwright/test'
 import { writeFile } from 'node:fs/promises'
-import { runtime, registerUI, productUI, uploadUI, confirmUI, account, taskDetail } from './workspace-support'
+import { runtime, registerUI, chooseAgentUI, productUI, uploadUI, confirmUI, account, taskDetail } from './workspace-support'
 
 test('regenerate_missing_material retains original and requires new fixed upload, quote and intent', async ({ page }, info) => {
   test.setTimeout(120000)
@@ -8,11 +8,10 @@ test('regenerate_missing_material retains original and requires new fixed upload
   await registerUI(page, meta.account_prefix + 'material_')
   const posts: any[] = []
   page.on('request', r => { if (new URL(r.url()).pathname === '/api/v1/tasks' && r.method() === 'POST') posts.push({ body: r.postDataJSON(), key: r.headers()['idempotency-key'] }) })
-  await page.getByLabel('选择 Agent').selectOption(meta.agents.image)
+  await chooseAgentUI(page, meta.agents.image, 'image')
   await productUI(page); await uploadUI(page)
-  await page.getByLabel('图片用途').selectOption('主图')
   await page.getByLabel('创作指令', { exact: true }).fill('保留原商品主体')
-  await (await confirmUI(page, 20)).getByRole('button', { name: '同意并冻结积分', exact: true }).click()
+  await (await confirmUI(page, 20)).getByRole('button', { name: '确认并冻结积分', exact: true }).click()
   await expect(page.locator('[data-task-id]')).toHaveCount(1)
   const id = (await page.locator('[data-task-id]').getAttribute('data-task-id'))!
   await command('/register', { task_id: id, paused: true })
@@ -21,17 +20,17 @@ test('regenerate_missing_material retains original and requires new fixed upload
   const source = await page.evaluate(async id => { const w = '/src/api/works.ts', f = '/src/api/files.ts'; const work = await (await import(w)).getWork(id); const receipt = await (await import(f)).deleteFile(work.source.input.material_versions[0].file_id, { policy_version: work.source.policy_versions['D-09'] }); return { work, receipt } }, original.work_ids[0])
   await page.getByRole('link', { name: '我的作品', exact: true }).click()
   await page.getByRole('button', { name: '重新生成', exact: true }).click()
-  await expect(page.getByRole('heading', { name: '准备本次创作' })).toBeVisible()
+  await expect(page.getByRole('heading', { name: '创作工作台' })).toBeVisible()
   await expect(page.getByText(/来源素材已不可用/).first()).toBeVisible()
   await expect(page.getByLabel('创作指令', { exact: true })).toHaveValue('保留原商品主体')
-  await expect(page.getByLabel('图片用途')).toHaveValue('主图')
+  await expect(page.locator('.settings-disclosure')).toHaveCount(0)
   const before = await account(page)
   await page.getByRole('button', { name: '确认费用并生成' }).click()
   expect(posts).toHaveLength(1)
   expect(await account(page)).toEqual(before)
   await expect(page.locator('[data-task-id]')).toHaveCount(0)
   await uploadUI(page)
-  await (await confirmUI(page, 20)).getByRole('button', { name: '同意并冻结积分', exact: true }).click()
+  await (await confirmUI(page, 20)).getByRole('button', { name: '确认并冻结积分', exact: true }).click()
   await expect(page.locator('[data-task-id]')).toHaveCount(1)
   const newId = (await page.locator('[data-task-id]').getAttribute('data-task-id'))!
   expect(newId).not.toBe(id); expect(posts).toHaveLength(2); expect(posts[1].key).not.toBe(posts[0].key)

@@ -60,18 +60,20 @@ class ResourceGrant:
 
 
 def authorize_admin(session, principal, *, user_ids=()):
-    """Start with sorted user locks before sessions/accounts/resources.
+    """Mutations start with sorted user locks before sessions/accounts/resources.
 
     Mutation routes release dependency authentication locks before calling this.
+    Read requests keep live role/session checks without holding account write locks.
     The live database role, not the incoming Principal role, is authoritative.
     """
-    for user_id in sorted({str(principal.user_id), *map(str, user_ids)}):
-        session.scalar(
-            select(User)
-            .where(User.id == user_id)
-            .with_for_update()
-            .execution_options(populate_existing=True)
-        )
+    if not getattr(session, "info", {}).get("read_only_request", False):
+        for user_id in sorted({str(principal.user_id), *map(str, user_ids)}):
+            session.scalar(
+                select(User)
+                .where(User.id == user_id)
+                .with_for_update()
+                .execution_options(populate_existing=True)
+            )
     CatalogService(session)._principal(principal, admin=True)
 
 

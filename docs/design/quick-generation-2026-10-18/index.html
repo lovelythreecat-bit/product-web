@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>映作 · 快速生成原型 V1.1</title>
+  <link rel="stylesheet" href="prototype.css">
+</head>
+<body>
+  <div class="review-bar"><span>原型评审 V1.1 · 字段对齐现有工作台 · 数据均为示例</span><a href="#product">从第一步查看</a><a href="#entry">查看工作台入口</a><button id="demo-error">演示生成失败</button></div>
+  <header class="app-header">
+    <a class="brand" href="#entry"><img src="assets/brand-mark.svg" alt=""><strong>映作</strong></a>
+    <nav aria-label="主导航"><a href="#entry" aria-current="page">创作工作台</a><button data-notice="作品将沿用现有我的作品页面。">我的作品</button><button data-notice="个人中心沿用现有页面。">个人中心</button></nav>
+    <div class="account"><span class="avatar">林</span><span>林小满</span></div>
+  </header>
+  <div class="shell">
+    <aside class="sidebar">
+      <button class="button secondary new-task" data-action="entry"><i data-icon="plus"></i>新建任务</button>
+      <a class="button primary quick-entry" href="#product"><i data-icon="spark"></i>快速生成</a>
+      <div class="recent-heading">最近任务 <span>3</span></div>
+      <div class="recent active"><i data-icon="layers"></i><div><strong>黑色头戴式耳机</strong><small>快速生成 · 进行中</small></div></div>
+      <div class="recent"><i data-icon="file"></i><div><strong>奶油色休闲运动鞋</strong><small>生成成功 · 今天 10:26</small></div></div>
+      <div class="recent"><i data-icon="image"></i><div><strong>纯棉连帽卫衣</strong><small>生成成功 · 昨天 16:40</small></div></div>
+      <div class="balance"><span>可用积分</span><strong>920<small>积分</small></strong><div>冻结 0 <button data-notice="充值沿用现有充值说明页。">充值积分 <i data-icon="arrow"></i></button></div></div>
+    </aside>
+    <main id="main">
+      <div class="page-top"><div class="page-title"><h1>创作工作台</h1><span class="mode-tag">快速生成</span></div><button class="button quiet" data-action="exit"><i data-icon="save"></i>保存并退出</button></div>
+      <div class="mobile-history"><label for="recent-task">最近任务</label><select id="recent-task" class="control"><option>黑色头戴式耳机 · 快速生成</option><option>奶油色休闲运动鞋 · 今天 10:26</option><option>纯棉连帽卫衣 · 昨天 16:40</option></select><a class="button" href="#entry">新建任务</a></div>
+      <section class="wizard" aria-label="快速生成">
+        <ol class="stepper" id="stepper"></ol>
+        <div class="wizard-body"><section class="content" id="content" aria-live="polite"></section><aside class="context" id="context"></aside></div>
+        <footer class="wizard-footer" id="footer"></footer>
+      </section>
+    </main>
+  </div>
+  <dialog id="overlay" aria-labelledby="overlay-title"><div id="overlay-content"></div></dialog>
+  <div class="toast" id="toast" role="status" hidden></div>
+  <input id="upload" type="file" accept="image/*" multiple hidden>
+  <script src="field-contract.js"></script>
+  <script src="prototype.js"></script>
+</body>
+</html>

@@ -4,7 +4,7 @@ from collections.abc import Mapping
 from enum import StrEnum
 from typing import Any, Literal, Protocol, runtime_checkable
 
-from pydantic import BaseModel, ConfigDict, Field, model_validator
+from pydantic import BaseModel, ConfigDict, Field, StrictStr, model_validator
 
 
 class Contract(BaseModel):
@@ -75,6 +75,9 @@ class ResultManifest(Contract):
     complete: bool
     expected_items: int = Field(ge=1)
     items: tuple[ResultItem, ...]
+    # Omit empty metadata so persisted historical receipts keep their exact
+    # serialization and digest when read by a newer worker.
+    warnings: tuple[StrictStr, ...] = Field(default=(), exclude_if=lambda value: not value)
 
     @model_validator(mode="after")
     def complete_delivery(self):
@@ -109,11 +112,19 @@ class Outcome(Contract):
 
 class SubmitOutcome(Outcome):
     status: Literal["ACCEPTED", "COMPLETED", "UNKNOWN", "REJECTED", "UNSUPPORTED",
-                    "PROVEN_NOT_ACCEPTED"]
+                    "PROVEN_NOT_ACCEPTED", "RATE_LIMITED"]
     result: ResultManifest | None = None
+    retry_after_seconds: int | None = Field(default=None, ge=1, le=3600,
+                                           exclude_if=lambda value: value is None)
 
     @model_validator(mode="after")
     def accepted_identity(self):
+        if self.status == "RATE_LIMITED" and (
+            self.upstream_task_id or self.result or self.retry_after_seconds is None
+            or self.protocol_version not in {"text-agent-v1", "image-agent-v1"}
+            or self.test_only
+        ):
+            raise ValueError("Rate limit requires explicit unaccepted text response")
         if self.status == "ACCEPTED" and not self.upstream_task_id:
             raise ValueError("Accepted asynchronous submission requires a task id")
         if self.status == "COMPLETED" and (self.result is None or not self.result.complete):
@@ -122,14 +133,24 @@ class SubmitOutcome(Outcome):
 
 
 class QueryOutcome(Outcome):
-    status: Literal["FOUND", "UNSUPPORTED", "NOT_FOUND", "UNAVAILABLE", "PROVEN_NOT_ACCEPTED"]
+    status: Literal["FOUND", "NEEDS_INPUT", "UNSUPPORTED", "NOT_FOUND", "UNAVAILABLE",
+                    "PROVEN_NOT_ACCEPTED"]
     state: Literal["RUNNING", "RESULT_READY", "FAILED"] | None = None
     result: ResultManifest | None = None
+    diagnostic_reason: Literal["UPSTREAM_NEEDS_INPUT"] | None = Field(
+        default=None, exclude_if=lambda value: value is None,
+    )
 
     @model_validator(mode="after")
     def found_identity(self):
         if self.status == "FOUND" and (not self.upstream_task_id or self.state is None):
             raise ValueError("Found task requires identity and state")
+        if self.status == "NEEDS_INPUT" and (
+            not self.upstream_task_id or self.state is not None or self.result is not None
+        ):
+            raise ValueError("Input wait requires identity without a result or terminal state")
+        if self.diagnostic_reason is not None and self.status != "NEEDS_INPUT":
+            raise ValueError("Input wait reason requires NEEDS_INPUT")
         return self
 
 

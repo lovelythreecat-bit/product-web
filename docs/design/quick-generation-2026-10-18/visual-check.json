@@ -1,0 +1,60 @@
+[
+  {
+    "viewport": [
+      1440,
+      1000
+    ],
+    "name": "desktop",
+    "checks": [
+      "01-entry",
+      "02-product",
+      "02-product-edit",
+      "all-10-product-types-match-existing-fields-and-labels",
+      "text-6-existing-settings-plus-existing-instruction",
+      "02-charge",
+      "03-copy",
+      "04-image-select",
+      "05-image-results",
+      "06-video",
+      "video-first-frame-uploaded-materials-only",
+      "07-video-plan",
+      "07-video-plan-details",
+      "video-plan-existing-readonly-fields",
+      "08-complete",
+      "local-prototype-draft-restored",
+      "09-failure",
+      "failure-retry-existing-freeze-or-explicit-release"
+    ],
+    "errors": [],
+    "scope": "Static review prototype only. No real generation or billing."
+  },
+  {
+    "viewport": [
+      390,
+      844
+    ],
+    "name": "mobile",
+    "checks": [
+      "01-entry",
+      "02-product",
+      "02-product-edit",
+      "all-10-product-types-match-existing-fields-and-labels",
+      "text-6-existing-settings-plus-existing-instruction",
+      "02-charge",
+      "03-copy",
+      "04-image-select",
+      "05-image-results",
+      "06-video",
+      "video-first-frame-uploaded-materials-only",
+      "07-video-plan",
+      "07-video-plan-details",
+      "video-plan-existing-readonly-fields",
+      "08-complete",
+      "local-prototype-draft-restored",
+      "09-failure",
+      "failure-retry-existing-freeze-or-explicit-release"
+    ],
+    "errors": [],
+    "scope": "Static review prototype only. No real generation or billing."
+  }
+]

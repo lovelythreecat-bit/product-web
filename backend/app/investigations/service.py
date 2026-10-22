@@ -17,10 +17,21 @@ from app.dispatch.outbox import enqueue_outbox
 from app.dispatch.recovery import TERMINAL_STATES, database_now
 from app.investigations.models import Investigation, InvestigationAlert, Resolution
 from app.ledger.service import lock_task_resources, release_credits
+from app.operations.telemetry import stage_diagnostic
 from app.policies.schemas import InvestigationPolicy
 from app.policies.service import PolicyGateError, PolicyService
 from app.tasks.models import GenerationTask, TaskSnapshot, TaskStateEvent
 from app.tasks.state_machine import TransitionError, TransitionEvidence, VerifiedTransition
+
+
+def running_watchdog_due(task, started, current, policy):
+    """An exact policy deadline invites review, never proves an upstream failure."""
+    return (
+        task.state == "RUNNING"
+        and policy is not None
+        and started + timedelta(seconds=policy.deadline_seconds) <= current
+        and (task.lease_expires_at is None or task.lease_expires_at <= current)
+    )
 
 
 class InvestigationService:
@@ -351,7 +362,9 @@ class InvestigationService:
         """Bounded operational sweep; no upstream I/O, money change or automatic failure."""
         with self.factory() as session:
             query = select(GenerationTask.id).where(
-                GenerationTask.state.in_(["INVESTIGATING", "SAVE_RECOVERY", *TERMINAL_STATES])
+                GenerationTask.state.in_(
+                    ["RUNNING", "INVESTIGATING", "SAVE_RECOVERY", *TERMINAL_STATES]
+                )
             )
             if task_ids is not None:
                 query = query.where(GenerationTask.id.in_(task_ids))
@@ -382,14 +395,48 @@ class InvestigationService:
                     if initial_policy
                     else None
                 )
+                busy = False
                 for uid in sorted({identity.user_id, *([candidate] if candidate else [])}):
-                    session.scalar(
+                    user = session.scalar(
                         select(User)
                         .where(User.id == uid)
-                        .with_for_update()
+                        .with_for_update(skip_locked=True)
                         .execution_options(populate_existing=True)
                     )
+                    if user is None:
+                        busy = True
+                        break
+                if busy:
+                    # This recurring maintenance sweep must not wait behind task/API
+                    # transactions and starve this Worker's Redis consumer heartbeat.
+                    # Leaving the transaction releases any earlier user locks; retry
+                    # this task on the next sweep with the normal ordered lock set.
+                    continue
                 task, _, _ = lock_task_resources(session, task_id)
+                # Recheck after acquiring the task lock: a callback can advance
+                # the task since the bounded candidate query above.
+                if task.state not in {"RUNNING", "INVESTIGATING", "SAVE_RECOVERY",
+                                      *TERMINAL_STATES}:
+                    continue
+                running_started = None
+                if task.state == "RUNNING":
+                    running_started = session.scalar(
+                        select(TaskStateEvent.created_at).where(
+                            TaskStateEvent.task_id == task.id,
+                            TaskStateEvent.to_state == "RUNNING",
+                        ).order_by(TaskStateEvent.state_version.desc()).limit(1)
+                    ) or task.created_at
+                    if initial_policy is None:
+                        self.alert(session, task, "POLICY_BLOCKED", "operations:investigations")
+                        continue
+                    if not running_watchdog_due(
+                        task, running_started, database_now(session), initial_policy,
+                    ):
+                        continue
+                    self.alert(session, task, "STALLED_RUNNING", initial_policy.escalation_ref)
+                    stage_diagnostic(stage="investigation", task_id=task.id,
+                                     state_version=task.state_version,
+                                     code="DEADLINE_EXCEEDED", outcome="no_progress")
                 case = session.scalar(
                     select(Investigation)
                     .where(Investigation.task_id == task_id)
@@ -405,7 +452,7 @@ class InvestigationService:
                             and responsible.status == "active"
                             and responsible.role == "admin"
                         ):
-                            started = (
+                            started = running_started or (
                                 session.scalar(
                                     select(TaskStateEvent.created_at)
                                     .where(
@@ -502,7 +549,7 @@ def complete_from_task(session, task, evidence):
     case.user_reason = (
         "原任务已完成保存并结算。"
         if task.state == "SUCCEEDED"
-        else "原任务已确认失败并释放冻结积分。"
+        else "原任务已确认失败，请查看积分状态并选择后续操作。"
     )
     task.investigation_reason = case.user_reason
     session.add(

@@ -1,0 +1,22 @@
+{
+  "version": "V1",
+  "date": "2026-10-14",
+  "status": "独立高保真动效预览，待用户评阅；未接入首页组件、未公开发布",
+  "base": "已确认的首页 V3 与奶油米色、陶土橙视觉；快照来自当前本地开发首页",
+  "scope": "仅首页动效展示；不改非首页业务或 Agent 能力",
+  "motion": {
+    "hero": "标题与行动 620ms 入场；三张成果卡 6～7s 错峰上下浮动，桌面幅度 8px，手机 4px",
+    "scroll": "创作能力与品类两组单次轻入场，其余阅读区保持稳定",
+    "video": "耳机图片制作的 4.8 秒、640×640、25fps、无音轨 MP4；缓慢推近和平移，无缝循环；并非真实 AI 视频生成结果",
+    "controls": "全局暂停、重播首屏、视频独立暂停；媒体离屏或页面隐藏停止；系统减少动态效果时默认静止"
+  },
+  "assets": {
+    "source": "frontend/public/homepage/commerce-categories-v3.png 与 commerce-hero-v3.png；沿用已存在的设计样例",
+    "derived": "通过 FFmpeg 仅裁切与镜头运动生成耳机 poster 和 MP4，不重绘商品",
+    "publicLabel": "创作示例／动态创作示例",
+    "previewControls": "仅设计预览的底部工具条，正式页面实施时不纳入产品导航"
+  },
+  "previewUrl": "http://127.0.0.1:15174/",
+  "verification": "verification.json；desktop.png；mobile.png",
+  "nextStep": "用户确认具体动效预览后，再迁入首页 Vue 组件与样式；若需商品真实转动或变换镜头，应使用另行提供或生成的视频素材"
+}

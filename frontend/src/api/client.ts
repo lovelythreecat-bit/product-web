@@ -45,6 +45,20 @@ export async function request<T>(path: string, options: {method?: 'GET'|'POST'|'
   return payload as T
 }
 export function sendIntent<T, R>(path: string, intent: Intent<T>): Promise<R> { return request<R>(path, {method:'POST', body:intent.body, key:intent.key}) }
+/** Private media obeys the same identity boundary as JSON reads. */
+export async function requestBlob(path: string, options: { signal?: AbortSignal } = {}): Promise<Blob> {
+  const epoch = identityBoundary?.epoch()
+  if (!path.startsWith('/api/v1/') || path.includes('\\') || new URL(path, location.origin).origin !== location.origin) throw new ApiError('仅允许同源平台接口。')
+  let response: Response
+  try { response = await fetch(path, { headers: { Accept: 'image/*,application/octet-stream' }, signal: options.signal, credentials: 'same-origin', redirect: 'error' }) }
+  catch { throw new ApiError('图片暂时无法读取，请重试。') }
+  if (epoch !== identityBoundary?.epoch()) throw new ApiError('登录身份已变更，请重新读取。', 0, 'IDENTITY_CHANGED')
+  if (response.status === 401) identityBoundary?.unauthorized()
+  if (!response.ok) throw new ApiError('图片暂时无法读取，请重试。', response.status)
+  const blob = await response.blob()
+  if (epoch !== identityBoundary?.epoch()) throw new ApiError('登录身份已变更，请重新读取。', 0, 'IDENTITY_CHANGED')
+  return blob
+}
 export function jsonRequest<T>(path: string, method: 'POST'|'PATCH'|'DELETE', body: unknown): Promise<T> { return request<T>(path, {method, body:JSON.stringify(body)}) }
 export function query(values: Record<string, string|number|undefined>): string {
   const params = new URLSearchParams(); for (const [key,value] of Object.entries(values)) if (value !== undefined) params.set(key,String(value))

@@ -2,8 +2,10 @@
 
 from alembic import context
 
-from app.config import Settings
+from app.agents import media_connection, media_execution  # noqa: F401
+from app.config import load_runtime_settings
 from app.db import Base, create_db_engine
+from app.quick_generation import models as quick_generation_models  # noqa: F401
 
 config = context.config
 target_metadata = Base.metadata
@@ -16,7 +18,7 @@ def run_migrations(connection):
 
 
 if context.is_offline_mode():
-    settings = Settings()
+    settings = load_runtime_settings()
     if settings.database_url is None:
         raise RuntimeError("APP_DATABASE_URL is required for migrations")
     context.configure(
@@ -30,7 +32,7 @@ if context.is_offline_mode():
 elif config.attributes.get("connection") is not None:
     run_migrations(config.attributes["connection"])
 else:
-    engine = create_db_engine(Settings())
+    engine = create_db_engine(load_runtime_settings())
     if engine is None:
         raise RuntimeError("APP_DATABASE_URL is required for migrations")
     try:

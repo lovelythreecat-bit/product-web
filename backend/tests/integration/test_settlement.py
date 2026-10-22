@@ -120,7 +120,7 @@ def failure(runtime, client):
 
 
 @pytest.mark.parametrize("has_store", [True, False])
-def test_actual_worker_releases_trusted_failure(
+def test_actual_worker_retains_failed_hold_until_owner_choice(
     upstream, callbacks, tmp_path, redis_namespace, has_store
 ):
     from app.storage.local_store import LocalStore
@@ -140,7 +140,17 @@ def test_actual_worker_releases_trusted_failure(
         store=LocalStore(tmp_path) if has_store else None,
     )
     assert worker.tick()[2].failed == 0
-    assert_facts(upstream, task, "FAILED")
+    with upstream[0]() as session:
+        row = session.get(GenerationTask, task)
+        reservation = session.scalar(select(CreditReservation).where(
+            CreditReservation.task_id == task))
+        account = session.get(CreditAccount, row.user_id)
+        assert row.state == "FAILED" and row.settlement_state == "FROZEN"
+        assert reservation.state == "frozen"
+        assert (account.available, account.frozen, account.consumed) == (70, 30, 0)
+        assert not session.scalars(select(CreditLedger).where(
+            CreditLedger.task_id == task, CreditLedger.kind.in_(["release", "consume"]),
+        )).all()
     before = calls(upstream, task)
     assert publisher(upstream, tmp_path).run(task) is None
     assert calls(upstream, task) == before

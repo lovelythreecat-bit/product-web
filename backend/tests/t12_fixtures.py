@@ -35,7 +35,8 @@ def upstream(mysql_engine, redis_namespace, ledger_task, monkeypatch):
     service = UpstreamService(factory, registry)
     owned = []
 
-    def create(scenario="normal", kind="copy", agent_identity=None):
+    def create(scenario="normal", kind="copy", agent_identity=None, *,
+               snapshot_transform=None, endpoint=None, secret_ref=None):
         task_id, user_id = str(uuid4()), str(uuid4())
         with Session(mysql_engine) as s, s.begin():
             s.add(
@@ -73,6 +74,8 @@ def upstream(mysql_engine, redis_namespace, ledger_task, monkeypatch):
                     policy_versions={},
                     secret_configured=False,
                 )
+                if snapshot_transform:
+                    snapshot_transform(connection, target)
 
             def identity_before_insert(mapper, connection, target):
                 if agent_identity:
@@ -93,7 +96,8 @@ def upstream(mysql_engine, redis_namespace, ledger_task, monkeypatch):
                         agent_id=task.agent_id,
                         version=task.agent_version,
                         snapshot=snapshot,
-                        endpoint=url,
+                        endpoint=endpoint or url,
+                        secret_ref=secret_ref,
                     )
                 )
             external = task.external_submission_id

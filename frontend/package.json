@@ -14,10 +14,13 @@
     "typecheck": "vue-tsc --noEmit",
     "test": "vitest run",
     "test:e2e": "playwright test",
+    "test:ui": "playwright test --config=playwright.ui.config.ts",
     "contracts:generate": "node scripts/contracts.mjs",
     "contracts:check": "node scripts/contracts.mjs --check"
   },
   "dependencies": {
+    "echarts": "6.1.0",
+    "element-plus": "2.14.7",
     "vue": "3.5.43",
     "vue-router": "4.6.4"
   },

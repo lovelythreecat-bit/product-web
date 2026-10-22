@@ -12,6 +12,7 @@ from fastapi import HTTPException
 from sqlalchemy import or_, select
 
 from app.audit.models import AuditEvent
+from app.auth.models import User
 from app.conversations.service import authenticate
 from app.ledger.service import now
 from app.policies.schemas import DeletePolicy
@@ -72,6 +73,7 @@ def task_protection(session, file, *, inflight_only):
         )
         if (matched or ref) and (
             not inflight_only or task.state not in ("SUCCEEDED", "FAILED", "MANUALLY_CLOSED")
+            or task.state == "FAILED" and task.settlement_state == "FROZEN"
         ):
             return True
         # Original capacity/save identities survive manual closure and credit release.
@@ -81,6 +83,14 @@ def task_protection(session, file, *, inflight_only):
 
 
 def retained(session, file):
+    if session.scalar(
+        select(User.id).where(
+            User.id == file.user_id,
+            User.avatar_file_id == file.id,
+            User.avatar_file_version == file.version,
+        )
+    ):
+        return True
     if task_protection(session, file, inflight_only=False):
         return True
     if session.scalar(select(FileRef.id).where(FileRef.file_id == file.id).with_for_update()):
@@ -145,6 +155,11 @@ class LifecycleService:
         return {"id": file.id, "deleted": True, "policy_version": policy_version}
 
     def _delete_file(self, principal, file, version):
+        # authenticate/lock_capacity already locks this owner. A concurrent
+        # profile update cannot bind the file while deletion holds that lock.
+        owner = self.session.get(User, file.user_id)
+        if owner and (owner.avatar_file_id, owner.avatar_file_version) == (file.id, file.version):
+            raise HTTPException(409)
         if file.deleted_at is not None:
             if file.deletion_policy_version != version:
                 raise HTTPException(409)

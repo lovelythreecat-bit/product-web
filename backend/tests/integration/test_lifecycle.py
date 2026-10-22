@@ -709,8 +709,6 @@ def stream_work(published, upstream, ready, tmp_path, monkeypatch):
     task_id = ready(kind="image", policies=policy_limits)
     with upstream[0]() as s, s.begin():
         uid = s.get(GenerationTask, task_id).user_id
-        # Only this fixture's newly created account, not a historical fixture/policy.
-        s.get(StorageAccount, uid).quota_bytes = 1000000
     assert publisher(upstream, tmp_path).run(task_id).state == "SUCCEEDED"
     client, _, login = published
     login(uid)

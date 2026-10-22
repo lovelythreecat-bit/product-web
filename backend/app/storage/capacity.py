@@ -2,7 +2,8 @@
 
 Lock order: user -> pool -> account -> reservation. Callers combining credits must
 lock credits before entering this service, and tasks after locking capacity.
-Existing pool/account limits are never silently reconfigured by a new version.
+Software account quotas and server budgets are retired; disk probes run under
+the shared pool lock so concurrent reservations cannot overbook actual free bytes.
 """
 
 from datetime import UTC, datetime, timedelta
@@ -47,7 +48,6 @@ def lock_capacity(session, user_id, pool_id, policy=None, policy_version=None):
             insert(StoragePool)
             .values(
                 id=pool_id,
-                budget_bytes=policy.server_budget_bytes,
                 reserved_bytes=0,
                 actual_bytes=0,
                 policy_version=policy_version,
@@ -62,7 +62,6 @@ def lock_capacity(session, user_id, pool_id, policy=None, policy_version=None):
         account = StorageAccount(
             user_id=user_id,
             pool_id=pool_id,
-            quota_bytes=policy.account_quota_bytes,
             reserved_bytes=0,
             actual_bytes=0,
             policy_version=policy_version,
@@ -71,15 +70,12 @@ def lock_capacity(session, user_id, pool_id, policy=None, policy_version=None):
         session.flush()
     if account is None or account.pool_id != pool_id:
         raise PolicyGateError()
-    if policy is not None and (
-        pool.budget_bytes != policy.server_budget_bytes
-        or account.quota_bytes != policy.account_quota_bytes
-    ):
-        raise PolicyGateError()
     return pool, account
 
 
-def reserve_capacity(session, user_id, intent_id, estimated_bytes, policy_version, *, mode="mock"):
+def reserve_capacity(
+    session, user_id, intent_id, estimated_bytes, policy_version, *, mode="mock", free_bytes=None
+):
     valid_bytes(estimated_bytes)
     if not isinstance(intent_id, str) or not 1 <= len(intent_id) <= 128:
         raise HTTPException(422)
@@ -100,11 +96,11 @@ def reserve_capacity(session, user_id, intent_id, estimated_bytes, policy_versio
         if (existing.estimated_bytes, existing.policy_version) != (estimated_bytes, policy_version):
             raise StorageError("IDEMPOTENCY_CONFLICT")
         return existing
-    if (
-        estimated_bytes > pool.budget_bytes - pool.actual_bytes - pool.reserved_bytes
-        or estimated_bytes > account.quota_bytes - account.actual_bytes - account.reserved_bytes
-    ):
-        raise StorageError()
+    if free_bytes is not None:
+        available = free_bytes()
+        valid_bytes(available, zero=True)
+        if estimated_bytes > available - pool.reserved_bytes:
+            raise StorageError()
     pool.reserved_bytes += estimated_bytes
     account.reserved_bytes += estimated_bytes
     reservation = CapacityReservation(
@@ -140,6 +136,31 @@ def reservation_locks(session, reservation_id):
     return pool, account, reservation
 
 
+def ensure_reserved_capacity(session, reservation_id, required_bytes, *, free_bytes):
+    """Protect a larger manifest before download under canonical capacity locks.
+
+    Existing reservations share the same disk probe as admission. Repeated or
+    smaller manifests retain the original protected bytes without reserving twice.
+    Caller owns the transaction and must commit before writing the added bytes.
+    """
+    valid_bytes(required_bytes, zero=True)
+    pool, account, reservation = reservation_locks(session, reservation_id)
+    if reservation.state != "reserved":
+        raise StorageError("IDEMPOTENCY_CONFLICT")
+    delta = max(0, required_bytes - reservation.estimated_bytes)
+    if not delta:
+        return reservation
+    available = free_bytes()
+    valid_bytes(available, zero=True)
+    if delta > available - pool.reserved_bytes:
+        raise StorageError()
+    pool.reserved_bytes += delta
+    account.reserved_bytes += delta
+    reservation.estimated_bytes += delta
+    session.flush()
+    return reservation
+
+
 def finalize_capacity(session, reservation_id, actual_bytes):
     valid_bytes(actual_bytes, zero=True)
     pool, account, reservation = reservation_locks(session, reservation_id)
@@ -149,12 +170,6 @@ def finalize_capacity(session, reservation_id, actual_bytes):
         return reservation
     if reservation.state != "reserved":
         raise StorageError("IDEMPOTENCY_CONFLICT")
-    delta = actual_bytes - reservation.estimated_bytes
-    if (
-        delta > pool.budget_bytes - pool.actual_bytes - pool.reserved_bytes
-        or delta > account.quota_bytes - account.actual_bytes - account.reserved_bytes
-    ):
-        raise StorageError()
     for ledger in (pool, account):
         ledger.reserved_bytes -= reservation.estimated_bytes
         ledger.actual_bytes += actual_bytes
@@ -180,7 +195,7 @@ def retain_original_capacity(session, task):
     Called after user/credits/capacity/task locks. Save identities are committed
     before any T11 disk write; no filesystem probe or upstream I/O is needed here.
     Keep the original reservation and increase it when declared bytes exceeded its
-    estimate. Capacity exhaustion aborts the caller's entire manual settlement.
+    estimate. Already staged bytes remain accounted independently of retired quotas.
     """
     from app.results.models import ResultManifestRecord, ResultSaveItem
     from app.storage.models import File
@@ -215,11 +230,6 @@ def retain_original_capacity(session, task):
     if reservation.state != "reserved":
         raise StorageError("IDEMPOTENCY_CONFLICT")
     delta = max(0, protected_bytes - reservation.estimated_bytes)
-    if (
-        delta > pool.budget_bytes - pool.actual_bytes - pool.reserved_bytes
-        or delta > account.quota_bytes - account.actual_bytes - account.reserved_bytes
-    ):
-        raise StorageError()
     pool.reserved_bytes += delta
     account.reserved_bytes += delta
     reservation.estimated_bytes += delta

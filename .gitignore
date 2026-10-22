@@ -1,16 +1,34 @@
 # Local agent state and tool reports
 .agent-runs/
 .impeccable/
+.superpowers/
+.tmp/
 
 # Dependencies and build output
 node_modules/
 dist/
 build/
 
+# Python caches and local test output (at any depth)
+.venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+.coverage
+.coverage.*
+coverage/
+htmlcov/
+test-results/
+playwright-report/
+.cache/
+
 # Local environment and credentials
 .env
 .env.*
 !.env.example
+.local-data/
 *.pem
 *.key
 

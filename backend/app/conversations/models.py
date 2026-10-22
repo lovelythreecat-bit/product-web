@@ -14,6 +14,7 @@ from sqlalchemy import (
 from sqlalchemy.dialects.mysql import DATETIME
 from sqlalchemy.orm import Mapped, mapped_column
 
+from app.common.display_numbers import display_number_default
 from app.db import Base
 
 
@@ -21,6 +22,9 @@ class Conversation(Base):
     __tablename__ = "conversations"
     __table_args__ = (UniqueConstraint("id", "user_id", name="uq_conversation_owner"),)
     id: Mapped[str] = mapped_column(String(36), primary_key=True)
+    display_number: Mapped[str] = mapped_column(
+        String(32), unique=True, default=display_number_default("H"),
+    )
     user_id: Mapped[str] = mapped_column(ForeignKey("users.id"), index=True)
     title: Mapped[str] = mapped_column(String(200))
     created_at: Mapped[datetime] = mapped_column(DATETIME(fsp=6))

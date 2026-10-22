@@ -11,11 +11,12 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[2] / "backend"))
 
-from app.ledger.reconcile import reconcile_accounts  # noqa: E402
-from app.operations.metrics import project_metrics, validate_thresholds  # noqa: E402
 from sqlalchemy import create_engine, text  # noqa: E402
 from sqlalchemy.engine import make_url  # noqa: E402
 from sqlalchemy.orm import Session  # noqa: E402
+
+from app.ledger.reconcile import reconcile_accounts  # noqa: E402
+from app.operations.metrics import project_metrics, validate_thresholds  # noqa: E402
 
 
 @contextmanager
@@ -48,8 +49,9 @@ def main():
         validate_thresholds(thresholds)
         with readonly_session() as session:
             report = reconcile_accounts(session)
+            disk = shutil.disk_usage(root)
             metrics = project_metrics(
-                session, free_bytes=shutil.disk_usage(root).free, thresholds=thresholds
+                session, free_bytes=disk.free, total_bytes=disk.total, thresholds=thresholds
             )
             metrics["migration_heads"] = list(
                 session.execute(text("SELECT version_num FROM alembic_version")).scalars()

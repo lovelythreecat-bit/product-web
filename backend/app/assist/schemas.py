@@ -1,6 +1,6 @@
 """Draft-only public contract, independent of generation admission and billing."""
 
-from typing import Any, Literal
+from typing import Any
 from uuid import UUID
 
 from pydantic import Field, model_validator
@@ -13,8 +13,6 @@ from app.policies.schemas import Version
 class AssistRequest(DTO):
     agent_id: UUID
     agent_version: Version
-    spec_id: UUID
-    spec_version: Version
     original: str = Field(max_length=20000)
     product: dict[str, Any]
     parameters: dict[str, Scalar]
@@ -38,4 +36,4 @@ class AssistProposal(DTO):
     parameters: dict[str, Scalar]
     agent_version: Version
     spec_version: Version
-    test_only: Literal[True] = True
+    test_only: bool = True

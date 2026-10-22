@@ -20,13 +20,11 @@ class StoragePool(Base):
     __tablename__ = "storage_pools"
     __table_args__ = (
         CheckConstraint(
-            "budget_bytes > 0 AND reserved_bytes >= 0 AND actual_bytes >= 0 "
-            "AND reserved_bytes <= budget_bytes - actual_bytes",
+            "reserved_bytes >= 0 AND actual_bytes >= 0",
             name="ck_pool_capacity",
         ),
     )
     id: Mapped[str] = mapped_column(String(16), primary_key=True)
-    budget_bytes: Mapped[int] = mapped_column(BigInteger)
     reserved_bytes: Mapped[int] = mapped_column(BigInteger, default=0)
     actual_bytes: Mapped[int] = mapped_column(BigInteger, default=0)
     policy_version: Mapped[str] = mapped_column(String(128))
@@ -37,14 +35,12 @@ class StorageAccount(Base):
     __table_args__ = (
         UniqueConstraint("user_id", "pool_id", name="uq_storage_account_pool"),
         CheckConstraint(
-            "quota_bytes > 0 AND reserved_bytes >= 0 AND actual_bytes >= 0 "
-            "AND reserved_bytes <= quota_bytes - actual_bytes",
+            "reserved_bytes >= 0 AND actual_bytes >= 0",
             name="ck_storage_account_capacity",
         ),
     )
     user_id: Mapped[str] = mapped_column(ForeignKey("users.id"), primary_key=True)
     pool_id: Mapped[str] = mapped_column(ForeignKey("storage_pools.id"))
-    quota_bytes: Mapped[int] = mapped_column(BigInteger)
     reserved_bytes: Mapped[int] = mapped_column(BigInteger, default=0)
     actual_bytes: Mapped[int] = mapped_column(BigInteger, default=0)
     policy_version: Mapped[str] = mapped_column(String(128))
@@ -112,7 +108,8 @@ class FileRef(Base):
         ),
         UniqueConstraint("file_id", "version", "ref_type", "ref_id", name="uq_file_reference"),
         CheckConstraint(
-            "ref_type IN ('task_input','task_result','message','work')", name="ck_file_ref_type"
+            "ref_type IN ('task_input','task_result','message','work','avatar')",
+            name="ck_file_ref_type",
         ),
     )
     id: Mapped[str] = mapped_column(String(36), primary_key=True)

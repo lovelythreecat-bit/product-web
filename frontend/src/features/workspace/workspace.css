@@ -1,0 +1,1075 @@
+/* Confirmed workspace V1.1: docs/design/workspace-redesign-2026-10-17/.
+   All styles are scoped to the authenticated workspace shell. */
+.app-shell.app-shell--workspace {
+  --studio-canvas:#f0ebe4;
+  --studio-line:#e4dbd0;
+  --studio-ink:var(--color-text);
+  --studio-muted:var(--color-muted);
+  --studio-white:var(--color-panel);
+  --studio-accent:var(--color-primary);
+  --studio-selected:var(--color-selected);
+  --studio-shadow:0 8px 28px #3228230a;
+}
+
+.app-shell.app-shell--workspace .shell-body {
+  display:grid;
+  grid-template-columns:248px minmax(0,1fr);
+  min-height:0;
+}
+
+.app-shell.app-shell--workspace .shell-sidebar {
+  padding:24px 16px 16px;
+  background:#f5efe7;
+  border-right:1px solid var(--studio-line);
+  border-bottom:0;
+  display:flex;
+  flex-direction:column;
+  gap:0;
+}
+
+.app-shell.app-shell--workspace .conversation-nav>.primary {
+  min-height:40px;
+  border-radius:8px;
+  font-size:13px;
+  box-shadow:0 3px 7px #a94e3215;
+  letter-spacing:.02em;
+}
+
+.app-shell.app-shell--workspace .sidebar-works {
+  margin-top:10px;
+  min-height:36px;
+  color:var(--studio-muted);
+  padding-left:12px;
+  font-size:13px;
+}
+
+.app-shell.app-shell--workspace .desktop-history {
+  margin-top:22px;
+  padding:0 2px 16px;
+  margin-inline:-2px;
+  scrollbar-width:thin;
+}
+
+.app-shell.app-shell--workspace .desktop-history>.history-heading {
+  padding:0 10px;
+  margin:0 0 12px;
+  letter-spacing:0;
+  font-size:12px;
+}
+
+.app-shell.app-shell--workspace .history-heading>span {
+  display:grid;
+  place-items:center;
+  background:#e9dfd3;
+  border-radius:5px;
+  min-width:24px;
+  height:20px;
+  color:#66503b;
+  font-size:12px;
+}
+
+.app-shell.app-shell--workspace .desktop-history .task-history-item {
+  display:grid;
+  grid-template-columns:26px minmax(0,1fr);
+  column-gap:10px;
+  padding:9px 10px;
+  margin:4px 0;
+  border:1px solid transparent;
+  border-radius:8px;
+  isolation:isolate;
+}
+
+.app-shell.app-shell--workspace .desktop-history .task-history-item:before {
+  display:none!important;
+}
+
+.app-shell.app-shell--workspace .task-list-icon {
+  grid-row:1/3;
+  align-self:center;
+  display:grid;
+  place-items:center;
+  width:26px;
+  height:28px;
+  border:1px solid #e4dbd0;
+  border-radius:6px;
+  background:#fffcf7;
+  color:#857263;
+  margin-top:0;
+}
+
+.app-shell.app-shell--workspace .task-list-icon svg {
+  width:16px;
+  height:16px;
+  stroke-width:1.6;
+}
+
+.app-shell.app-shell--workspace .task-title {
+  font-size:13px;
+  font-weight:600;
+  line-height:1.5;
+  min-width:0;
+  overflow-wrap:anywhere;
+}
+
+.app-shell.app-shell--workspace .desktop-history .task-title {
+  line-height:20px;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+
+.app-shell.app-shell--workspace .task-meta {
+  grid-column:2;
+  margin-top:4px;
+  gap:4px;
+  font-size:12px;
+  line-height:18px;
+  flex-wrap:nowrap;
+}
+
+.app-shell.app-shell--workspace .task-meta time {
+  font-size:12px;
+  letter-spacing:-.03em;
+  white-space:nowrap;
+}
+
+.app-shell.app-shell--workspace .task-state {
+  display:inline-flex;
+  align-items:center;
+  gap:4px;
+  white-space:nowrap;
+  color:#706259;
+}
+
+.app-shell.app-shell--workspace .task-state:before {
+  width:4px;
+  height:4px;
+  background:#9c8b78;
+  margin:0;
+  flex-shrink:0;
+}
+
+.app-shell.app-shell--workspace .task-state.is-warning {
+  color:#795117;
+}
+
+.app-shell.app-shell--workspace .task-state.is-warning:before {
+  background:#a07739;
+}
+
+.app-shell.app-shell--workspace .task-state.is-failed {
+  color:#a52b28;
+}
+
+.app-shell.app-shell--workspace .task-state.is-failed:before {
+  background:#a52b28;
+}
+
+.app-shell.app-shell--workspace .task-state.is-running {
+  color:#a94e32;
+}
+
+.app-shell.app-shell--workspace .task-state.is-running:before {
+  background:#a94e32;
+}
+
+.app-shell.app-shell--workspace .desktop-history .task-history-item.is-selected {
+  border-color:#d6b39d;
+  background:var(--studio-white);
+  box-shadow:0 3px 10px #6e4e3210;
+}
+
+.app-shell.app-shell--workspace .desktop-history .task-history-item.is-selected .task-title {
+  color:var(--studio-accent);
+}
+
+.app-shell.app-shell--workspace .desktop-history .task-history-item.is-selected .task-list-icon {
+  background:var(--studio-accent);
+  border-color:var(--studio-accent);
+  color:var(--studio-white);
+}
+
+.app-shell.app-shell--workspace .desktop-history .task-history-item:hover:not(.is-selected) {
+  background:#fffcf7;
+  border-color:#e4dbd0;
+}
+
+.app-shell.app-shell--workspace .sidebar-bottom {
+  position:relative;
+  display:grid;
+  grid-template-columns:minmax(0,1fr) auto;
+  gap:7px 8px;
+  padding:16px 12px 12px;
+  border:1px solid var(--studio-line);
+  border-radius:12px;
+  background:var(--studio-white);
+  margin-top:12px;
+}
+
+.app-shell.app-shell--workspace .sidebar-balance {
+  display:flex;
+  flex-direction:column;
+  align-items:flex-start;
+  gap:3px;
+  font-size:12px;
+  grid-column:1;
+}
+
+.app-shell.app-shell--workspace .sidebar-balance>strong {
+  font-size:28px;
+  line-height:1.2;
+  font-weight:650;
+  font-variant-numeric:tabular-nums;
+  color:var(--studio-ink);
+}
+
+.app-shell.app-shell--workspace .sidebar-bottom>.button {
+  grid-column:2;
+  grid-row:1;
+  min-height:30px;
+  padding:5px 8px;
+  font-size:12px;
+  align-self:end;
+  background:#f5e9df;
+  border:0;
+  color:var(--studio-accent);
+}
+
+.app-shell.app-shell--workspace .sidebar-bottom>.button svg {
+  width:14px;
+  height:14px;
+}
+
+.app-shell.app-shell--workspace .sidebar-bottom>small {
+  grid-column:1/-1;
+  font-size:12px;
+  line-height:1.5;
+  color:var(--studio-muted);
+  display:block;
+}
+
+.app-shell.app-shell--workspace .sidebar-bottom>small:last-child {
+  padding-top:6px;
+  border-top:1px solid #eee6dc;
+  margin-top:2px;
+}
+
+.app-shell.app-shell--workspace main {
+  padding:22px 24px 24px;
+  background:var(--studio-canvas);
+}
+
+.app-shell.app-shell--workspace .workspace-grid {
+  grid-template-columns:minmax(0,1fr) minmax(340px,380px);
+  gap:16px 20px;
+}
+
+.app-shell.app-shell--workspace .workspace-heading {
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  min-height:30px;
+  gap:16px;
+}
+
+.app-shell.app-shell--workspace .workspace-heading h1 {
+  font-size:22px;
+  line-height:1.35;
+  font-weight:650;
+  letter-spacing:-.03em;
+}
+
+.app-shell.app-shell--workspace .task-history {
+  background:#f6f1ea;
+  border:1px solid var(--studio-line);
+  border-radius:14px;
+  box-shadow:none;
+}
+
+.app-shell.app-shell--workspace .task-history>.history-heading {
+  padding:14px 22px;
+  background:var(--studio-white);
+  border-color:var(--studio-line);
+}
+
+.app-shell.app-shell--workspace .history-heading h2 {
+  font-size:13px;
+  font-weight:600;
+  color:var(--studio-muted);
+}
+
+.app-shell.app-shell--workspace .results-canvas {
+  padding:0;
+  scrollbar-width:thin;
+  scrollbar-gutter:auto;
+}
+
+.app-shell.app-shell--workspace .task-card {
+  border:0;
+  border-radius:0;
+  padding:0;
+  background:transparent;
+  margin:0;
+  box-shadow:none;
+}
+
+.app-shell.app-shell--workspace .task-heading {
+  padding:18px 22px 16px;
+  margin:0;
+  gap:10px;
+  border:0;
+  background:transparent;
+  align-items:center;
+  flex-wrap:wrap;
+}
+
+.app-shell.app-shell--workspace .task-kind-icon {
+  width:32px;
+  height:36px;
+  background:#e9ded1;
+  color:#795942;
+  border-radius:7px;
+}
+
+.app-shell.app-shell--workspace .task-heading .task-title {
+  display:flex;
+  align-items:baseline;
+  gap:10px;
+  flex:1;
+  flex-wrap:wrap;
+}
+
+.app-shell.app-shell--workspace .task-heading h3 {
+  font-size:14px;
+  letter-spacing:0;
+  margin:0;
+  font-weight:650;
+}
+
+.app-shell.app-shell--workspace .task-heading small {
+  font-size:12px;
+  color:var(--studio-muted);
+  font-weight:400;
+}
+
+.app-shell.app-shell--workspace .status-label {
+  font-size:12px;
+  display:inline-flex;
+  align-items:center;
+  gap:5px;
+  background:#eae3d8;
+  color:#66503b;
+  padding:4px 8px;
+  border-radius:5px;
+  margin-left:0;
+  line-height:1.4;
+}
+
+.app-shell.app-shell--workspace .status-label:before {
+  content:'';
+  width:5px;
+  height:5px;
+  border-radius:50%;
+  background:#826d51;
+}
+
+.app-shell.app-shell--workspace .status-label.status-error {
+  color:var(--color-danger);
+  background:color-mix(in srgb, var(--color-danger) 8%, var(--color-panel));
+}
+
+.app-shell.app-shell--workspace .status-label.status-error:before {
+  background:var(--color-danger);
+}
+
+.app-shell.app-shell--workspace .status-label.status-warning {
+  color:var(--color-warning);
+  background:color-mix(in srgb, var(--color-warning) 8%, var(--color-panel));
+}
+
+.app-shell.app-shell--workspace .status-label.status-warning:before {
+  background:var(--color-warning);
+}
+
+.app-shell.app-shell--workspace .task-state-note,
+.app-shell.app-shell--workspace .failed-task-actions,
+.app-shell.app-shell--workspace .task-card>.field-error,
+.app-shell.app-shell--workspace .task-card>.button,
+.app-shell.app-shell--workspace .result-read-state,
+.app-shell.app-shell--workspace .transient,
+.app-shell.app-shell--workspace .video-task-panel {
+  margin-inline:26px;
+}
+
+@media(max-width:700px) {
+  .app-shell.app-shell--workspace .task-state-note,
+  .app-shell.app-shell--workspace .failed-task-actions,
+  .app-shell.app-shell--workspace .task-card>.field-error,
+  .app-shell.app-shell--workspace .task-card>.button,
+  .app-shell.app-shell--workspace .result-read-state,
+  .app-shell.app-shell--workspace .transient,
+  .app-shell.app-shell--workspace .video-task-panel {
+    margin-inline:16px;
+  }
+}
+
+.app-shell.app-shell--workspace .details-button {
+  margin-left:2px;
+  font-size:12px!important;
+  color:var(--studio-muted);
+  gap:4px!important;
+  min-height:28px!important;
+  padding:2px 0!important;
+}
+
+.app-shell.app-shell--workspace .task-card .work-output {
+  margin:0;
+  padding:0 26px;
+}
+
+.app-shell.app-shell--workspace .task-card .result-item {
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  margin:0;
+}
+
+.app-shell.app-shell--workspace .task-card .copy-result {
+  font-family:inherit;
+  font-size:14px;
+  line-height:1.95;
+  white-space:pre-wrap;
+  overflow-wrap:anywhere;
+  width:100%;
+  max-width:760px;
+  min-height:390px;
+  margin:0;
+  padding:32px 36px 34px;
+  border:0;
+  border-radius:4px;
+  background:var(--studio-white);
+  box-shadow:0 7px 22px #523d2610;
+  color:var(--studio-ink);
+  text-align:left;
+}
+
+.app-shell.app-shell--workspace .copy-result .copy-headline {
+  display:block;
+  font-size:21px;
+  font-weight:400;
+  line-height:1.55;
+  letter-spacing:-.025em;
+  margin-bottom:-12px;
+  color:var(--studio-ink);
+}
+
+.app-shell.app-shell--workspace .task-card .result-actions {
+  width:100%;
+  max-width:760px;
+  display:flex;
+  flex-wrap:wrap;
+  gap:8px;
+  margin:18px 0 0;
+  padding:0;
+  border:0;
+}
+
+.app-shell.app-shell--workspace .result-actions .button {
+  background:var(--studio-white);
+  border:1px solid #ded2c4;
+  min-height:32px;
+  border-radius:6px;
+  font-size:12px;
+  padding:5px 10px;
+}
+
+.app-shell.app-shell--workspace .result-actions .copy-action {
+  color:var(--studio-accent);
+  background:#f4e4d7;
+  border-color:#e4c7b2;
+  font-weight:600;
+}
+
+.app-shell.app-shell--workspace .result-actions .regenerate-action {
+  margin-left:auto;
+  background:transparent;
+  color:var(--studio-muted);
+  border-color:transparent;
+}
+
+.app-shell.app-shell--workspace .task-footer {
+  border-top:1px solid #e4dbd0;
+  margin:20px 26px 0;
+  padding:12px 0 18px;
+  font-size:12px;
+  color:var(--studio-muted);
+  gap:8px;
+  flex-wrap:wrap;
+}
+
+.app-shell.app-shell--workspace .creation-panel {
+  border:1px solid var(--studio-line);
+  border-radius:14px;
+  background:var(--studio-white);
+  box-shadow:none;
+}
+
+.app-shell.app-shell--workspace .creation-panel .composer-tabs {
+  padding:14px 16px;
+  border-color:var(--studio-line);
+  background:var(--studio-white);
+}
+
+.app-shell.app-shell--workspace .agent-types {
+  background:#f2ece4;
+  padding:4px;
+  gap:3px;
+  border-radius:8px;
+}
+
+.app-shell.app-shell--workspace .agent-types .button {
+  border:0!important;
+  border-radius:5px;
+  min-height:34px;
+  font-size:13px;
+  font-weight:500;
+  background:transparent;
+  box-shadow:none;
+  color:var(--studio-muted);
+}
+
+.app-shell.app-shell--workspace .agent-types .button[aria-pressed=true] {
+  background:var(--studio-white);
+  color:var(--studio-accent);
+  box-shadow:0 1px 4px #523d2612;
+  font-weight:650;
+}
+
+.app-shell.app-shell--workspace .agent-types .button svg {
+  width:16px;
+  height:16px;
+}
+
+.app-shell.app-shell--workspace .composer-scroll {
+  padding:18px 18px 22px;
+  gap:22px!important;
+  scrollbar-width:thin;
+  scrollbar-gutter:auto;
+}
+
+.app-shell.app-shell--workspace .section-heading {
+  margin:0 0 12px!important;
+  align-items:center;
+}
+
+.app-shell.app-shell--workspace .creation-section h3 {
+  font-size:14px;
+  letter-spacing:0;
+  font-weight:650;
+  display:flex;
+  align-items:center;
+  gap:8px;
+}
+
+.app-shell.app-shell--workspace .section-symbol {
+  width:16px;
+  height:16px;
+  color:#8b735e;
+}
+
+.app-shell.app-shell--workspace .section-heading .text-button {
+  font-size:12px;
+  color:var(--studio-accent);
+  padding:0;
+  min-height:28px;
+}
+
+.app-shell.app-shell--workspace .product-details {
+  gap:0 14px;
+  background:#f8f4ee;
+  padding:10px 12px;
+  border-radius:8px;
+  font-size:12px;
+  grid-template-columns:minmax(0,1fr);
+}
+
+.app-shell.app-shell--workspace .product-details>div {
+  display:block;
+  padding:6px 0;
+  line-height:1.6;
+  min-width:0;
+}
+
+.app-shell.app-shell--workspace .product-details>div:first-child {
+  padding-top:2px;
+  padding-bottom:10px;
+  border-bottom:1px solid #e9dfd3;
+  margin-bottom:2px;
+}
+
+.app-shell.app-shell--workspace .product-details>div:first-child dt {
+  font-size:12px;
+}
+
+.app-shell.app-shell--workspace .product-details>div:first-child dd {
+  font-size:16px;
+  font-weight:600;
+  margin-top:2px;
+}
+
+.app-shell.app-shell--workspace .product-details dt {
+  font-size:12px;
+  color:var(--studio-muted);
+  margin:0;
+  line-height:1.5;
+}
+
+.app-shell.app-shell--workspace .product-details dd {
+  margin:2px 0 0;
+  font-size:13px;
+  line-height:1.5;
+  color:var(--studio-ink);
+  font-weight:500;
+}
+
+.app-shell.app-shell--workspace .product-details>.product-wide:not(:first-child) {
+  display:grid;
+  grid-template-columns:88px minmax(0,1fr);
+  gap:8px;
+}
+
+.app-shell.app-shell--workspace .product-details>.product-wide:not(:first-child) dd {
+  margin:0;
+}
+
+.app-shell.app-shell--workspace .product-materials {
+  margin-top:14px;
+}
+
+.app-shell.app-shell--workspace .material-label {
+  font-size:12px;
+}
+
+.app-shell.app-shell--workspace .upload-control {
+  padding:10px 12px;
+  background:transparent;
+  border:1px dashed #c8b19b;
+  border-radius:7px;
+  margin-top:8px;
+}
+
+.app-shell.app-shell--workspace .upload-control p {
+  font-size:12px;
+  color:var(--studio-muted);
+}
+
+.app-shell.app-shell--workspace .upload-control .button {
+  font-size:12px;
+  background:#f7f1e9;
+  border:0;
+  min-height:30px;
+}
+
+.app-shell.app-shell--workspace .text-choices {
+  padding-top:18px;
+  border-color:var(--studio-line);
+  gap:12px;
+}
+
+.app-shell.app-shell--workspace .text-choices label {
+  font-size:12px;
+  color:var(--studio-muted);
+  margin-bottom:5px;
+  line-height:1.6;
+}
+
+.app-shell.app-shell--workspace .el-input__wrapper,.app-shell.app-shell--workspace .el-select__wrapper {
+  min-height:36px;
+  background:#fffdfa;
+  border-radius:6px;
+  box-shadow:0 0 0 1px #c9b6a3 inset;
+  padding:1px 10px;
+}
+
+.app-shell.app-shell--workspace .el-input__inner {
+  font-size:13px;
+  color:var(--studio-ink);
+  height:34px;
+  line-height:34px;
+}
+
+.app-shell.app-shell--workspace .el-input__inner::placeholder,.app-shell.app-shell--workspace .el-textarea__inner::placeholder {
+  color:#77675b;
+  opacity:1;
+}
+
+.app-shell.app-shell--workspace .el-textarea__inner {
+  font-size:13px;
+  border-radius:7px;
+  box-shadow:0 0 0 1px #c9b6a3 inset;
+  background:var(--studio-white);
+  padding:10px 12px;
+  line-height:1.8;
+}
+
+.app-shell.app-shell--workspace .text-choices small {
+  font-size:12px;
+}
+
+.app-shell.app-shell--workspace .composer-footer {
+  padding:16px 18px;
+  border-color:var(--studio-line);
+  box-shadow:none;
+  background:var(--studio-white);
+  gap:12px!important;
+}
+
+.app-shell.app-shell--workspace .quote-panel {
+  align-items:center;
+  font-size:12px;
+}
+
+.app-shell.app-shell--workspace .quote-panel strong {
+  font-size:26px;
+  font-weight:650;
+  letter-spacing:-.025em;
+}
+
+.app-shell.app-shell--workspace .generate-button {
+  height:44px;
+  min-height:44px;
+  border-radius:8px;
+  font-size:13px;
+  letter-spacing:.02em;
+  box-shadow:0 3px 6px #a94e3218;
+}
+
+.app-shell.app-shell--workspace a:focus-visible,.app-shell.app-shell--workspace button:focus-visible {
+  outline:2px solid var(--studio-accent);
+  outline-offset:3px;
+}
+
+@media(min-width:1600px) {
+  .app-shell.app-shell--workspace .workspace-grid {
+    grid-template-columns:minmax(0,1fr) 400px;
+    gap:16px 24px;
+  }
+  .app-shell.app-shell--workspace .task-card .work-output {
+    padding:0 40px;
+  }
+  .app-shell.app-shell--workspace .task-card .copy-result {
+    padding:38px 46px;
+  }
+  .app-shell.app-shell--workspace main {
+    padding:24px 28px 28px;
+  }
+}
+
+@media(min-width:901px) and (max-width:1180px) {
+  .app-shell.app-shell--workspace .shell-body {
+    grid-template-columns:248px minmax(0,1fr);
+  }
+  .app-shell.app-shell--workspace main {
+    padding:18px;
+  }
+  .app-shell.app-shell--workspace .workspace-grid {
+    grid-template-columns:minmax(0,1fr) 330px;
+    gap:14px;
+  }
+  .app-shell.app-shell--workspace .task-card .work-output {
+    padding:0 18px;
+  }
+  .app-shell.app-shell--workspace .task-card .copy-result {
+    padding:24px;
+  }
+  .app-shell.app-shell--workspace .task-heading .task-title {
+    display:block;
+  }
+}
+
+@media(max-width:900px) {
+  .app-shell.app-shell--workspace .shell-body {
+    grid-template-columns:248px minmax(0,1fr);
+  }
+  .app-shell.app-shell--workspace main {
+    padding:20px;
+  }
+  .app-shell.app-shell--workspace .workspace-grid {
+    display:flex;
+    gap:18px;
+  }
+  .app-shell.app-shell--workspace .task-card .copy-result {
+    padding:26px;
+  }
+  .app-shell.app-shell--workspace .task-card .work-output {
+    padding:0 18px;
+  }
+  .app-shell.app-shell--workspace .creation-panel {
+    width:100%;
+  }
+  .app-shell.app-shell--workspace .composer-scroll {
+    max-height:none;
+  }
+}
+
+@media(max-width:700px) {
+  .app-shell.app-shell--workspace {
+    height:auto;
+    min-height:100dvh;
+  }
+  .app-shell.app-shell--workspace .shell-body {
+    display:flex;
+    flex-direction:column;
+  }
+  .app-shell.app-shell--workspace .shell-sidebar {
+    padding:14px 18px 0;
+    background:var(--studio-canvas);
+    border:0;
+    display:block;
+  }
+  .app-shell.app-shell--workspace .conversation-nav {
+    display:flex;
+    flex-direction:column;
+    margin:0;
+    gap:10px;
+  }
+  .app-shell.app-shell--workspace .conversation-nav>.primary {
+    min-height:44px;
+  }
+  .app-shell.app-shell--workspace .sidebar-works {
+    grid-row:1;
+    grid-column:2;
+    justify-content:center;
+    border:1px solid #c9b6a3;
+    background:var(--studio-white);
+    min-height:44px;
+    margin:0;
+  }
+  .app-shell.app-shell--workspace .conversation-nav>label {
+    align-self:stretch;
+    grid-row:2;
+    grid-column:1/-1;
+    text-align:left;
+    margin-top:4px;
+    font-size:12px;
+  }
+  .app-shell.app-shell--workspace .mobile-history.ui-select {
+    grid-row:3;
+    grid-column:1/-1;
+  }
+  .app-shell.app-shell--workspace .mobile-history .ui-native-select {
+    min-height:44px;
+    border-color:#c9b6a3;
+  }
+  .app-shell.app-shell--workspace .desktop-history {
+    display:none;
+  }
+  .app-shell.app-shell--workspace .sidebar-bottom {
+    display:flex;
+    align-items:center;
+    flex-wrap:wrap;
+    padding:12px;
+    margin-top:12px;
+    gap:8px 12px;
+  }
+  .app-shell.app-shell--workspace .sidebar-balance {
+    flex-direction:row;
+    align-items:center;
+    gap:10px;
+  }
+  .app-shell.app-shell--workspace .sidebar-balance>strong {
+    font-size:22px;
+  }
+  .app-shell.app-shell--workspace .sidebar-bottom>.button {
+    margin-left:auto;
+    min-height:44px;
+    padding:8px 10px;
+  }
+  .app-shell.app-shell--workspace .sidebar-bottom>small {
+    font-size:12px;
+    display:block;
+  }
+  .app-shell.app-shell--workspace .sidebar-bottom>small:last-child {
+    width:100%;
+    padding-top:8px;
+    margin:0;
+  }
+  .app-shell.app-shell--workspace main {
+    padding:22px 18px;
+  }
+  .app-shell.app-shell--workspace .workspace-heading h1 {
+    font-size:21px;
+  }
+  .app-shell.app-shell--workspace .workspace-grid {
+    gap:16px;
+  }
+  .app-shell.app-shell--workspace .creation-panel .composer-tabs {
+    padding:12px;
+  }
+  .app-shell.app-shell--workspace .agent-types .button {
+    min-height:44px;
+  }
+  .app-shell.app-shell--workspace .composer-scroll {
+    padding:18px 16px;
+    gap:20px!important;
+  }
+  .app-shell.app-shell--workspace .section-heading .text-button {
+    min-height:44px;
+    padding:6px;
+  }
+  .app-shell.app-shell--workspace .product-details {
+    grid-template-columns:minmax(0,1fr);
+    padding:10px 12px;
+    gap:0 10px;
+  }
+  .app-shell.app-shell--workspace .product-details>div {
+    padding:7px 0;
+  }
+  .app-shell.app-shell--workspace .product-details>.product-wide:not(:first-child) {
+    grid-template-columns:82px minmax(0,1fr);
+  }
+  .app-shell.app-shell--workspace .upload-control .button {
+    min-height:44px;
+  }
+  .app-shell.app-shell--workspace .el-input__wrapper,.app-shell.app-shell--workspace .el-select__wrapper {
+    min-height:44px;
+  }
+  .app-shell.app-shell--workspace .el-input__inner {
+    height:42px;
+    line-height:42px;
+  }
+  .app-shell.app-shell--workspace .text-choices {
+    grid-template-columns:repeat(2,minmax(0,1fr));
+    gap:14px 10px;
+  }
+  .app-shell.app-shell--workspace .text-choices .text-choice-wide {
+    grid-column:1/-1;
+  }
+  .app-shell.app-shell--workspace .composer-footer {
+    padding:16px;
+  }
+  .app-shell.app-shell--workspace .generate-button {
+    min-height:48px;
+    font-size:14px;
+  }
+  .app-shell.app-shell--workspace .task-history>.history-heading {
+    padding:14px 16px;
+  }
+  .app-shell.app-shell--workspace .task-heading {
+    padding:16px;
+    gap:8px;
+  }
+  .app-shell.app-shell--workspace .task-heading .task-title {
+    display:block;
+  }
+  .app-shell.app-shell--workspace .task-heading small {
+    display:block;
+    margin-top:3px;
+  }
+  .app-shell.app-shell--workspace .task-heading .status-label {
+    order:initial;
+    margin-left:0;
+  }
+  .app-shell.app-shell--workspace .details-button {
+    margin-left:auto;
+    min-height:44px!important;
+  }
+  .app-shell.app-shell--workspace .task-card .work-output {
+    padding:0 12px;
+  }
+  .app-shell.app-shell--workspace .task-card .copy-result {
+    padding:24px 20px;
+    font-size:14px;
+    min-height:0;
+  }
+  .app-shell.app-shell--workspace .copy-result .copy-headline {
+    font-size:19px;
+  }
+  .app-shell.app-shell--workspace .result-actions .button {
+    min-height:44px;
+    padding:8px 10px;
+  }
+  .app-shell.app-shell--workspace .result-actions .regenerate-action {
+    margin-left:0;
+  }
+  .app-shell.app-shell--workspace .task-footer {
+    margin:18px 16px 0;
+    padding-bottom:16px;
+  }
+  .app-shell.app-shell--workspace .task-footer time {
+    margin-top:4px;
+  }
+}
+
+/* Preserve public controls' keyboard and validation states in the studio theme. */
+.app-shell.app-shell--workspace .ui-input:focus-within .el-input__wrapper,
+.app-shell.app-shell--workspace .ui-select:focus-within .el-select__wrapper,
+.app-shell.app-shell--workspace .el-textarea__inner:focus {
+  outline:2px solid var(--color-primary);
+  outline-offset:2px;
+}
+
+.app-shell.app-shell--workspace .ui-input:has([aria-invalid="true"]) .el-input__wrapper,
+.app-shell.app-shell--workspace .ui-select-field:has([aria-invalid="true"]) .el-select__wrapper,
+.app-shell.app-shell--workspace .el-textarea__inner[aria-invalid="true"] {
+  box-shadow:0 0 0 1px var(--color-danger) inset;
+}
+
+@media(pointer:coarse) {
+  .app-shell.app-shell--workspace .button {
+    min-height:44px!important;
+  }
+
+  .app-shell.app-shell--workspace .el-input__wrapper,
+  .app-shell.app-shell--workspace .el-select__wrapper {
+    min-height:44px;
+  }
+
+  .app-shell.app-shell--workspace .el-input__inner {
+    height:42px;
+    line-height:42px;
+  }
+}
+
+.app-shell.app-shell--workspace .product-details>div:not(:first-child) {
+  display:grid;
+  grid-template-columns:88px minmax(0,1fr);
+  gap:6px;
+  padding:6px 0;
+  align-items:start;
+}
+
+.app-shell.app-shell--workspace .product-details>div:not(:first-child) dt {
+  white-space:normal;
+  overflow-wrap:anywhere;
+}
+
+.app-shell.app-shell--workspace .product-details>div:not(:first-child) dd {
+  margin:0;
+}
+
+.app-shell.app-shell--workspace .product-details>.product-wide:not(:first-child) {
+  grid-template-columns:88px minmax(0,1fr);
+}
+
+@media(max-width:700px) {
+  .app-shell.app-shell--workspace .product-details>div:not(:first-child) {
+    grid-template-columns:88px minmax(0,1fr);
+    padding:7px 0;
+  }
+  .app-shell.app-shell--workspace .product-details>.product-wide:not(:first-child) {
+    grid-template-columns:88px minmax(0,1fr);
+  }
+}
+
+@media(prefers-reduced-motion:no-preference) {
+  .app-shell.app-shell--workspace .desktop-history .task-history-item {
+    transition:background-color 160ms ease,border-color 160ms ease,box-shadow 160ms ease;
+  }
+  .app-shell.app-shell--workspace .task-list-icon {
+    transition:background-color 160ms ease,color 160ms ease;
+  }
+  .app-shell.app-shell--workspace .button {
+    transition:background-color 140ms ease,border-color 140ms ease;
+  }
+}

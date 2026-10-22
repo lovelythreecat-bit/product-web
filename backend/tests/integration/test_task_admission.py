@@ -112,7 +112,7 @@ def admission(catalog):
     settings = settings.model_copy(
         update={
             "generation_capacity_estimates": {
-                c.spec_id: {
+                c.agent_id: {
                     "spec_version": "TEST_ONLY_v1",
                     "policy_version": versions["D-10"],
                     "estimation_ref": "TEST_ONLY_all_results",
@@ -236,7 +236,7 @@ def test_replay_after_reprice_returns_original(admission):
     first = submit(c, body, key)
     assert first.status_code == 201, first.text
     c.set_policies(credits=11)
-    assert c.price(11, "TEST_ONLY_v2", "TEST_ONLY_v1").status_code == 201
+    assert c.price(11).status_code == 200
     response = submit(c, body, key)
     assert response.status_code == 200 and response.json()["task"] == first.json()["task"]
     before = counts(c)
@@ -286,7 +286,7 @@ def test_insufficient_credits_no_side_effect(admission):
     c = admission
     body = request_body(c)
     c.set_policies(credits=101)
-    assert c.price(101, "TEST_ONLY_v2", "TEST_ONLY_v1").status_code == 201
+    assert c.price(101).status_code == 200
     body["confirmed_quote"] = c.quote().json()
     before = counts(c)
     assert submit(c, body).status_code == 402
@@ -444,26 +444,27 @@ def test_bad_material_never_leaves_task(admission, change):
     assert counts(c) == before
 
 
-def test_concurrent_new_keys_obey_capacity_and_policy(admission):
+def test_concurrent_new_keys_obey_task_policy_without_account_quota(admission):
     c = admission
     body = request_body(c)
     with ThreadPoolExecutor(max_workers=6) as pool:
         responses = list(pool.map(lambda _: submit(c, body), range(6)))
-    assert sorted(r.status_code for r in responses) == [201, 201, 201, 201, 409, 409], [
+    assert sorted(r.status_code for r in responses) == [201, 201, 201, 201, 201, 429], [
         r.text for r in responses
     ]
-    assert counts(c)["balances"] == (72, 28, 0)
-    assert counts(c)["capacity"] == 200
+    assert counts(c)["balances"] == (65, 35, 0)
+    assert counts(c)["capacity"] == 250
     with c.engine.connect() as conn:
         assert list(
             conn.execute(
                 text("SELECT event_seq FROM durable_events WHERE user_id=:u ORDER BY event_seq"),
                 {"u": c.user},
             ).scalars()
-        ) == [1, 2, 3, 4]
+        ) == [1, 2, 3, 4, 5]
 
 
-def test_concurrency_gate_with_adequate_capacity(admission):
+@pytest.mark.parametrize("max_tasks,expected", [(1, [201, 429]), (None, [201, 201])])
+def test_concurrency_gate_with_adequate_capacity(admission, max_tasks, expected):
     c = admission
     body = request_body(c)
     settings = c.client.app.state.settings
@@ -476,15 +477,18 @@ def test_concurrency_gate_with_adequate_capacity(admission):
                 mode="mock",
                 test_only=True,
                 payload={
-                    "generation": {"max_concurrent_tasks": 1, "enforcement_ref": "TEST_ONLY_db"}
+                    "generation": {"max_concurrent_tasks": max_tasks,
+                                   "enforcement_ref": "TEST_ONLY_db"}
                 },
             )
         )
     settings.generation_policy_versions["D-05"] = version
     with ThreadPoolExecutor(max_workers=2) as pool:
         responses = list(pool.map(lambda _: submit(c, body), range(2)))
-    assert sorted(r.status_code for r in responses) == [201, 429], [r.text for r in responses]
-    assert counts(c)["capacity"] == 50 and counts(c)["balances"] == (93, 7, 0)
+    assert sorted(r.status_code for r in responses) == expected, [r.text for r in responses]
+    accepted = expected.count(201)
+    assert counts(c)["capacity"] == 50 * accepted
+    assert counts(c)["balances"] == (100 - 7 * accepted, 7 * accepted, 0)
 
 
 def test_outbox_and_event_writers_share_transaction(admission):
@@ -607,7 +611,7 @@ def test_direct_admission_retains_quote_locks_and_rollback(admission):
         with c.engine.connect() as conn, conn.begin():
             entered.set()
             conn.execute(
-                text("SELECT version FROM price_heads WHERE spec_id=:id FOR UPDATE"),
+                text("SELECT version FROM generation_parameter_heads WHERE mode='mock' FOR UPDATE"),
                 {"id": c.spec_id},
             ).one()
             return "acquired"
@@ -675,7 +679,7 @@ def test_concurrent_different_accounts_share_budget_without_deadlock(admission):
         body2["conversation_id"] = conversation["conversation_id"]
         body2["input"]["product_version"] = product["version"]
         body2["confirmed_quote"] = other.post(
-            "/api/v1/quotes", json={"spec_id": c.spec_id, "input": body2["input"]}
+            "/api/v1/quotes", json={"agent_id": c.agent_id, "input": body2["input"]}
         ).json()
         with ThreadPoolExecutor(max_workers=2) as pool:
             a = pool.submit(submit, c, body1)

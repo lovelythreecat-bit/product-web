@@ -57,7 +57,7 @@ def reconcile_accounts(session):
             by_grant[row.grant_id].append(row)
         totals = defaultdict(int)
         for grant in grants:
-            totals[grant.user_id] += grant.amount
+            totals[grant.user_id] += -grant.amount if grant.kind == "admin_deduct" else grant.amount
             rows = by_grant[grant.id]
             if len(rows) != 1 or (rows[0].amount, rows[0].kind, rows[0].user_id) != (
                 grant.amount,
@@ -80,6 +80,7 @@ def reconcile_accounts(session):
                 delta = {
                     "signup": (row.amount, 0, 0),
                     "admin": (row.amount, 0, 0),
+                    "admin_deduct": (-row.amount, 0, 0),
                     "freeze": (-row.amount, row.amount, 0),
                     "consume": (0, -row.amount, row.amount),
                     "release": (row.amount, -row.amount, 0),

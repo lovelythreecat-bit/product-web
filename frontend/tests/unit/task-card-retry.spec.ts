@@ -2,14 +2,27 @@ import { beforeEach, expect, it, vi } from 'vitest'
 import { flushPromises, mount } from '@vue/test-utils'
 import type { Schema } from '../../src/types/api'
 const api = vi.hoisted(() => ({ getWork: vi.fn() }))
+const tasksApi = vi.hoisted(() => ({ retryFailedTask: vi.fn(), releaseFailedTask: vi.fn() }))
 const identity = vi.hoisted(() => ({ epoch: { value: 0 } }))
 vi.mock('../../src/api/works', () => api)
+vi.mock('../../src/api/tasks', () => tasksApi)
 vi.mock('../../src/features/auth/session', () => ({ session: identity }))
 import TaskCard from '../../src/components/TaskCard.vue'
 const detail = { task: { task_id: 'original-task', work_ids: ['original-work'], state: 'SUCCEEDED', settlement_state: 'CONSUMED', quote: { credits: 20 } }, input: { instruction: 'original input' }, policy_versions: {} } as Schema<'TaskDetail'>
 const work = { work_id: 'original-work', task_id: 'original-task', kind: 'copy', items: [] }
 const global = { stubs: { AppDrawer: true, ResultViewer: { props: ['work'], template: '<p>{{ work.work_id }}</p>' } } }
 beforeEach(() => { vi.resetAllMocks(); identity.epoch.value = 0 })
+it('shows permanent readable task and conversation numbers while retaining internal request IDs', async () => {
+  const numbered = { ...detail, conversation_id:'11111111-1111-4111-8111-111111111111', conversation_display_number:'H20261016-000003', task:{...detail.task, task_id:'22222222-2222-4222-8222-222222222222',display_number:'T20261016-000007',work_ids:[]} }
+  const wrapper = mount(TaskCard, { props:{detail:numbered}, global:{stubs:{...global.stubs,AppDrawer:{props:['open'],template:'<aside v-if="open"><slot/></aside>'}}} })
+  expect(wrapper.text()).toContain('T20261016-000007')
+  await wrapper.findAll('button').find(x=>x.text()==='任务详情')!.trigger('click')
+  expect(wrapper.text()).toContain('H20261016-000003')
+  expect(wrapper.text()).not.toContain(numbered.task.task_id)
+  expect(wrapper.text()).not.toContain(numbered.conversation_id)
+  expect(wrapper.attributes('data-task-id')).toBe(numbered.task.task_id)
+  wrapper.unmount()
+})
 it('explicitly retries the original work after same-ID task refresh and clears the read error', async () => {
   api.getWork.mockRejectedValueOnce(new Error('temporary read failure')).mockResolvedValueOnce(work)
   const wrapper = mount(TaskCard, { props: { detail }, global }); await flushPromises()
@@ -23,6 +36,17 @@ it('explicitly retries the original work after same-ID task refresh and clears t
   expect(wrapper.text()).toContain('生成成功'); expect(wrapper.text()).toContain('已消费')
   expect(wrapper.emitted('regenerate')).toBeUndefined(); wrapper.unmount()
 })
+it('retains work-read recovery inside the compact quick original task drawer', async () => {
+  api.getWork.mockRejectedValueOnce(new Error('temporary read failure')).mockResolvedValueOnce(work)
+  const wrapper = mount(TaskCard, { props: { detail, compactLabel: '原始宣传文案', quickGeneration: true }, global: { stubs: { ResultViewer: global.stubs.ResultViewer, TaskDetailsContent: true } } })
+  await flushPromises()
+  await wrapper.get('.details-button').trigger('click')
+  expect(wrapper.text()).toContain('作品暂时无法读取')
+  await wrapper.get('[data-work-retry]').trigger('click'); await flushPromises()
+  expect(wrapper.text()).toContain('original-work')
+  expect(wrapper.find('[role="alert"]').exists()).toBe(false)
+  wrapper.unmount()
+})
 it.each(['resolve', 'reject'])('ignores a late retry %s across an identity epoch', async outcome => {
   api.getWork.mockRejectedValueOnce(new Error('temporary read failure'))
   let resolve!: (value: typeof work) => void, reject!: (reason: Error) => void
@@ -34,4 +58,93 @@ it.each(['resolve', 'reject'])('ignores a late retry %s across an identity epoch
   await flushPromises()
   expect(wrapper.text()).not.toContain('original-work')
   expect(wrapper.find('[role="alert"]').exists()).toBe(false); wrapper.unmount()
+})
+
+const failedDetail = { ...detail, task: { ...detail.task, work_ids: [], state: 'FAILED', settlement_state: 'FROZEN', created_at: '2026-10-16T01:02:03Z', updated_at: '2026-10-16T01:03:03Z' } } as Schema<'TaskDetail'>
+const actionGlobal = { stubs: { ...global.stubs, AppDialog: { props: ['open'], template: '<section v-if="open"><slot/><slot name="actions"/></section>' } } }
+it('retries a stopped image input wait after confirmation and follows its successor', async () => {
+  const stopped = { ...failedDetail, task: { ...failedDetail.task, state: 'INVESTIGATING', investigation_reason: 'UPSTREAM_NEEDS_INPUT' }, media: { kind: 'image', status: 'completed', core_status: 'needs_input' } } as Schema<'TaskDetail'>
+  tasksApi.retryFailedTask.mockResolvedValue({ task: { task_id: 'successor' }, replayed: false })
+  const wrapper = mount(TaskCard, { props: { detail: stopped }, global: actionGlobal })
+  expect(wrapper.text()).toContain('等待补充资料')
+  expect(wrapper.find('[data-failed-release]').exists()).toBe(false)
+  await wrapper.get('[data-failed-retry]').trigger('click')
+  expect(tasksApi.retryFailedTask).not.toHaveBeenCalled()
+  await wrapper.get('[data-confirm-failed-action]').trigger('click'); await flushPromises()
+  expect(wrapper.emitted('mediaChanged')).toEqual([['successor']])
+  expect(wrapper.find('[data-failed-retry]').exists()).toBe(false)
+  wrapper.unmount()
+})
+
+it.each(['running', 'queued'])('does not offer input-wait retry while image task is %s', status => {
+  const wrapper = mount(TaskCard, { props: { detail: { ...failedDetail, task: { ...failedDetail.task, state: 'INVESTIGATING', investigation_reason: 'UPSTREAM_NEEDS_INPUT' }, media: { kind: 'image', status, core_status: 'needs_input' } } as Schema<'TaskDetail'> }, global: actionGlobal })
+  expect(wrapper.find('[data-failed-retry]').exists()).toBe(false)
+  wrapper.unmount()
+})
+it('preserves result viewing but removes generation and failure actions in read-only history', async () => {
+  api.getWork.mockResolvedValue(work)
+  const wrapper = mount(TaskCard, { props: { detail, readOnly: true }, global: { stubs: { ...actionGlobal.stubs, ResultViewer: { template: '<div>历史成果<slot name="actions"/></div>' } } } })
+  await flushPromises()
+  expect(wrapper.text()).toContain('历史成果')
+  expect(wrapper.text()).toContain('任务详情')
+  expect(wrapper.find('.regenerate-action').exists()).toBe(false)
+  await wrapper.setProps({ detail: failedDetail })
+  expect(wrapper.find('[data-failed-retry]').exists()).toBe(false)
+  expect(wrapper.find('[data-failed-release]').exists()).toBe(false)
+  expect(tasksApi.retryFailedTask).not.toHaveBeenCalled()
+  expect(tasksApi.releaseFailedTask).not.toHaveBeenCalled()
+  wrapper.unmount()
+})
+it.each(['retry', 'release'] as const)('confirms %s and refreshes after the owner choice succeeds', async action => {
+  tasksApi.retryFailedTask.mockResolvedValue({ task: { task_id: 'successor' }, replayed: false })
+  tasksApi.releaseFailedTask.mockResolvedValue({ ...failedDetail.task, settlement_state: 'RELEASED' })
+  const failedWithReason = { ...failedDetail, task: { ...failedDetail.task, investigation_reason: 'UPSTREAM_ERROR: generation failed' } }
+  const wrapper = mount(TaskCard, { props: { detail: failedWithReason }, global: actionGlobal })
+  expect(wrapper.get('.status-label').text()).toBe('生成失败')
+  expect(wrapper.text()).not.toContain('UPSTREAM_ERROR')
+  expect(wrapper.text()).not.toContain('generation failed')
+  await wrapper.get(`[data-failed-${action}]`).trigger('click')
+  expect(tasksApi.retryFailedTask).not.toHaveBeenCalled()
+  expect(tasksApi.releaseFailedTask).not.toHaveBeenCalled()
+  await wrapper.get('[data-confirm-failed-action]').trigger('click'); await flushPromises()
+  const sender = action === 'retry' ? tasksApi.retryFailedTask : tasksApi.releaseFailedTask
+  expect(sender).toHaveBeenCalledWith('original-task', expect.objectContaining({ body: '{}', key: expect.any(String) }))
+  expect(wrapper.emitted('mediaChanged')).toEqual([[action === 'retry' ? 'successor' : undefined]])
+  wrapper.unmount()
+})
+it('keeps an uncertain failure action and replays its exact request instead of switching actions', async () => {
+  tasksApi.retryFailedTask.mockRejectedValueOnce(new Error('connection lost')).mockResolvedValueOnce({ task: { task_id: 'successor' }, replayed: true })
+  const wrapper = mount(TaskCard, { props: { detail: failedDetail }, global: actionGlobal })
+  await wrapper.get('[data-failed-retry]').trigger('click')
+  await wrapper.get('[data-confirm-failed-action]').trigger('click'); await flushPromises()
+  expect(wrapper.get('[data-failed-release]').attributes('disabled')).toBeDefined()
+  expect(wrapper.text()).toContain('操作结果尚未确认')
+  await wrapper.get('[data-repeat-failed-action]').trigger('click'); await flushPromises()
+  expect(tasksApi.retryFailedTask.mock.calls[0]).toEqual(tasksApi.retryFailedTask.mock.calls[1])
+  expect(tasksApi.releaseFailedTask).not.toHaveBeenCalled()
+  expect(wrapper.emitted('mediaChanged')).toHaveLength(1)
+  wrapper.unmount()
+})
+it.each(['RUNNING', 'INVESTIGATING', 'SAVING', 'SUCCEEDED'])('never offers release or execution retry for %s', state => {
+  const wrapper = mount(TaskCard, { props: { detail: { ...failedDetail, task: { ...failedDetail.task, state } } as Schema<'TaskDetail'> }, global: actionGlobal })
+  expect(wrapper.find('[data-failed-release]').exists()).toBe(false)
+  expect(wrapper.find('[data-failed-retry]').exists()).toBe(false)
+  wrapper.unmount()
+})
+it('keeps submitted inputs in task details while showing only results in the task surface', async () => {
+  const submitted = { ...detail, task: { ...detail.task, work_ids: [] }, input: { product: { name: '轻量外套', sellingPoints: '完整卖点\n第二行' }, instruction: '只在详情查看的原始创作指令', parameters: { platform: 'taobao', output_type: 'detail_page' }, material_versions: [{ file_id: 'reference-image', version: 'image-v1' }], product_version: 'product-v1' }, policy_versions: { pricing: 'private-policy-version' } } as Schema<'TaskDetail'>
+  const wrapper = mount(TaskCard, { props: { detail: submitted }, global: { stubs: { ...global.stubs, AppDrawer: { props: ['open'], template: '<aside v-if="open"><slot/></aside>' } } } })
+  expect(wrapper.text()).not.toContain('只在详情查看的原始创作指令')
+  expect(wrapper.find('img').exists()).toBe(false)
+  await wrapper.findAll('button').find(button => button.text() === '任务详情')!.trigger('click')
+  const drawer = wrapper.get('aside')
+  expect(drawer.text()).toContain('只在详情查看的原始创作指令')
+  expect(drawer.text()).toContain('完整卖点\n第二行')
+  expect(drawer.text()).toContain('淘宝')
+  expect(drawer.text()).toContain('详情图（3 张）')
+  expect(drawer.get('img').attributes('src')).toContain('reference-image')
+  expect(drawer.text()).not.toContain('适用政策版本')
+  expect(drawer.text()).not.toContain('private-policy-version')
+  expect(drawer.find('pre').exists()).toBe(false)
+  wrapper.unmount()
 })

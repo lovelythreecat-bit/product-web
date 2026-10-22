@@ -4,26 +4,46 @@ from datetime import UTC
 from hashlib import sha256
 
 from fastapi import HTTPException
-from sqlalchemy import select
+from sqlalchemy import func, select
 
 from app.admin.permissions import authorize_resource
 from app.common.pagination import page_rows
-from app.common.types import CursorPage
-from app.conversations.models import Message
+from app.conversations.models import Conversation, Message
 from app.conversations.service import authenticate
 from app.ledger.models import CreditLedger, CreditReservation
 from app.storage.models import File
 from app.tasks.models import GenerationTask, TaskSnapshot
 from app.tasks.repository import TaskRepository
 from app.works.models import Work, WorkItem
-from app.works.schemas import SourceMaterial, WorkDetail, WorkItemView, WorkSource, WorkView
+from app.works.schemas import (
+    SourceMaterial,
+    WorkDetail,
+    WorkItemView,
+    WorkPage,
+    WorkSource,
+    WorkView,
+)
+
+
+def work_display(kind, input_snapshot):
+    """A display title comes from the work's immutable original product facts."""
+    product = input_snapshot.get("product", {})
+    name = product.get("name") if isinstance(product, dict) else None
+    if not isinstance(name, str) or not name.strip():
+        return None
+    suffix = {"copy": "文案", "image": "图片", "video": "视频"}.get(kind, "作品")
+    parameters = input_snapshot.get("parameters", {})
+    purpose = parameters.get("purpose") if isinstance(parameters, dict) else None
+    if kind == "image" and purpose in ("主图", "场景图", "海报", "详情页图片"):
+        suffix = purpose
+    return name + suffix
 
 
 class WorkService:
     def __init__(self, session):
         self.session = session
 
-    def _predicates(self, principal, kind=None):
+    def _predicates(self, principal, kind=None, q=None):
         tasks = select(GenerationTask.id).where(
             GenerationTask.user_id == str(principal.user_id),
             GenerationTask.state == "SUCCEEDED",
@@ -50,18 +70,54 @@ class WorkService:
                     )
                 )
             )
+        if q and q.strip():
+            term = q.strip().lower()
+            product_name = TaskSnapshot.input_snapshot["product"]["name"].as_string()
+            predicates.append(
+                Work.task_id.in_(
+                    select(TaskSnapshot.task_id).where(
+                        TaskSnapshot.user_id == str(principal.user_id),
+                        func.lower(product_name).contains(term, autoescape=True),
+                    )
+                )
+            )
         return predicates
 
-    def list_works(self, principal, kind=None, cursor=None, limit=20):
+    def list_works(self, principal, kind=None, cursor=None, limit=20, *, q=None, page=None):
         authenticate(self.session, principal)
-        predicates = self._predicates(principal, kind)
+        if type(limit) is not int or not 1 <= limit <= 100:
+            raise HTTPException(422)
+        if q is not None and (not isinstance(q, str) or len(q) > 120):
+            raise HTTPException(422)
+        if page is not None and (type(page) is not int or page < 1 or cursor is not None):
+            raise HTTPException(422)
+        predicates = self._predicates(principal, kind, q)
+        if page is not None:
+            total = (
+                self.session.scalar(select(func.count()).select_from(Work).where(*predicates)) or 0
+            )
+            page = min(page, max(1, (total + limit - 1) // limit))
+            rows = self.session.scalars(
+                select(Work)
+                .where(*predicates)
+                .order_by(Work.created_at.desc(), Work.id.desc())
+                .offset((page - 1) * limit)
+                .limit(limit)
+            ).all()
+            return WorkPage(
+                items=[self._view(principal, row) for row in rows],
+                next_cursor=None,
+                total=total,
+                page=page,
+                page_size=limit,
+            )
         if cursor:
             # Resolve the anchor in precisely the same owner/filter scope.
             authorize_resource(self.session, principal, "work", cursor)
             if self.session.scalar(select(Work.id).where(*predicates, Work.id == cursor)) is None:
                 raise HTTPException(404)
         rows, next_cursor = page_rows(self.session, Work, predicates, cursor, limit)
-        return CursorPage[WorkView](
+        return WorkPage(
             items=[self._view(principal, row) for row in rows],
             next_cursor=next_cursor,
         )
@@ -71,6 +127,7 @@ class WorkService:
         authorize_resource(self.session, principal, "conversation", row.conversation_id)
         authorize_resource(self.session, principal, "message", row.message_id)
         snapshot = self.session.get(TaskSnapshot, row.task_id)
+        conversation = self.session.get(Conversation, row.conversation_id)
         message = self.session.get(Message, row.message_id)
         if (
             (message.task_id, message.conversation_id, message.kind, message.role)
@@ -129,6 +186,9 @@ class WorkService:
             message_id=row.message_id,
             created_at=row.created_at.replace(tzinfo=UTC),
             items=views,
+            warnings=message.content.get("warnings", []),
+            name=work_display(snapshot.agent_snapshot["kind"], snapshot.input_snapshot),
+            conversation_title=conversation.title if conversation is not None else None,
         )
 
     def read_work(self, principal, id):

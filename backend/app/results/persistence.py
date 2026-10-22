@@ -17,8 +17,10 @@ from app.agents.callbacks import CallbackService, OriginalResult
 from app.agents.models import AgentEventDecision
 from app.dispatch.consumer import LeaseManager
 from app.dispatch.recovery import database_now
+from app.ledger.service import lock_task_resources
 from app.results.manifest import exact_policy, result_rule, validate_manifest
 from app.results.models import ResultDeliveryRecord, ResultManifestRecord, ResultSaveItem
+from app.storage.capacity import StorageError, ensure_reserved_capacity
 from app.storage.download import DownloadPolicy, OriginalUnavailable
 from app.storage.local_store import StagedFile
 from app.storage.models import File, FileRef
@@ -51,6 +53,7 @@ class DurableDelivery:
     snapshot_digest: str
     items: tuple[DurableItem, ...]
     total_bytes: int
+    warnings: tuple[str, ...] = ()
 
 
 class ResultPersistence:
@@ -76,6 +79,8 @@ class ResultPersistence:
         if not isinstance(outcome, OriginalResult) or outcome.task_id != task_id:
             raise TransitionError("EVIDENCE_MISMATCH")
         with self.factory() as session, session.begin():
+            # Capacity must precede the task lock, as in admission and settlement.
+            lock_task_resources(session, task_id)
             task = locked_execution(session, task_id, lease)
             if task.state not in {"SAVING", "SAVE_RECOVERY", "INVESTIGATING"}:
                 raise TransitionError("INVALID_TRANSITION")
@@ -91,6 +96,12 @@ class ResultPersistence:
             )
             if existing:
                 self._check_manifest(session, task, existing)
+            ensure_reserved_capacity(
+                session, task.capacity_reservation_id,
+                sum(item.byte_length for item in manifest.items),
+                free_bytes=self.store.free_bytes,
+            )
+            if existing:
                 return existing.id
             record = ResultManifestRecord(
                 id=str(uuid4()),
@@ -138,7 +149,7 @@ class ResultPersistence:
         ).all()
         if len(jobs) != len(manifest.items):
             raise TransitionError("EVIDENCE_MISMATCH")
-        for job, item in zip(jobs, manifest.items, strict=True):
+        for job, item in zip(jobs, sorted(manifest.items, key=lambda i: i.item_key), strict=True):
             if (job.item_key, job.locator, job.sha256, job.actual_bytes, job.media_type) != (
                 item.item_key,
                 item.locator,
@@ -237,6 +248,7 @@ class ResultPersistence:
             record.identity["snapshot_digest"],
             tuple(items),
             total,
+            tuple(record.manifest.get("warnings", ())),
         )
 
     @staticmethod
@@ -270,22 +282,42 @@ class ResultPersistence:
     def _retrieve(self, binding, job, policy):
         # The bounded mock JSON transport is an explicit fixture-only exception;
         # it cannot enable arbitrary loopback URLs or any production download.
+        from app.agents.image import DOWNLOAD_SOURCE as IMAGE_SOURCE
+        from app.agents.image import ImageAgentAdapter
         from app.agents.mock import MockAgentAdapter
+        from app.agents.text import DOWNLOAD_SOURCE, TextAgentAdapter
+        from app.agents.video import DOWNLOAD_SOURCE as VIDEO_SOURCE
+        from app.agents.video import VideoAgentAdapter
 
-        if (
-            not isinstance(binding.adapter, MockAgentAdapter)
-            or not binding.adapter.test_only
-            or "TEST_ONLY:bound-mock" not in policy.allowed_download_sources
-        ):
+        mock_source = (
+            isinstance(binding.adapter, MockAgentAdapter) and binding.adapter.test_only
+            and "TEST_ONLY:bound-mock" in policy.allowed_download_sources
+        )
+        text_source = (
+            isinstance(binding.adapter, TextAgentAdapter)
+            and DOWNLOAD_SOURCE in policy.allowed_download_sources
+        )
+        media_source = (
+            isinstance(binding.adapter, ImageAgentAdapter)
+            and IMAGE_SOURCE in policy.allowed_download_sources
+        ) or (
+            isinstance(binding.adapter, VideoAgentAdapter)
+            and VIDEO_SOURCE in policy.allowed_download_sources
+        )
+        if not (mock_source or text_source or media_source):
             raise OriginalUnavailable("Original source unavailable")
-        binding.adapter.timeout = min(binding.adapter.timeout, policy.download_timeout_seconds)
+        if media_source:
+            binding.adapter.client.timeout = min(binding.adapter.client.timeout,
+                                                 policy.download_timeout_seconds)
+        else:
+            binding.adapter.timeout = min(binding.adapter.timeout, policy.download_timeout_seconds)
         source = binding.adapter.retrieve_original(job.locator)
         if source.status in {"EXPIRED", "NOT_FOUND", "UNSUPPORTED"}:
             raise OriginalUnavailable("Original result cannot be recovered")
         if (
             source.status != "AVAILABLE"
             or not source.complete
-            or not source.test_only
+            or source.test_only != binding.adapter.test_only
             or source.protocol_version != binding.protocol_version
             or source.locator != job.locator
             or source.sha256 != job.sha256
@@ -343,7 +375,8 @@ class ResultPersistence:
                 if not recovered:
                     if recorded:
                         raise FileValidationError()
-                    source = self._retrieve(binding, job, policy)
+                    source = self.upstream._leased_transport(
+                        self._retrieve, (binding, job, policy), lease)
                     prepared = StagedFile(job.internal_path, 0, "", reservation_id, identity)
                     staged = asyncio.run(
                         self.store.stage(
@@ -445,7 +478,7 @@ class ResultPersistence:
         except OriginalUnavailable:
             self._failure(task_id, lease, True)
             return None
-        except (FileValidationError, OSError):
+        except (FileValidationError, OSError, StorageError):
             self._failure(task_id, lease, False)
             return None
         except TransitionError:

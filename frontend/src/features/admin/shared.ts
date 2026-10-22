@@ -1,4 +1,5 @@
 import { onBeforeUnmount, ref } from 'vue'
+import './admin.css'
 import { ApiError } from '../../api/client'
 import { session } from '../auth/session'
 export function useAdminRequest() {
@@ -11,7 +12,7 @@ export function useAdminRequest() {
     if (busy.value || !current()) return false
     busy.value = true; error.value = ''
     try { const result = await task(); if (!current()) return false; apply(result); return true }
-    catch (e) { if (current()) error.value = e instanceof ApiError ? (e.status === 409 ? '版本或业务标识冲突，草稿已保留。请核对最新记录后再提交。' : e.message) : e instanceof Error ? e.message : '操作未完成，草稿已保留。'; return false }
+    catch (e) { if (current()) error.value = e instanceof ApiError ? (e.status === 409 ? '数据已更新或操作冲突，草稿已保留。请关闭后重新打开编辑。' : e.message) : e instanceof Error ? e.message : '操作未完成，草稿已保留。'; return false }
     finally { if (current()) busy.value = false }
   }
   return { busy, error, current, run }

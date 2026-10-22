@@ -29,14 +29,14 @@ test('TEST_ONLY real HTTPS registration CSRF admission Worker publication MySQL 
    const bytes=Uint8Array.from(atob(png),c=>c.charCodeAt(0))
    const file=await files.uploadFile(new File([bytes],'TEST_ONLY.png',{type:'image/png'}))
    const input={product_version:product.version,product:product.product,instruction:'TEST_ONLY complete result',parameters:{},material_versions:[file]}
-   const quote=await catalog.quote({spec_id:data.specId,input})
+   const quote=await catalog.quote({agent_id:data.agentId,input})
    const body={conversation_id:conversation.conversation_id,agent_id:data.agentId,input,confirmed_quote:quote}
    const intent=client.createIntent(body)
    const first=await tasks.submitTaskIntent(intent)
    const replay=await tasks.submitTaskIntent(intent)
    const frozen=await account.getAccount()
    return {registered,me,before,denied:denied.status,updated,first,replay,frozen,file,body}
- },{account:metadata.account_prefix+info.project.name+'_'+randomUUID().slice(0,8),key:randomUUID(),specId:metadata.specs.copy,agentId:metadata.agents.copy})
+ },{account:metadata.account_prefix+info.project.name+'_'+randomUUID().slice(0,8),key:randomUUID(),agentId:metadata.agents.copy})
  expect(result.me.user_id).toBe(result.registered.profile.user_id)
  expect(result.updated.nickname).toBe('TEST_ONLY browser')
  expect(result.denied).toBe(403)

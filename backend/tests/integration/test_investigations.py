@@ -217,6 +217,31 @@ def test_deadline_requires_owner_not_auto_failure(upstream, desk):
         assert s.get(CreditAccount, row.user_id).frozen == 30
 
 
+def test_investigation_sweep_defers_locked_user_and_retries_next_scan(upstream, desk):
+    from app.investigations.models import Investigation
+    from app.investigations.service import InvestigationService
+
+    task, _ = open_case(upstream, desk)
+    factory = upstream[0]
+    with factory() as session, session.begin():
+        session.execute(
+            text("UPDATE investigations SET deadline_at=UTC_TIMESTAMP(6)-INTERVAL 1 SECOND "
+                 "WHERE task_id=:id"), {"id": task},
+        )
+        owner = session.get(GenerationTask, task).user_id
+    sweep = InvestigationService(factory, upstream=upstream[1])
+    with factory() as blocker, blocker.begin():
+        blocker.scalar(select(User).where(User.id == owner).with_for_update())
+        # Maintenance must yield busy accounts instead of starving task consumption.
+        sweep.scan([task])
+        with factory() as check:
+            assert check.get(Investigation, task).status == "open"
+    sweep.scan([task])
+    with factory() as check:
+        assert check.get(Investigation, task).status == "overdue"
+        assert check.get(GenerationTask, task).settlement_state == "FROZEN"
+
+
 def test_no_delivery_no_manual_settle(upstream, desk):
     task, case = open_case(upstream, desk)
     assert resolve(desk, task, case, "settle").status_code == 409
@@ -726,10 +751,11 @@ def test_alert_api_paginates_without_private_payload(upstream, desk):
     assert second["items"][0]["key"] != page["items"][0]["key"]
 
 
-def test_capacity_shortfall_rolls_back_entire_manual_close(upstream, desk, ready, monkeypatch):
+def test_manual_close_accounts_staged_bytes_without_quota(upstream, desk, ready, monkeypatch):
     from app.audit.models import AuditEvent
     from app.investigations.models import Investigation, Resolution
-    from app.storage.models import StorageAccount
+    from app.results.models import ResultManifestRecord, ResultSaveItem
+    from app.storage.models import CapacityReservation, StorageAccount
     from tests.integration.test_settlement import publisher
 
     task = ready(count=2)
@@ -741,26 +767,32 @@ def test_capacity_shortfall_rolls_back_entire_manual_close(upstream, desk, ready
     monkeypatch.setattr(pub.persistence.store, "commit", fail_commit)
     assert pub.run(task) is None
     case = existing_case(desk, task)
-    with upstream[0]() as s, s.begin():
-        owner = s.get(GenerationTask, task).user_id
-        s.get(StorageAccount, owner).quota_bytes = 1
     response = resolve(desk, task, case, "manual_close")
-    assert response.status_code == 409, response.text
+    assert response.status_code == 200, response.text
     with upstream[0]() as s:
         row = s.get(GenerationTask, task)
-        assert row.state == "SAVE_RECOVERY" and row.settlement_state == "FROZEN"
-        assert s.get(Investigation, task).version == case["version"]
-        assert s.get(CreditAccount, row.user_id).frozen == 30
-        assert s.scalar(select(Resolution).where(Resolution.task_id == task)) is None
+        assert row.state == "MANUALLY_CLOSED" and row.settlement_state == "RELEASED"
+        assert s.get(Investigation, task).version > case["version"]
+        assert s.get(CreditAccount, row.user_id).frozen == 0
+        assert s.scalar(select(Resolution).where(Resolution.task_id == task)) is not None
+        expected = sum(s.scalars(
+            select(ResultSaveItem.actual_bytes)
+            .join(ResultManifestRecord, ResultManifestRecord.id == ResultSaveItem.manifest_id)
+            .where(ResultManifestRecord.task_id == task)
+        ).all())
+        reservation = s.get(CapacityReservation, row.capacity_reservation_id)
+        assert reservation.state == "reserved"
+        assert reservation.estimated_bytes >= expected > 0
+        assert s.get(StorageAccount, row.user_id).reserved_bytes >= expected
         assert (
             s.scalar(
                 select(AuditEvent).where(
                     AuditEvent.object_id == task, AuditEvent.action == "investigation.manual_close"
                 )
             )
-            is None
+            is not None
         )
         assert (
             s.scalar(select(CreditLedger).where(CreditLedger.operation_key == "settle:" + task))
-            is None
+            is not None
         )

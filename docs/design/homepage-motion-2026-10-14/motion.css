@@ -1,0 +1,35 @@
+/* V1 motion study on the confirmed homepage V3. Preview only. */
+html { scroll-behavior: smooth; }
+#main-content { padding: 0; max-width: none; margin: 0; }
+.home-output { animation: output-float 6s ease-in-out infinite; animation-play-state: paused; }
+.home-output--image { animation-duration: 7s; animation-delay: -2s; }
+.home-output--video { animation-duration: 6.5s; animation-delay: -4s; }
+.home-hero-stage.is-visible .home-output { animation-play-state: running; }
+@keyframes output-float { 0%,100% { translate: 0 0; } 50% { translate: 0 -8px; } }
+.motion-video { display: block; position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+.home-film-caption { bottom: 16px; padding: 6px 10px; }
+.home-cover-label { pointer-events: none; }
+.film-toggle { position: absolute; bottom: 14px; right: 14px; z-index: 3; width: 44px; height: 44px; display: grid; place-items: center; border: 1px solid #e7d9ca; border-radius: 50%; background: #fffdfa; color: #322823; }
+.film-toggle svg { width: 18px; height: 18px; fill: currentColor; }
+@media (hover:hover) {
+  .home-button,.home-scenario { transition: translate 180ms ease-out, box-shadow 180ms ease-out, background 180ms ease-out; }
+  .home-button:hover { translate: 0 -2px; }
+  .home-scenario:hover { translate: 0 -4px; box-shadow: 0 12px 24px #67452718; }
+}
+.preview-tools { position: fixed; z-index: 20; right: 20px; bottom: 16px; display: flex; align-items: center; gap: 8px; padding: 7px 9px 7px 15px; background: #fffdfa; color: #322823; border: 1px solid #e7d9ca; border-radius: 12px; box-shadow: 0 8px 25px #32282318; font-size: 12px; }
+.preview-tools>span { font-weight: 700; padding-right: 6px; }
+.preview-tools button,.preview-tools a { min-height: 40px; display: inline-flex; align-items: center; justify-content: center; padding: 7px 10px; border: 0; border-radius: 7px; background: #f1e7da; color: #573c2f; font: inherit; text-decoration: none; }
+.preview-tools button:hover,.preview-tools a:hover { background: #ead7c6; }
+.preview-tools :focus-visible { outline: 3px solid #a94e32; outline-offset: 2px; }
+body { padding-bottom: 78px; }
+body.motion-paused .home-output,body.page-hidden .home-output { animation-play-state: paused !important; }
+@media(max-width:760px) {
+  @keyframes output-float { 0%,100% { translate: 0 0; } 50% { translate: 0 -4px; } }
+  .preview-tools { left: 8px; right: 8px; bottom: 8px; padding: 6px; gap: 4px; justify-content: space-between; font-size: 11px; }
+  .preview-tools>span { padding: 0 2px; }
+  .preview-tools button,.preview-tools a { padding: 6px 8px; min-height: 44px; }
+}
+@media(prefers-reduced-motion:reduce) {
+  html { scroll-behavior: auto; }
+  .home-output { animation: none !important; }
+}

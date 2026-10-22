@@ -7,7 +7,7 @@ from uuid import UUID
 
 from pydantic import ConfigDict, Field, SecretStr, model_validator
 
-from app.common.types import DTO, InputSnapshot, NonNegativeInt, Quote
+from app.common.types import ConfigurationChange, DTO, InputSnapshot, NonNegativeInt, Quote
 from app.policies.schemas import Mode, Version
 
 Name = Annotated[str, Field(min_length=1, max_length=128, pattern=r"\S")]
@@ -104,11 +104,10 @@ class ParameterSchema(CatalogDTO):
         return self
 
 
-class Publication(CatalogDTO):
+class Publication(CatalogDTO, ConfigurationChange):
     version: Version
     expected_version: Version | None = None
     enabled: bool = Field(strict=True)
-    reason: Annotated[str, Field(min_length=1, max_length=500, pattern=r"\S")]
 
 
 class AgentDraft(Publication):
@@ -181,7 +180,7 @@ class PriceVersion(CatalogDTO):
 
 
 class QuoteRequest(CatalogDTO):
-    spec_id: UUID
+    agent_id: UUID
     input: InputSnapshot
 
 
@@ -197,3 +196,18 @@ class ValidatedQuote(CatalogDTO):
 def support_ref(value) -> str:
     # Exclude absent optional rule fields so clients can hash the compact declared schema.
     return "sha256:" + content_digest(value.model_dump(mode="json", exclude_none=True))
+
+
+def single_spec(agent: AgentVersion) -> SpecVersion:
+    """Fixed single-result envelope for current per-kind pricing, not a UI option."""
+    return SpecVersion(
+        spec_id=agent.agent_id,
+        version=agent.version,
+        agent_id=agent.agent_id,
+        agent_version=agent.version,
+        name=agent.name,
+        enabled=True,
+        parameter_schema=ParameterSchema(fields={}, combinations=[]),
+        delivery_kind="single",
+        policy_versions={},
+    )

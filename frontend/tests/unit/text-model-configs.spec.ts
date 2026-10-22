@@ -1,0 +1,91 @@
+import { beforeEach, expect, it, vi } from 'vitest'
+import { flushPromises, mount } from '@vue/test-utils'
+import { defineComponent } from 'vue'
+import { ApiError } from '../../src/api/client'
+const api = vi.hoisted(() => ({ listTextModels: vi.fn(), getTextDefaultModel: vi.fn(), saveTextDefaultModel: vi.fn(), getTextModel: vi.fn(), createTextModel: vi.fn(), updateTextModel: vi.fn() }))
+vi.mock('../../src/api/admin', () => api)
+vi.mock('../../src/features/auth/session', () => ({ session: { epoch: { value: 0 } } }))
+import TextModelConfigs from '../../src/features/admin/TextModelConfigs.vue'
+const row = { id: '00000000-0000-4000-8000-000000000001', name: '文本服务模型', provider: 'openai_chat', base_url: 'https://models.example/v1', model: 'current-model', supports_images: false, timeout_seconds: 60, temperature: null, max_tokens: null, enabled: true, has_api_key: true, revision: 3 }
+const overlay = defineComponent({ props: ['open'], template: '<section v-if="open"><slot/><slot name="actions"/></section>' })
+const global = { stubs: { AppDrawer: overlay } }
+beforeEach(() => { vi.clearAllMocks(); api.getTextDefaultModel.mockResolvedValue({ model_config_id: null, revision: 0, connection_revision: 2 }); api.listTextModels.mockResolvedValue({ items: [row], next_cursor: null }) })
+
+it('creates, reads and clears reasoning effort without confusing none with model default', async () => {
+  api.listTextModels.mockResolvedValue({ items: [{ ...row, reasoning_effort: 'low' }], next_cursor: null })
+  const wrapper = mount(TextModelConfigs, { global }); await flushPromises()
+  await wrapper.findAll('button').find(b => b.text() === '配置模型')!.trigger('click')
+  const select = wrapper.get('select[data-select-id="text-model-reasoning"]')
+  expect((select.element as HTMLSelectElement).value).toBe('low')
+  expect(select.findAll('option').map(option => option.attributes('value'))).toEqual(['', 'none', 'minimal', 'low', 'medium', 'high', 'xhigh', 'max'])
+  api.updateTextModel.mockResolvedValue({ ...row, reasoning_effort: null })
+  await select.setValue('')
+  await wrapper.get('#text-model-form').trigger('submit'); await flushPromises()
+  expect(api.updateTextModel.mock.calls[0][1].config.reasoning_effort).toBeNull()
+  await wrapper.findAll('button').find(b => b.text() === '配置模型')!.trigger('click')
+  expect((wrapper.get('select[data-select-id="text-model-reasoning"]').element as HTMLSelectElement).value).toBe('')
+  wrapper.unmount()
+
+  const creating = mount(TextModelConfigs, { global }); await flushPromises()
+  await creating.findAll('button').find(b => b.text() === '新增模型配置')!.trigger('click')
+  await creating.get('select[data-select-id="text-model-reasoning"]').setValue('none')
+  api.createTextModel.mockResolvedValue({ ...row, reasoning_effort: 'none' })
+  await creating.get('#text-model-form').trigger('submit'); await flushPromises()
+  expect(api.createTextModel.mock.calls[0][0].config.reasoning_effort).toBe('none')
+  creating.unmount()
+})
+
+it('edits using the loaded revision and never submits a blank replacement key', async () => {
+  const wrapper = mount(TextModelConfigs, { global }); await flushPromises()
+  await wrapper.findAll('button').find(b => b.text() === '配置模型')!.trigger('click')
+  expect((wrapper.get('#text-model-key').element as HTMLInputElement).value).toBe('')
+  await wrapper.get('#text-model-name').setValue('新的名称')
+  expect(wrapper.find('#text-model-reason').exists()).toBe(false)
+  api.updateTextModel.mockRejectedValueOnce(new ApiError('版本冲突', 409))
+  await wrapper.get('#text-model-form').trigger('submit'); await flushPromises()
+  expect(api.updateTextModel).toHaveBeenCalledWith(row.id, expect.objectContaining({ expected_revision: 3, config: expect.objectContaining({ name: '新的名称' }) }))
+  expect(api.updateTextModel.mock.calls[0][1]).not.toHaveProperty('reason')
+  expect(api.updateTextModel.mock.calls[0][1].config).not.toHaveProperty('api_key')
+  expect(wrapper.text()).toContain('草稿已保留')
+  expect((wrapper.get('#text-model-name').element as HTMLInputElement).value).toBe('新的名称')
+  expect(wrapper.findAll('button').find(b => b.text() === '保存模型配置')!.attributes('disabled')).toBeDefined()
+  api.getTextModel.mockResolvedValue({ ...row, revision: 4, name: '服务端更新名称' })
+  await wrapper.findAll('button').find(b => b.text() === '放弃草稿并载入最新配置')!.trigger('click'); await flushPromises()
+  expect(api.getTextModel).toHaveBeenCalledWith(row.id)
+  expect((wrapper.get('#text-model-name').element as HTMLInputElement).value).toBe('服务端更新名称')
+  expect(wrapper.text()).toContain('当前配置版本：4')
+  wrapper.unmount()
+})
+
+it('loads another page without losing earlier configs and refreshes from the first page', async () => {
+  api.listTextModels.mockResolvedValueOnce({ items: [row], next_cursor: 'next' })
+  const wrapper = mount(TextModelConfigs, { global }); await flushPromises()
+  api.listTextModels.mockResolvedValueOnce({ items: [{ ...row, id: 'another', name: '另一配置' }], next_cursor: null })
+  await wrapper.findAll('button').find(b => b.text() === '加载更多模型')!.trigger('click'); await flushPromises()
+  expect(api.listTextModels).toHaveBeenLastCalledWith('next')
+  expect(wrapper.text()).toContain('文本服务模型'); expect(wrapper.text()).toContain('另一配置')
+  await wrapper.findAll('button').find(b => b.text() === '刷新模型配置')!.trigger('click'); await flushPromises()
+  expect(api.listTextModels).toHaveBeenLastCalledWith(undefined)
+  wrapper.unmount()
+})
+
+it('sets a default without a change reason and retains optimistic revision protection', async () => {
+  const wrapper = mount(TextModelConfigs, { global }); await flushPromises()
+  const action = wrapper.findAll('button').find(b => b.text() === '设为默认')
+  expect(action).toBeDefined()
+  await action!.trigger('click')
+  expect(wrapper.find('#text-default-reason').exists()).toBe(false)
+  api.saveTextDefaultModel.mockRejectedValueOnce(new ApiError('连接已更新', 409))
+  await wrapper.get('#text-default-form').trigger('submit'); await flushPromises()
+  expect(wrapper.find('#text-default-form').exists()).toBe(true)
+  expect(wrapper.text()).toContain('草稿已保留')
+  api.saveTextDefaultModel.mockResolvedValue({ model_config_id: row.id, revision: 1, connection_revision: 2 })
+  // A fresh selection is required after reviewing the latest revision.
+  await wrapper.findAll('button').find(b => b.text() === '重新加载默认设置')!.trigger('click')
+  await flushPromises()
+  await wrapper.get('#text-default-form').trigger('submit'); await flushPromises()
+  expect(api.saveTextDefaultModel).toHaveBeenLastCalledWith({ model_config_id: row.id, expected_revision: 0, expected_connection_revision: 2 })
+  expect(wrapper.text()).toContain('工作台默认模型')
+  expect(wrapper.find('#text-default-form').exists()).toBe(false)
+  wrapper.unmount()
+})

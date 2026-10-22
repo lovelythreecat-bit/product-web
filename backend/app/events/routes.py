@@ -1,11 +1,11 @@
 """Cookie-only native EventSource. MySQL polling remains authoritative without Redis."""
 
 import asyncio
-from datetime import UTC
+from datetime import UTC, timedelta
 from typing import Annotated
 
 from fastapi import APIRouter, Cookie, Header, HTTPException, Query, Request
-from sqlalchemy import select
+from sqlalchemy import func, select
 from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.orm import Session
 from starlette.concurrency import run_in_threadpool
@@ -13,9 +13,10 @@ from starlette.responses import StreamingResponse
 
 from app.auth.service import AuthService
 from app.common.errors import ErrorResponse
-from app.events.models import DurableEvent
+from app.events.models import DurableEvent, EventHead
 from app.events.schemas import DurableEventView, ResetEvent
 from app.events.service import prune_events
+from app.ledger.service import now
 
 router = APIRouter(prefix="/api/v1")
 
@@ -40,7 +41,7 @@ def same_origin(request):
 
 def authenticate(engine, cookie):
     with Session(engine) as session, session.begin():
-        return AuthService(session).require_active_principal(cookie)
+        return AuthService(session).require_active_principal(cookie, lock=False)
 
 
 def frame(kind, data, cursor=None):
@@ -52,11 +53,20 @@ def read_next(engine, cookie, principal, cursor, retention, hub, subscription):
     # All synchronous SQL (including lock waits) runs in a worker thread. The Session
     # is committed/closed before this string crosses any ASGI network boundary.
     with Session(engine) as session, session.begin():
-        current = AuthService(session).require_active_principal(cookie)
+        current = AuthService(session).require_active_principal(cookie, lock=False)
         if current != principal:
             raise HTTPException(401)
         uid = str(current.user_id)
-        head = prune_events(session, uid, retention)
+        # Idle delivery is read-only. Take retention locks only when rows have expired,
+        # preserving the permanent receipt and cursor-floor cleanup contract.
+        expired = session.scalar(select(func.max(DurableEvent.event_seq)).where(
+            DurableEvent.user_id == uid,
+            DurableEvent.created_at < now() - timedelta(seconds=retention),
+        ))
+        head = (prune_events(session, uid, retention) if expired is not None
+                else session.get(EventHead, uid))
+        last_seq = head.last_seq if head else 0
+        pruned_through = head.pruned_through if head else 0
         seq = 0
         try:
             if cursor is not None:
@@ -64,10 +74,10 @@ def read_next(engine, cookie, principal, cursor, retention, hub, subscription):
                 if owner != uid or not raw_seq.isascii() or not raw_seq.isdecimal():
                     raise ValueError
                 seq = int(raw_seq)
-            if not head.pruned_through <= seq <= head.last_seq:
+            if not pruned_through <= seq <= last_seq:
                 raise ValueError
         except (ValueError, OverflowError):
-            latest = f"{uid}:{head.last_seq}"
+            latest = f"{uid}:{last_seq}"
             return latest, frame("reset", ResetEvent().model_dump_json(), latest), True
         row = session.scalar(
             select(DurableEvent)
@@ -115,7 +125,7 @@ async def stream_events(request, principal, cookie, after):
                     return
             else:
                 yield ": keep-alive\n\n"
-                await asyncio.sleep(0.25)
+                await asyncio.sleep(1)
     finally:
         if hub:
             hub.unsubscribe(subscription)

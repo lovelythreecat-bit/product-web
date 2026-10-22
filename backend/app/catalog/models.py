@@ -1,6 +1,14 @@
 """Append-only catalog versions plus transactionally advanced current heads."""
 
-from sqlalchemy import JSON, ForeignKeyConstraint, String, UniqueConstraint
+from sqlalchemy import (
+    JSON,
+    BigInteger,
+    ForeignKey,
+    ForeignKeyConstraint,
+    LargeBinary,
+    String,
+    UniqueConstraint,
+)
 from sqlalchemy.orm import Mapped, mapped_column
 
 from app.db import Base
@@ -87,3 +95,23 @@ class PriceHead(Base):
     )
     spec_id: Mapped[str] = mapped_column(String(36), primary_key=True)
     version: Mapped[str] = mapped_column(String(128))
+
+
+class ParameterConfig(Base):
+    """Append-only prices per creation kind; no administrator-authored specs."""
+
+    __tablename__ = "generation_parameter_configs"
+    version: Mapped[str] = mapped_column(String(36), primary_key=True)
+    mode: Mapped[str] = mapped_column(String(16))
+    text_price: Mapped[int | None] = mapped_column(BigInteger)
+    image_price: Mapped[int | None] = mapped_column(BigInteger)
+    video_price: Mapped[int | None] = mapped_column(BigInteger)
+    assist_base_url: Mapped[str | None] = mapped_column(String(2048))
+    assist_model: Mapped[str | None] = mapped_column(String(200))
+    assist_key_ciphertext: Mapped[bytes | None] = mapped_column(LargeBinary)
+
+
+class ParameterHead(Base):
+    __tablename__ = "generation_parameter_heads"
+    mode: Mapped[str] = mapped_column(String(16), primary_key=True)
+    version: Mapped[str | None] = mapped_column(ForeignKey("generation_parameter_configs.version"))

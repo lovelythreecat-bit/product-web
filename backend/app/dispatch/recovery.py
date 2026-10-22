@@ -3,12 +3,18 @@
 from dataclasses import dataclass
 from datetime import timedelta
 
-from sqlalchemy import or_, select, text
+from sqlalchemy import and_, case, or_, select, text
 
-from app.dispatch.outbox import enqueue_outbox
+from app.dispatch.models import OutboxEvent
+from app.dispatch.outbox import rearm_outbox
 from app.tasks.models import GenerationTask
 
 TERMINAL_STATES = frozenset({"SUCCEEDED", "FAILED", "MANUALLY_CLOSED"})
+AUTOMATIC_RECOVERY_BLOCKERS = frozenset({"UPSTREAM_NEEDS_INPUT", "CALLBACK_EVENT_CONFLICT"})
+
+
+def automatic_recovery_blocked(task):
+    return getattr(task, "investigation_reason", None) in AUTOMATIC_RECOVERY_BLOCKERS
 
 
 def database_now(session):
@@ -52,6 +58,23 @@ class RecoveryScheduler:
             query = select(GenerationTask).where(
                 GenerationTask.state.not_in(TERMINAL_STATES),
                 GenerationTask.recovery_due_at <= current,
+                ~select(OutboxEvent.event_id).where(
+                    OutboxEvent.task_id == GenerationTask.id,
+                    OutboxEvent.state_version == GenerationTask.state_version,
+                    OutboxEvent.claimed_generation < OutboxEvent.dispatch_generation,
+                    OutboxEvent.ready_at > current,
+                    or_(
+                        OutboxEvent.operation == case(
+                            (GenerationTask.state.in_({"SAVING", "SAVE_RECOVERY"}), "save"),
+                            else_="recover",
+                        ),
+                        and_(OutboxEvent.operation == "submit",
+                             GenerationTask.state.in_({"SUBMITTED", "QUEUED"}),
+                             GenerationTask.upstream_id.is_(None)),
+                    ),
+                ).exists(),
+                or_(GenerationTask.investigation_reason.is_(None),
+                    GenerationTask.investigation_reason.not_in(AUTOMATIC_RECOVERY_BLOCKERS)),
                 or_(
                     GenerationTask.lease_expires_at.is_(None),
                     GenerationTask.lease_expires_at <= current,
@@ -69,11 +92,11 @@ class RecoveryScheduler:
                 action = recovery_action(task)
                 if action is None:
                     continue
-                row = enqueue_outbox(
-                    session, task.id, "save" if action == "save_original" else "recover"
+                rearm_outbox(
+                    session, task.id, "save" if action == "save_original" else "recover",
+                    ready_at=current,
                 )
-                # Re-arm even a previously ACKed / dispatched event. Message loss is harmless.
-                row.ready_at, row.dispatched_at = current, None
+                # This is a watchdog deadline, not the generation's execution not-before.
                 task.recovery_due_at = current + timedelta(seconds=self.retry_seconds)
                 scheduled.append(task.id)
             return RecoveryReport(tuple(scheduled))

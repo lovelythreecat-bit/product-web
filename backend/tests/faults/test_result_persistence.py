@@ -105,6 +105,37 @@ def test_partial_temporary_not_complete(upstream, ready, tmp_path):
     assert facts(upstream[0], task)[-1] == "frozen"
 
 
+def test_manifest_reserves_declared_bytes_before_retrieval(upstream, ready, tmp_path, monkeypatch):
+    from app.results.models import ResultSaveItem
+    from app.storage.models import CapacityReservation, StorageAccount, StoragePool
+
+    task_id = ready(count=2)
+    service = persistence(upstream, tmp_path)
+    # Reproduce an estimate smaller than the returned complete manifest.
+    with upstream[0]() as session, session.begin():
+        task = session.get(GenerationTask, task_id)
+        reservation = session.get(CapacityReservation, task.capacity_reservation_id)
+        difference = reservation.estimated_bytes - 1
+        session.get(StoragePool, reservation.pool_id).reserved_bytes -= difference
+        session.get(StorageAccount, task.user_id).reserved_bytes -= difference
+        reservation.estimated_bytes = 1
+
+    def before_retrieval(task_id, manifest_id, *, lease):
+        with upstream[0]() as session:
+            task = session.get(GenerationTask, task_id)
+            reservation = session.get(CapacityReservation, task.capacity_reservation_id)
+            required = sum(session.scalars(select(ResultSaveItem.actual_bytes).where(
+                ResultSaveItem.manifest_id == manifest_id,
+            )))
+            assert required > 1
+            assert reservation.estimated_bytes >= required
+        return None
+
+    monkeypatch.setattr(service, "persist_original_result", before_retrieval)
+    assert service.save_original(task_id) is None
+    assert calls(upstream, task_id)["retrieve_original"] == 0
+
+
 def test_disk_complete_db_commit_failure(upstream, ready, tmp_path, monkeypatch):
     task = ready()
     service = persistence(upstream, tmp_path)

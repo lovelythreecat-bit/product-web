@@ -3,7 +3,9 @@
 from typing import Literal
 from uuid import UUID
 
-from app.common.types import DTO, FileVersionRef, PositiveInt, Timestamp
+from pydantic import Field
+
+from app.common.types import DTO, CursorPage, FileVersionRef, PositiveInt, Timestamp
 from app.tasks.schemas import TaskDetail
 
 WorkKind = Literal["copy", "image", "video"]
@@ -42,6 +44,15 @@ class WorkView(DTO):
     message_id: UUID
     created_at: Timestamp
     items: list[WorkItemView]
+    warnings: list[str] = Field(default_factory=list)
+    name: str | None = None
+    conversation_title: str | None = None
+
+
+class WorkPage(CursorPage[WorkView]):
+    total: int | None = None
+    page: int | None = None
+    page_size: int | None = None
 
 
 class WorkDetail(WorkView):

@@ -138,7 +138,7 @@ class TransitionReceipt:
 ALLOWED = {
     "SUBMITTED": {"QUEUED", "SUBMITTING", "FAILED"},
     "QUEUED": {"QUEUED", "SUBMITTING", "FAILED"},
-    "SUBMITTING": {"RUNNING", "SAVING", "INVESTIGATING", "FAILED"},
+    "SUBMITTING": {"RUNNING", "SAVING", "INVESTIGATING", "FAILED", "QUEUED"},
     "RUNNING": {"SAVING", "INVESTIGATING", "FAILED"},
     "INVESTIGATING": {"RUNNING", "SAVING", "SUBMITTING", "QUEUED", "FAILED", "MANUALLY_CLOSED"},
     "SAVING": {"SUCCEEDED", "SAVE_RECOVERY"},
@@ -153,13 +153,19 @@ def required_proof(source, target):
         return "definite_failure"
     if target == "MANUALLY_CLOSED":
         return "manual_close"
-    if source == "INVESTIGATING" and target in {"SUBMITTING", "QUEUED"}:
+    if ((source == "INVESTIGATING" and target in {"SUBMITTING", "QUEUED"})
+            or (source == "SUBMITTING" and target == "QUEUED")):
         return "safe_retry"
     if target == "RUNNING":
         return "accepted"
     if target == "SAVING":
         return "original_save" if source == "SAVE_RECOVERY" else "original_result"
     return None
+
+
+def failed_settlement_valid(task_state, reservation_state):
+    # New failures wait for the owner; already-released historical failures remain valid.
+    return (task_state, reservation_state) in {("FROZEN", "frozen"), ("RELEASED", "released")}
 
 
 def transition_task(session, task_id, expected_version, event, evidence):
@@ -198,11 +204,13 @@ def transition_task(session, task_id, expected_version, event, evidence):
             select(CreditReservation).where(CreditReservation.task_id == task.id).with_for_update()
         )
         expected_settlement = "CONSUMED" if event == "SUCCEEDED" else "RELEASED"
-        if (
-            task.settlement_state != expected_settlement
-            or reservation is None
-            or reservation.state != expected_settlement.lower()
-        ):
+        settlement_valid = reservation is not None and (
+            failed_settlement_valid(task.settlement_state, reservation.state)
+            if event == "FAILED"
+            else task.settlement_state == expected_settlement
+            and reservation.state == expected_settlement.lower()
+        )
+        if not settlement_valid:
             raise TransitionError("SETTLEMENT_REQUIRED")
     if source == event:
         return TransitionReceipt(task.id, source, task.state_version, False)

@@ -44,7 +44,7 @@ wsl.exe -d Ubuntu-24.04 -- timeout 45 docker compose -f /mnt/f/Work/电商/web/i
 
 ## API 与前端
 
-`infra/env.example` 是配置说明，不会被自动加载。`Settings` 从 `APP_` 环境变量读取；不在源码中放真实秘密。开发凭据的 `TEST_ONLY` 是明确的公开测试值。
+2026-10-13 更新：API、Alembic 与 Worker 自动读取 `backend/.env`，环境变量优先于文件。首次从 `backend/.env.example` 复制并按本机环境修改，之后无需重复设置下方环境变量；最新启动步骤见仓库 README。`infra/env.example` 仍是基础设施与测试配置说明，不会自动加载。以下保留 T01 环境变量启动方式作为历史参考。开发凭据的 `TEST_ONLY` 是明确的公开测试值。
 
 ```powershell
 $env:APP_MODE = 'mock'
@@ -67,7 +67,7 @@ $env:APP_STORAGE_PERSISTENT = 'true'
 打开 `http://127.0.0.1:15173`。Vite 将 `/api` 代理到 `http://127.0.0.1:18000`；可通过非公开的 `API_PROXY_TARGET` 环境变量改变代理目标。不要把凭据放入 `VITE_*`。
 
 - `GET http://127.0.0.1:18000/api/v1/health/live` 返回 200 及 `mode`、`test_only`。
-- ready 要求数据库 `SELECT 1` 成功，并且显式声明 `APP_STORAGE_PERSISTENT=true`，持久根为已存在的绝对目录，可写入/flush/fsync。任何条件不满足返回 503、`ready=false` 和安全的布尔检查结果，不返回内部路径或连接信息，也不自动创建存储根。
+- ready 要求数据库 `SELECT 1` 成功、实际 Alembic revision 与当前代码 migration head 一致，并且显式声明 `APP_STORAGE_PERSISTENT=true`，持久根为已存在的绝对目录，可写入/flush/fsync。任何条件不满足返回 503、`ready=false` 和安全的布尔检查结果，不返回内部路径或连接信息，也不自动创建存储根。2026-10-13 补充迁移检查：未初始化、旧版本或未知版本数据库不能仅凭连接成功返回 ready；先执行 `alembic upgrade head`，再启动业务接口。
 - 该检查验证配置声明与可写性，不能代替 T24 对实际磁盘挂载、备份恢复和断电持久性的验收。
 - staging/production 拒绝 `test_only=true`，也拒绝数据库/Redis URL、存储路径里的 TEST_ONLY 标记。设置 `APP_TEST_ONLY=false` 不等于业务生产门槛已确认。
 - Redis 不参与 readiness 判定；其故障不应把持久任务解释为不存在。

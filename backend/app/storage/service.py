@@ -36,6 +36,7 @@ class UploadService:
             self.policy.max_file_bytes,
             self.policy_version,
             mode=self.mode,
+            free_bytes=self.store.free_bytes,
         )
         self.reservation_id = reservation.id
         # Journal precedes the caller's reservation commit, including ambiguous outcomes.

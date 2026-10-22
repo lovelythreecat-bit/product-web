@@ -13,7 +13,7 @@ from threading import Event, RLock, Thread
 from uuid import uuid4
 
 from redis import Redis
-from sqlalchemy import select, text
+from sqlalchemy import select
 from sqlalchemy.engine import make_url
 from sqlalchemy.orm import sessionmaker
 
@@ -111,12 +111,11 @@ class Runtime:
         )
         self.engine = create_db_engine(settings)
         self.factory = sessionmaker(self.engine, expire_on_commit=False)
+        from app.db import database_schema_current
+
         with self.engine.connect() as c:
-            if (
-                c.execute(text("SELECT version_num FROM alembic_version")).scalar_one()
-                != "0021_site_content"
-            ):
-                raise ValueError("Browser harness requires migration 0021_site_content")
+            if not database_schema_current(c):
+                raise ValueError("Browser harness requires the current bundled database schema")
         self.redis = Redis.from_url(redis_url, socket_timeout=3, socket_connect_timeout=3)
         self.redis.ping()
         self.mock = BoundedServer(("127.0.0.1", 0))
@@ -252,17 +251,32 @@ class Runtime:
 
     def drive(self, task_id):
         """Wake only a registered original task through the production outbox/consumer."""
-        from app.dispatch.outbox import enqueue_outbox
+        from app.dispatch.outbox import rearm_outbox
+        from app.dispatch.recovery import automatic_recovery_blocked, recovery_action
+        from app.tasks.models import GenerationTask
 
         with self.lock:
             if task_id not in self.owned:
                 raise ValueError("Task outside this run")
             with self.factory() as session, session.begin():
                 self.checked_task(session, task_id)
-                row = enqueue_outbox(session, task_id, "recover")
-                fields = dict(
-                    event_id=row.event_id, task_id=task_id, state_version=str(row.state_version)
+                task = session.scalar(
+                    select(GenerationTask).where(GenerationTask.id == task_id)
+                    .with_for_update().execution_options(populate_existing=True)
                 )
+                action = recovery_action(task)
+                fields = None
+                if action is not None and not automatic_recovery_blocked(task):
+                    row = rearm_outbox(
+                        session, task_id, "save" if action == "save_original" else "recover",
+                    )
+                    fields = dict(
+                        event_id=row.event_id, task_id=task_id,
+                        state_version=str(row.state_version),
+                        dispatch_generation=str(row.dispatch_generation),
+                    )
+            if fields is None:
+                return self.inspect(task_id)
             outcome = self.worker.consumer.process_message(fields)
             if outcome not in {"handled", "unhandled"}:
                 raise RuntimeError("Original task handler did not complete")
@@ -324,30 +338,25 @@ class Runtime:
     def reprice(self, kind):
         """Publish a new exact version at the same TEST_ONLY 8/20/60 price."""
         from app.auth.service import AuthService
-        from app.catalog.models import PriceHead, PriceRecord
-        from app.catalog.schemas import PriceDraft
-        from app.catalog.service import CatalogService
+        from app.catalog.parameters import ParameterConfigUpdate, read_parameters, update_parameters
 
         if kind not in self.agents:
             raise ValueError("Agent outside this run")
-        spec_id = self.metadata["specs"][kind]
         with self.lock, self.factory() as session, session.begin():
             auth = AuthService(session, mode="mock")
             login = auth.authenticate(self.prefix + "admin", "TEST_ONLY_browser_password")
             actor = auth.require_active_principal(login.session_token)
-            head = session.get(PriceHead, spec_id)
-            previous = session.get(PriceRecord, (spec_id, head.version)).snapshot
-            result = CatalogService(session, mode="mock").set_price_version(
-                actor,
-                PriceDraft(
-                    spec_id=spec_id,
-                    version="TEST_ONLY_requote_" + uuid4().hex,
-                    expected_version=head.version,
-                    enabled=True,
-                    credits=previous["credits"],
-                    policy_version=previous["policy_version"],
-                    reason="TEST_ONLY exact stale quote browser scenario",
+            previous = read_parameters(session, "mock")
+            result = update_parameters(
+                session,
+                "mock",
+                ParameterConfigUpdate(
+                    expected_version=previous.version,
+                    text_price=previous.text_price,
+                    image_price=previous.image_price,
+                    video_price=previous.video_price,
                 ),
+                actor.user_id,
             )
             return result.model_dump(mode="json")
 

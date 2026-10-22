@@ -101,7 +101,7 @@ def capacity_api():
     return capacity
 
 
-def test_concurrent_capacity_reservation(storage):
+def test_concurrent_reservations_can_exceed_retired_account_quota(storage):
     _, engine, user, version = storage
     api = capacity_api()
     barrier = Barrier(2)
@@ -118,7 +118,11 @@ def test_concurrent_capacity_reservation(storage):
                 return exc.code
 
     with ThreadPoolExecutor(max_workers=2) as executor:
-        assert sorted(executor.map(claim, range(2))) == ["CAPACITY_INSUFFICIENT", "reserved"]
+        assert list(executor.map(claim, range(2))) == ["reserved", "reserved"]
+    from app.storage.models import StorageAccount
+
+    with Session(engine) as session:
+        assert session.get(StorageAccount, user).reserved_bytes == 300
 
 
 def test_rollback_idempotent_reclaim(storage):
@@ -186,7 +190,7 @@ def set_policy(storage, *, changes=None, mode="mock", status="draft"):
     return version
 
 
-def test_upload_requires_only_applicable_budget_and_consistent_quota(storage):
+def test_upload_ignores_retired_budget_and_conflicting_legacy_quota(storage):
     c, _, _, _ = storage
     # Fixture generation section intentionally has no download/source/agent fields.
     assert upload(c).status_code == 201
@@ -197,7 +201,7 @@ def test_upload_requires_only_applicable_budget_and_consistent_quota(storage):
     ):
         set_policy(storage, changes=change)
         r = upload(c)
-        assert r.status_code == 403 and r.json()["error"]["code"] == "FEATURE_NOT_ENABLED"
+        assert r.status_code == 201, r.text
 
 
 def test_unconfirmed_production_d10_is_closed(storage):
@@ -215,12 +219,12 @@ def test_policy_change_cannot_overwrite_existing_bytes(storage):
         p["generation"]["account_quota_bytes"] = 500
 
     set_policy(storage, changes=change)
-    assert upload(c).status_code == 403
+    assert upload(c).status_code == 201
     from app.storage.models import StorageAccount
 
     with Session(engine) as s:
         account = s.get(StorageAccount, user)
-        assert (account.quota_bytes, account.actual_bytes, account.reserved_bytes) == (200, 138, 0)
+        assert (account.actual_bytes, account.reserved_bytes) == (276, 0)
 
 
 def test_failed_upload_rolls_back_all_capacity(storage):
@@ -247,10 +251,9 @@ def test_shared_session_rollback_and_over_actual_capacity(storage):
 
     with Session(engine) as s:
         r = api.reserve_capacity(s, user, uuid4().hex, 180, version)
-        with pytest.raises(api.StorageError):
-            api.finalize_capacity(s, r.id, 201)
-        assert r.state == "reserved"
-        api.finalize_capacity(s, r.id, 195)
+        api.finalize_capacity(s, r.id, 201)
+        assert r.state == "finalized"
+        assert s.get(StorageAccount, user).actual_bytes == 201
         s.rollback()
     with Session(engine) as s:
         assert s.get(StorageAccount, user) is None
@@ -303,7 +306,7 @@ def test_file_metadata_and_reference_owner_are_database_protected(storage):
         s.rollback()
 
 
-def test_two_accounts_cannot_overbook_server_budget(storage):
+def test_two_accounts_cannot_overbook_actual_free_disk(storage):
     c, engine, first, _ = storage
     second = c.post(
         "/api/v1/auth/register",
@@ -314,19 +317,25 @@ def test_two_accounts_cannot_overbook_server_budget(storage):
         },
     ).json()["profile"]["user_id"]
 
-    def increase_quota(p):
-        p["upload"]["account_quota_bytes"] = 100000000
-        p["generation"]["account_quota_bytes"] = 100000000
-
-    version = set_policy(storage, changes=increase_quota)
+    version = storage[3]
     api = capacity_api()
     barrier = Barrier(2)
+    from app.storage.models import StoragePool
+
+    with Session(engine) as s:
+        pool = s.get(StoragePool, "mock")
+        prior_reserved = pool.reserved_bytes if pool is not None else 0
+    # Deterministic real-disk probe, independent of the retired policy budgets.
+    # Existing fixture reservations remain protected; two new claims cannot fit.
+    free_disk_bytes = prior_reserved + 100000000
+    claim_bytes = 50000001
 
     def claim(user):
         with Session(engine) as s:
             barrier.wait()
             try:
-                r = api.reserve_capacity(s, user, uuid4().hex, 60000000, version)
+                r = api.reserve_capacity(s, user, uuid4().hex, claim_bytes, version,
+                                         free_bytes=lambda: free_disk_bytes)
                 s.commit()
                 return r.id
             except api.StorageError as exc:
@@ -342,6 +351,47 @@ def test_two_accounts_cannot_overbook_server_budget(storage):
             for value in results:
                 if value != "CAPACITY_INSUFFICIENT":
                     api.release_capacity(s, value)
+
+
+def test_two_reservations_cannot_concurrently_expand_beyond_real_free_disk(storage):
+    _, engine, user, version = storage
+    api = capacity_api()
+    from app.storage.models import CapacityReservation, StoragePool
+
+    with Session(engine) as session, session.begin():
+        reservations = [api.reserve_capacity(session, user, uuid4().hex, 100, version)
+                        for _ in range(2)]
+        reservation_ids = [reservation.id for reservation in reservations]
+        reserved_before_growth = session.get(StoragePool, "mock").reserved_bytes
+    # One additional 100-byte manifest fits, but the two together need 200.
+    free_disk_bytes = reserved_before_growth + 150
+    barrier = Barrier(2)
+
+    def expand(reservation_id):
+        with Session(engine) as session:
+            barrier.wait()
+            try:
+                api.ensure_reserved_capacity(session, reservation_id, 200,
+                                             free_bytes=lambda: free_disk_bytes)
+                session.commit()
+                return "expanded"
+            except api.StorageError as error:
+                session.rollback()
+                return error.code
+
+    try:
+        with ThreadPoolExecutor(max_workers=2) as executor:
+            assert sorted(executor.map(expand, reservation_ids)) == [
+                "CAPACITY_INSUFFICIENT", "expanded"
+            ]
+        with Session(engine) as session:
+            assert sorted(session.get(CapacityReservation, identity).estimated_bytes
+                          for identity in reservation_ids) == [100, 200]
+            assert session.get(StoragePool, "mock").reserved_bytes == reserved_before_growth + 100
+    finally:
+        with Session(engine) as session, session.begin():
+            for identity in reservation_ids:
+                api.release_capacity(session, identity)
 
 
 def test_commit_failure_retains_recoverable_file_without_visible_record(storage, monkeypatch):

@@ -1,0 +1,58 @@
+[
+  {
+    "check": "thumbnail selection",
+    "pass": true
+  },
+  {
+    "check": "image preview next",
+    "pass": true
+  },
+  {
+    "check": "remove single reference",
+    "pass": true
+  },
+  {
+    "check": "multiple reference upload",
+    "pass": true
+  },
+  {
+    "check": "edit leads to confirmation for updated plan",
+    "pass": true
+  },
+  {
+    "check": "cancel confirmation preserves edited draft",
+    "pass": true
+  },
+  {
+    "check": "saved plan displays edited content",
+    "pass": true
+  },
+  {
+    "check": "task status aligned for varying name lengths",
+    "pass": true,
+    "alignment": {
+      "names": [
+        "宣传文案 · 原始任务与成果",
+        "商品标题 · 原始任务与成果",
+        "卖点描述 · 原始任务与成果",
+        "详情介绍 · 原始任务与成果",
+        "社交平台文案 · 原始任务与成果",
+        "直播口播 · 原始任务与成果",
+        "营销策略 · 原始任务与成果"
+      ],
+      "lefts": [
+        1157,
+        1157,
+        1157,
+        1157,
+        1157,
+        1157,
+        1157
+      ]
+    }
+  },
+  {
+    "check": "detail images have no invented title",
+    "pass": true
+  }
+]

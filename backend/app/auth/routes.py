@@ -9,7 +9,14 @@ from sqlalchemy.exc import OperationalError
 from sqlalchemy.orm import Session
 
 from app.auth.models import AuthSession
-from app.auth.schemas import AuthView, LoginRequest, ProfileUpdate, ProfileView, RegisterRequest
+from app.auth.schemas import (
+    AuthView,
+    LoginRequest,
+    PasswordChangeRequest,
+    ProfileUpdate,
+    ProfileView,
+    RegisterRequest,
+)
 from app.auth.security import digest, normalize_account
 from app.auth.service import AuthService
 from app.common.errors import ErrorResponse
@@ -216,6 +223,29 @@ def logout(request: Request, session: DB, principal: PrincipalDep):
 @router.get("/me", response_model=ProfileView, operation_id="get_profile")
 def get_profile(request: Request, session: DB, principal: PrincipalDep):
     return service(request, session).get_profile(principal)
+
+
+@router.post(
+    "/auth/password",
+    status_code=204,
+    operation_id="auth_change_password",
+    responses={400: {"model": ErrorResponse}},
+    dependencies=[Depends(require_csrf)],
+)
+def change_password(
+    dto: PasswordChangeRequest, request: Request, session: DB, principal: PrincipalDep
+):
+    limit_auth(request, str(principal.user_id))
+    service(request, session).change_password(
+        principal, dto.current_password.get_secret_value(), dto.new_password.get_secret_value()
+    )
+    session.commit()
+    response = Response(status_code=204)
+    for name in ("session", "csrf_token"):
+        response.delete_cookie(
+            name, secure=True, httponly=name == "session", samesite="lax", path="/"
+        )
+    return response
 
 
 @router.patch(

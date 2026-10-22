@@ -113,7 +113,9 @@ class InputPolicy(PolicyData):
 
 
 class ConcurrencyPolicy(PolicyData):
-    max_concurrent_tasks: PositiveInt
+    # Required and explicit: null disables the per-account task count gate.
+    # Credits, storage and worker capacity still apply independently.
+    max_concurrent_tasks: PositiveInt | None
     enforcement_ref: Text
 
 
@@ -133,18 +135,30 @@ class LifecycleHandoff(PolicyData):
     disabled_account_tasks_ref: Text
 
 
-class UploadPolicy(PolicyData):
+class StorageAccountingPolicy(PolicyData):
+    """Read immutable old storage policies without reviving retired quota limits."""
+
+    @model_validator(mode="before")
+    @classmethod
+    def discard_retired_storage_limits(cls, value):
+        if isinstance(value, dict):
+            return {
+                key: item
+                for key, item in value.items()
+                if key not in {"account_quota_bytes", "server_budget_bytes"}
+            }
+        return value
+
+
+class UploadPolicy(StorageAccountingPolicy):
     max_file_bytes: PositiveInt
-    account_quota_bytes: PositiveInt
     allowed_types: Annotated[list[Text], Field(min_length=1)]
     reservation_seconds: PositiveInt
     reclamation_ref: Text
     alert_ref: Text
 
 
-class StoragePolicy(PolicyData):
-    account_quota_bytes: PositiveInt
-    server_budget_bytes: PositiveInt
+class StoragePolicy(StorageAccountingPolicy):
     estimation_ref: Text
     reservation_seconds: PositiveInt
     reclamation_ref: Text
