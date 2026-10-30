@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { chartColors } from '../../styles/theme'
 import { computed, ref, watch } from 'vue'
 import { init, use, type EChartsCoreOption } from 'echarts/core'
 import { LineChart } from 'echarts/charts'
@@ -8,19 +9,19 @@ import { SVGRenderer } from 'echarts/renderers'
 use([LineChart, GridComponent, TooltipComponent, SVGRenderer])
 const props = defineProps<{ days: { date: string; registered_count?: number; active_user_count?: number }[] }>()
 const element = ref<HTMLDivElement | null>(null)
-const series = [
-  { name: '注册用户', key: 'registered_count', color: '#a94e32', symbol: 'circle', line: 'solid' },
-  { name: '活跃用户', key: 'active_user_count', color: '#706259', symbol: 'rect', line: 'dashed' },
-] as const
+const series = computed(() => [
+  { name: '注册用户', key: 'registered_count', color: chartColors.value.primary, symbol: 'circle', line: 'solid' },
+  { name: '活跃用户', key: 'active_user_count', color: chartColors.value.muted, symbol: 'rect', line: 'dashed' },
+] as const)
 const description = computed(() => `用户每日趋势；${props.days.map(day => `${day.date}：注册 ${day.registered_count ?? '未提供'} 人，活跃 ${day.active_user_count ?? '未提供'} 人`).join('；')}`)
 const option = computed<EChartsCoreOption>(() => ({
   animation: false,
-  textStyle: { fontFamily: 'inherit' },
+  textStyle: { fontFamily: 'inherit', color: chartColors.value.text },
   grid: { top: 16, right: 12, bottom: 26, left: 36 },
-  tooltip: { trigger: 'axis', confine: true, backgroundColor: '#fffdfa', borderColor: '#e7d9ca', valueFormatter: (value: unknown) => typeof value === 'number' ? `${value.toLocaleString('zh-CN')} 人` : '未提供' },
-  xAxis: { type: 'category', data: props.days.map(day => day.date), boundaryGap: false, axisTick: { show: false }, axisLine: { lineStyle: { color: '#dccfc2' } }, axisLabel: { color: '#706259', hideOverlap: true, formatter: (date: string) => date.slice(5).replace('-', '/') } },
-  yAxis: { type: 'value', min: 0, minInterval: 1, max: props.days.every(day => !day.registered_count && !day.active_user_count) ? 1 : undefined, axisLabel: { color: '#706259' }, splitLine: { lineStyle: { color: '#e9dfd5' } } },
-  series: series.map(item => ({ name: item.name, type: 'line', data: props.days.map(day => day[item.key] ?? null), symbol: item.symbol, symbolSize: 5, itemStyle: { color: item.color }, lineStyle: { color: item.color, type: item.line, width: 2 }, connectNulls: false })),
+  tooltip: { textStyle: { color: chartColors.value.text }, trigger: 'axis', confine: true, backgroundColor: chartColors.value.panel, borderColor: chartColors.value.border, valueFormatter: (value: unknown) => typeof value === 'number' ? `${value.toLocaleString('zh-CN')} 人` : '未提供' },
+  xAxis: { type: 'category', data: props.days.map(day => day.date), boundaryGap: false, axisTick: { show: false }, axisLine: { lineStyle: { color: chartColors.value.border } }, axisLabel: { color: chartColors.value.muted, hideOverlap: true, formatter: (date: string) => date.slice(5).replace('-', '/') } },
+  yAxis: { type: 'value', min: 0, minInterval: 1, max: props.days.every(day => !day.registered_count && !day.active_user_count) ? 1 : undefined, axisLabel: { color: chartColors.value.muted }, splitLine: { lineStyle: { color: chartColors.value.line } } },
+  series: series.value.map(item => ({ name: item.name, type: 'line', data: props.days.map(day => day[item.key] ?? null), symbol: item.symbol, symbolSize: 5, itemStyle: { color: item.color }, lineStyle: { color: item.color, type: item.line, width: 2 }, connectNulls: false })),
 }))
 watch(element, (target, _previous, cleanup) => {
   if (!target) return

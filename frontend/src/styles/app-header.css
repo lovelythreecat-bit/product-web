@@ -1,11 +1,11 @@
-/* Shared workspace header, reused by My Works and Account without changing navigation. */
+/* Approved Feima header, shared by workspace, collections and administration. */
 .app-shell .app-header.app-header--studio {
   height:68px;
   min-height:68px;
   padding:0 28px;
-  gap:36px;
+  gap:48px;
   background:var(--color-panel);
-  border-bottom:1px solid #e4dbd0;
+  border-bottom:1px solid var(--color-border);
 }
 
 .app-shell .app-header.app-header--studio .brand {
@@ -20,35 +20,52 @@
 }
 
 .app-shell .app-header.app-header--studio nav {
-  height:auto;
-  gap:6px;
-  font-size:14px;
+  height:100%;
+  gap:30px;
+  font-size:13px;
   min-height:0;
 }
 
 .app-shell .app-header.app-header--studio nav>a {
   border:0;
-  min-height:36px;
-  padding:7px 16px;
-  border-radius:7px;
+  min-height:44px;
+  height:100%;
+  padding:0;
+  border-radius:0;
   color:var(--color-muted);
   font-weight:500;
-  align-self:center;
+  align-self:stretch;
+  display:flex;
+  align-items:center;
+  position:relative;
   line-height:22px;
 }
 
 .app-shell .app-header.app-header--studio nav>a.router-link-active {
-  background:#f5e9df;
+  background:transparent;
   color:var(--color-primary);
   font-weight:650;
 }
 
 .app-shell .app-header.app-header--studio nav>a:hover {
-  background:var(--color-background);
+  background:transparent;
+  color:var(--color-primary);
 }
 
 .app-shell .app-header.app-header--studio nav>a:after {
   display:none;
+}
+
+.app-shell .app-header.app-header--studio nav>a.router-link-active:after {
+  content:'';
+  display:block;
+  position:absolute;
+  left:0;
+  right:0;
+  bottom:0;
+  height:3px;
+  border-radius:2px 2px 0 0;
+  background:var(--color-primary);
 }
 
 .app-shell .app-header.app-header--studio .user-menu-trigger {
@@ -64,10 +81,10 @@
 }
 
 @media(max-width:700px) {
-  .app-shell .app-header--authenticated { display:grid; grid-template-columns:minmax(0,1fr) 66px; align-items:center; gap:12px; }
+  .app-shell .app-header--authenticated { display:grid; grid-template-columns:minmax(0,1fr) 44px 66px; align-items:center; gap:12px; }
   .app-shell .app-header--authenticated > .brand { grid-column:1; grid-row:1; min-width:0; font-size:17px; gap:8px; }
   .app-shell .app-header--authenticated > .header-actions { display:contents; width:auto; margin:0; order:initial; }
-  .app-shell .app-header--authenticated .shell-user-menu { grid-column:2; grid-row:1; justify-self:end; }
+  .app-shell .app-header--authenticated .shell-user-menu { grid-column:3; grid-row:1; justify-self:end; }
   .app-shell .app-header--authenticated > nav { grid-column:1 / -1; grid-row:2; min-width:0; flex-basis:auto; flex-wrap:wrap; gap:16px; order:initial; }
   .app-shell .app-header--authenticated .header-actions > .button { grid-column:1 / -1; grid-row:3; justify-self:start; }
 
@@ -77,20 +94,20 @@
     display:grid;
     gap:10px;
     padding:16px 18px 10px;
-    grid-template-columns:minmax(0,1fr) 66px;
+    grid-template-columns:minmax(0,1fr) 44px 66px;
   }
 
   .app-shell .app-header.app-header--studio nav {
     display:flex;
     flex-wrap:nowrap;
-    gap:4px;
+    gap:22px;
     overflow:auto;
     padding-bottom:0;
   }
 
   .app-shell .app-header.app-header--studio nav>a {
     font-size:12px;
-    padding:9px 10px;
+    padding:9px 0;
     min-height:38px;
     white-space:nowrap;
   }
@@ -102,3 +119,5 @@
     min-height:44px!important;
   }
 }
+
+@media(max-width:700px) { .app-shell .app-header--authenticated .theme-toggle { grid-column:2; grid-row:1; } }

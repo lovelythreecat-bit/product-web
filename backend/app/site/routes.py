@@ -9,11 +9,29 @@ from app.auth.routes import DB, PrincipalDep, require_csrf
 from app.common.errors import ErrorResponse
 from app.site import schemas as s
 from app.site import service
+from app.site.brand import read_brand, update_brand
 from app.storage.local_store import LocalStore
 
 router = APIRouter(
     prefix="/api/v1", responses={n: {"model": ErrorResponse} for n in (401, 403, 404, 409, 422)}
 )
+
+
+@router.get("/site/brand", response_model=s.SiteBrandView, operation_id="public_site_brand")
+def brand(request: Request, response: Response, session: DB):
+    response.headers["Cache-Control"] = "no-store"
+    return read_brand(session, request.app.state.settings.mode)
+
+
+@router.patch(
+    "/admin/site/brand", response_model=s.SiteBrandView,
+    dependencies=[Depends(require_csrf)], operation_id="update_site_brand",
+)
+def save_brand(dto: s.SiteBrandUpdate, request: Request, session: DB, principal: PrincipalDep):
+    session.rollback()
+    result = update_brand(session, principal, request.app.state.settings.mode, dto)
+    session.commit()
+    return result
 
 
 @router.get("/site/content", response_model=s.PublicSiteView, operation_id="public_site_content")

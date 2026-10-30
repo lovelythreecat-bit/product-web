@@ -505,6 +505,23 @@ export interface paths {
         patch: operations["admin_update_registration_credit_config"];
         trace?: never;
     };
+    "/api/v1/admin/site/brand": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /** Save Brand */
+        patch: operations["update_site_brand"];
+        trace?: never;
+    };
     "/api/v1/admin/site/cases": {
         parameters: {
             query?: never;
@@ -1246,6 +1263,23 @@ export interface paths {
         put?: never;
         /** Quote */
         post: operations["quote_generation"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/site/brand": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Brand */
+        get: operations["public_site_brand"];
+        put?: never;
+        post?: never;
         delete?: never;
         options?: never;
         head?: never;
@@ -3525,6 +3559,20 @@ export interface components {
          * @enum {string}
          */
         SettlementState: "FROZEN" | "CONSUMED" | "RELEASED";
+        /** SiteBrandUpdate */
+        SiteBrandUpdate: {
+            /** Expected Version */
+            expected_version: number;
+            /** Name */
+            name: string;
+        };
+        /** SiteBrandView */
+        SiteBrandView: {
+            /** Name */
+            name: string;
+            /** Version */
+            version: number;
+        };
         /** SiteContent */
         SiteContent: {
             agent_descriptions: components["schemas"]["AgentDescriptions"];
@@ -8118,6 +8166,96 @@ export interface operations {
             };
         };
     };
+    update_site_brand: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description Required token bound to this session and csrf_token cookie; omission or mismatch returns 403. */
+                "X-CSRF-Token": string;
+                /** @description Required exact allowlisted Origin; browsers send this automatically. Do not set Origin in frontend JavaScript. */
+                origin: string;
+                /** @description Required literal platform; omission or mismatch returns 403. */
+                "X-Requested-With": string;
+            };
+            path?: never;
+            cookie: {
+                /** @description Required session-bound CSRF cookie; omission or mismatch returns 403. */
+                csrf_token: string;
+                /** @description Required Secure HttpOnly session cookie; omission or invalid session returns 401. */
+                session: string;
+            };
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SiteBrandUpdate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SiteBrandView"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unprocessable Entity */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Internal Server Error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
     admin_site_cases: {
         parameters: {
             query?: never;
@@ -12479,6 +12617,80 @@ export interface operations {
             };
             /** @description Forbidden */
             403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unprocessable Entity */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Internal Server Error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    public_site_brand: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SiteBrandView"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Not Found */
+            404: {
                 headers: {
                     [name: string]: unknown;
                 };

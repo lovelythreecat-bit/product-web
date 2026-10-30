@@ -1,25 +1,35 @@
-/* Confirmed V2 source: docs/design/high-fidelity-2026-10-11/visual-reference.md */
+/* Approved Feima palette: docs/design/feima-ui-2026-10-29/README.md */
 :root {
   color-scheme:light;
-  --color-background:#f8f3ed;
-  --color-sidebar:#f1e7da;
-  --color-panel:#fffdfa;
-  --color-text:#322823;
-  --color-muted:#706259;
-  --color-border:#e7d9ca;
-  --color-primary:#a94e32;
-  --color-selected:#f2dfcf;
-  --color-message:#f7e9db;
-  --color-success-bg:#f0e9df;
-  --color-success:#66503b;
-  --color-warning:#795117;
-  --color-danger:#a52b28;
+  --color-background:#f3f6fb;
+  --color-sidebar:#ffffff;
+  --color-panel:#ffffff;
+  --color-surface:var(--color-panel);
+  --color-raised:#e9f1ff;
+  --color-text:#182843;
+  --color-muted:#586b85;
+  --color-border:#dbe3ef;
+  --color-primary:#1559d6;
+  --color-primary-hover:#1048b0;
+  --color-on-primary:#ffffff;
+  --color-selected:#e9f1ff;
+  --color-message:#e9f1ff;
+  --color-success-bg:#e8f5ee;
+  --color-success:#166848;
+  --color-warning-bg:#fff3dc;
+  --color-warning:#88540e;
+  --color-error-bg:#fcecef;
+  --color-danger:#b52d3d;
+  --color-on-danger:#ffffff;
+  --color-disabled:#687b94;
+  --color-overlay:rgb(9 26 52 / 44%);
+  --shadow-overlay:0 16px 64px rgb(24 59 109 / 16%);
   --radius-panel:14px;
   --radius-control:8px;
   --space:8px;
-  --scrollbar-track:#f1e7da;
-  --scrollbar-thumb:#bfa28d;
-  --scrollbar-hover:#a94e32;
+  --scrollbar-track:#f3f6fb;
+  --scrollbar-thumb:#b0bfd3;
+  --scrollbar-hover:#586b85;
   font-family:"Microsoft YaHei UI","PingFang SC","Noto Sans SC",sans-serif;
   color:var(--color-text);
   background:var(--color-background);
@@ -94,11 +104,11 @@ small {
 .button.primary {
   background:var(--color-primary);
   border-color:var(--color-primary);
-  color:white
+  color:var(--color-on-primary)
 }
 .button.danger {
   background:var(--color-danger);
-  color:white
+  color:var(--color-on-danger)
 }
 .icon-button {
   width:44px;
@@ -252,14 +262,14 @@ main {
   color:var(--color-text);
   width:min(560px,calc(100vw - 32px));
   max-height:calc(100dvh - 48px);
-  box-shadow:0 16px 64px #32282322
+  box-shadow:var(--shadow-overlay)
 }
 .app-overlay[open] {
   display:flex;
   flex-direction:column
 }
 .app-overlay::backdrop {
-  background:#32282366
+  background:var(--color-overlay)
 }
 .overlay-header,.overlay-actions {
   flex-shrink:0;
@@ -515,7 +525,7 @@ dd { margin:0; min-width:0; overflow-wrap:anywhere; white-space:pre-wrap }
 @media(max-width:1000px) { .app-header { height:auto; flex-wrap:wrap; padding:16px; gap:12px } .app-header nav { order:3; flex-basis:100%; min-height:44px } }
 @media(max-width:700px) { .header-actions { order:4; width:100%; margin:0 } .header-actions .button { flex:1 } .auth-card { margin:8px auto } .balance-grid { gap:8px } .balance-grid strong { font-size:26px } .profile-summary { grid-template-columns:1fr; gap:4px } .profile-summary dd { margin-bottom:12px } .ledger-list li { grid-template-columns:minmax(0,1fr) auto } .ledger-list li .button { grid-column:2 } .section-heading { flex-wrap:wrap } }
 
-/* Warm scrollbars for page, tables and overlay content. */
+/* Theme-aware scrollbars for page, tables and overlay content. */
 html,* { scrollbar-width:thin; scrollbar-color:var(--scrollbar-thumb) var(--scrollbar-track); }
 ::-webkit-scrollbar { width:10px; height:10px; }
 ::-webkit-scrollbar-track { background:var(--scrollbar-track); border-radius:999px; }

@@ -24,10 +24,10 @@
 .admin-page .admin-table th { background:var(--color-background); color:var(--color-muted); font-weight:500; white-space:nowrap; }
 .admin-page .admin-table th+th,.admin-page .admin-table td+td { border-left:1px solid var(--color-border); }
 .admin-page .admin-table tr:last-child td { border-bottom:0; }
-.admin-page .admin-table tbody tr:hover { background:#f8f3ed80; }
+.admin-page .admin-table tbody tr:hover { background:var(--color-background); }
 .admin-page .admin-table td small { margin-top:6px; color:var(--color-muted); font-size:12px; }
 .admin-page .admin-table .button { background:transparent; color:var(--color-primary); white-space:nowrap; }
-.admin-page .admin-table .button.primary { background:var(--color-primary); color:white; }
+.admin-page .admin-table .button.primary { background:var(--color-primary); color:var(--color-on-primary); }
 .admin-state { display:inline-flex; align-items:center; min-height:28px; padding:3px 9px; border-radius:6px; background:var(--color-success-bg); color:var(--color-success); font-size:12px; white-space:nowrap; }
 .admin-state--off { color:var(--color-muted); background:var(--color-background); }
 .admin-page .admin-statistics { display:grid; grid-template-columns:none; grid-template-rows:auto auto; grid-auto-flow:column; grid-auto-columns:minmax(130px,1fr); gap:0; max-width:100%; margin:16px 0; padding:20px 0; overflow-x:auto; font-variant-numeric:tabular-nums; background:var(--color-background); border-radius:8px; }
@@ -51,7 +51,7 @@
 .admin-page .site-summary { font-size:15px; line-height:1.8; }
 .admin-page .site-public-link { margin-top:12px; }
 .admin-prices-embedded { margin-top:0; }
-.admin-nav a.router-link-active { background:var(--color-primary); color:white; }
+.admin-nav a.router-link-active { background:var(--color-primary); color:var(--color-on-primary); }
 @media(max-width:900px) {
   .admin-page .panel { padding:20px; }
   .admin-page .admin-statistics { grid-auto-flow:row; grid-template-rows:none; grid-template-columns:minmax(0,1fr) minmax(0,1fr); padding:8px 16px; overflow:visible; }
@@ -112,7 +112,7 @@
 .admin-page:not(.operations-overview) .admin-filters { padding:0 0 18px; gap:12px; margin:0; border:0; border-bottom:1px solid var(--color-border); border-radius:0; background:transparent; }
 .admin-page:not(.operations-overview) .admin-filters label { flex:1 1 170px; max-width:360px; gap:7px; color:var(--color-muted); font-size:13px; }
 .admin-page:not(.operations-overview) .admin-filters .button { margin:0; }
-.admin-page:not(.operations-overview) .admin-filters > .button[type="submit"] { color:var(--color-panel); background:var(--color-primary); border-color:var(--color-primary); }
+.admin-page:not(.operations-overview) .admin-filters > .button[type="submit"] { color:var(--color-on-primary); background:var(--color-primary); border-color:var(--color-primary); }
 .admin-page:not(.operations-overview) .admin-table { border-radius:10px; }
 .admin-page:not(.operations-overview) .admin-table .el-table { --el-table-header-text-color:var(--color-text); --el-table-row-hover-bg-color:var(--color-background); }
 .admin-page:not(.operations-overview) .admin-table .el-table__cell { padding:10px 0; border-left:0; border-right:0; vertical-align:middle; }
@@ -126,7 +126,7 @@
 .admin-page:not(.operations-overview) .admin-table .button { border-color:transparent; background:transparent; color:var(--color-primary); }
 .admin-page:not(.operations-overview) .admin-table .button:hover:not(:disabled) { background:var(--color-selected); }
 .admin-page:not(.operations-overview) .admin-table .button.danger { color:var(--color-danger); }
-.admin-page:not(.operations-overview) .admin-table .button.primary { border-color:var(--color-primary); background:var(--color-primary); color:var(--color-panel); }
+.admin-page:not(.operations-overview) .admin-table .button.primary { border-color:var(--color-primary); background:var(--color-primary); color:var(--color-on-primary); }
 .admin-page:not(.operations-overview) .admin-table .action-row,
 .admin-page:not(.operations-overview) .admin-table .button-row { display:flex; align-items:center; flex-wrap:wrap; gap:4px; }
 .admin-page:not(.operations-overview) .model-summary dt { color:var(--color-muted); font-size:13px; font-weight:500; }

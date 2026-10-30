@@ -1,0 +1,69 @@
+/* Approved Feima blue themes. Layout and preference persistence stay shared. */
+:root,
+:root[data-theme="light"] {
+  --theme-panel:var(--color-panel);
+  --theme-canvas:var(--color-background);
+  --theme-sidebar:var(--color-sidebar);
+  --theme-selected:var(--color-selected);
+  --theme-line:var(--color-border);
+  --theme-muted:var(--color-muted);
+  --theme-primary:var(--color-primary);
+  --theme-warning:var(--color-warning);
+  --theme-danger:var(--color-danger);
+  --theme-error-bg:var(--color-error-bg);
+  --text-muted:var(--color-muted);
+}
+:root[data-theme="dark"] {
+  color-scheme:dark;
+  --color-background:#0b1220;
+  --color-sidebar:#121e32;
+  --color-panel:#121e32;
+  --color-surface:var(--color-panel);
+  --color-raised:#192841;
+  --color-text:#eaf1ff;
+  --color-muted:#a4b5ce;
+  --color-border:#2b3d58;
+  --color-primary:#79aaff;
+  --color-primary-hover:#9bbfff;
+  --color-on-primary:#091a34;
+  --color-selected:#192841;
+  --color-message:#192841;
+  --color-success-bg:#14372e;
+  --color-success:#80d9b0;
+  --color-warning-bg:#382e1b;
+  --color-warning:#edc16e;
+  --color-error-bg:#3d2230;
+  --color-danger:#ff9da8;
+  --color-on-danger:#28101b;
+  --color-disabled:#8e9fb8;
+  --color-overlay:rgb(0 5 14 / 68%);
+  --shadow-overlay:0 16px 64px rgb(0 0 0 / 32%);
+  --scrollbar-track:#121e32;
+  --scrollbar-thumb:#415573;
+  --scrollbar-hover:#79aaff;
+  --theme-panel:var(--color-panel);
+  --theme-canvas:var(--color-background);
+  --theme-sidebar:var(--color-sidebar);
+  --theme-selected:var(--color-selected);
+  --theme-line:var(--color-border);
+  --theme-muted:var(--color-muted);
+  --theme-primary:var(--color-primary);
+  --theme-warning:var(--color-warning);
+  --theme-danger:var(--color-danger);
+  --theme-error-bg:var(--color-error-bg);
+  --text-muted:var(--color-muted);
+}
+
+/* The configured name can be longer than the original two-character label. */
+.brand-name { min-width:0; max-width:12em; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.brand { min-width:0; }
+.home-brand { min-width:0; max-width:30%; }
+.home-account-links { flex-shrink:0; }
+@media(max-width:700px) {
+  .brand-name { max-width:8em; }
+  .home-header { flex-wrap:wrap; gap:8px 12px; }
+  .home-header .home-brand { max-width:100%; }
+  .home-header .home-account-links { margin-left:auto; gap:8px; }
+  .home-header .home-nav { order:3; width:100%; justify-content:center; }
+  .header-actions .theme-toggle { flex:none; }
+}

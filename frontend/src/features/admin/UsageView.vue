@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { chartColors } from '../../styles/theme'
 import { computed, onMounted, ref, watch } from 'vue'
 import { init, use, type EChartsCoreOption, type EChartsType } from 'echarts/core'
 import { BarChart } from 'echarts/charts'
@@ -85,9 +86,9 @@ const stateRows = computed(() => Object.entries(stats.value?.state_counts || {})
   state, name: taskStates[state] || state, count,
 })))
 const segments = [
-  { key: 'succeeded_count', name: '成功', color: '#a94e32' },
-  { key: 'failed_count', name: '失败', color: '#d28c63' },
-  { key: 'manually_closed_count', name: '人工关闭', color: '#94735a' },
+  { key: 'succeeded_count', name: '成功', color: 'var(--color-primary)' },
+  { key: 'failed_count', name: '失败', color: 'var(--color-danger)' },
+  { key: 'manually_closed_count', name: '人工关闭', color: 'var(--color-muted)' },
 ] as const
 function share(value: number | undefined, total: number | undefined) {
   return total && value ? Math.min(100, value / total * 100) : 0
@@ -103,22 +104,22 @@ const trendTotal = computed(() => trend.value.reduce((total, day) => total + day
 const trendDescription = computed(() => `${trendTitle.value}日趋势；${trend.value.map(day => `${day.date}：${number(day[metric.value])}${metric.value === 'task_count' ? '次' : '积分'}`).join('；')}`)
 const chartOption = computed<EChartsCoreOption>(() => ({
   animation: false,
-  color: [metric.value === 'task_count' ? '#a94e32' : '#a87035'],
-  textStyle: { fontFamily: 'inherit', color: '#6e5b50' },
+  color: [metric.value === 'task_count' ? chartColors.value.primary : chartColors.value.secondary],
+  textStyle: { fontFamily: 'inherit', color: chartColors.value.muted },
   grid: { top: 16, right: 12, bottom: 26, left: 44 },
   tooltip: {
     trigger: 'axis', confine: true, renderMode: 'html', axisPointer: { type: 'shadow' },
-    backgroundColor: '#fffdfa', borderColor: '#dccfc2', textStyle: { color: '#322823', fontSize: 13 },
+    backgroundColor: chartColors.value.panel, borderColor: chartColors.value.border, textStyle: { color: chartColors.value.text, fontSize: 13 },
     valueFormatter: (value: unknown) => `${number(typeof value === 'number' ? value : undefined)} ${metric.value === 'task_count' ? '次' : '积分'}`,
   },
   xAxis: {
     type: 'category', data: trend.value.map(day => day.date),
-    axisLine: { lineStyle: { color: '#dccfc2' } }, axisTick: { show: false },
-    axisLabel: { color: '#6e5b50', fontSize: 12, hideOverlap: true, formatter: (date: string) => date.slice(5).replace('-', '/') },
+    axisLine: { lineStyle: { color: chartColors.value.border } }, axisTick: { show: false },
+    axisLabel: { color: chartColors.value.muted, fontSize: 12, hideOverlap: true, formatter: (date: string) => date.slice(5).replace('-', '/') },
   },
   yAxis: {
     type: 'value', min: 0, minInterval: 1, max: trendTotal.value === 0 ? 1 : undefined,
-    axisLabel: { color: '#6e5b50', fontSize: 12 }, splitLine: { lineStyle: { color: '#e9dfd5' } },
+    axisLabel: { color: chartColors.value.muted, fontSize: 12 }, splitLine: { lineStyle: { color: chartColors.value.line } },
   },
   series: [{ name: trendTitle.value, type: 'bar', data: trend.value.map(day => day[metric.value]), barMaxWidth: 32, itemStyle: { borderRadius: [3, 3, 0, 0] } }],
 }))
@@ -247,7 +248,7 @@ onMounted(load)
 .overview-refresh { display:flex; align-items:center; gap:12px; }
 .overview-refresh > span,.trend-period { font-size:12px; color:var(--color-muted); }
 .overview-refresh svg { width:16px; height:16px; fill:none; stroke:currentColor; stroke-width:1.5; stroke-linecap:round; stroke-linejoin:round; margin-right:6px; }
-.overview-error { display:flex; align-items:center; justify-content:space-between; gap:16px; padding:14px 16px; border:1px solid #dfb9a9; border-radius:12px; background:#fbebe3; color:var(--color-danger); }
+.overview-error { display:flex; align-items:center; justify-content:space-between; gap:16px; padding:14px 16px; border:1px solid var(--color-border); border-radius:12px; background:var(--color-error-bg); color:var(--color-danger); }
 .overview-error p { margin:4px 0 0; font-size:14px; color:inherit; }
 .overview-loading p { margin:0; font-size:14px; }
 .loading-shape { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:16px; padding:16px 0; }
@@ -280,13 +281,13 @@ onMounted(load)
 .state-distribution dt { font-size:13px; color:var(--color-muted); }
 .state-distribution dd { margin:0; font-size:14px; font-weight:600; }
 .state-distribution small { margin-left:4px; font-weight:400; }
-.state-track { grid-column:1/-1; height:4px; border-radius:3px; background:#eee5dc; overflow:hidden; }
-.state-track span { display:block; height:100%; background:#ae8c70; }
+.state-track { grid-column:1/-1; height:4px; border-radius:3px; background:var(--color-selected); overflow:hidden; }
+.state-track span { display:block; height:100%; background:var(--color-primary); }
 .state-track .state-track-success { background:var(--color-primary); }
 .agent-legend { display:flex; flex-wrap:wrap; gap:16px; font-size:12px; color:var(--color-muted); margin-bottom:8px; }
 .agent-legend > span { display:flex; align-items:center; gap:6px; }
 .agent-legend i { width:8px; height:8px; border-radius:2px; }
-.legend-active { background:#d9cbbb; }
+.legend-active { background:var(--color-muted); }
 .agent-row { display:grid; grid-template-columns:minmax(110px,.65fr) minmax(180px,1.4fr) minmax(340px,2fr); gap:20px; align-items:center; padding:10px 0; border-top:1px solid var(--color-border); }
 .agent-identity { min-width:0; }
 .agent-identity > strong { display:block; margin:0 0 4px; font-size:14px; font-weight:600; overflow-wrap:anywhere; }
@@ -294,7 +295,7 @@ onMounted(load)
 .agent-task-heading { display:flex; align-items:baseline; justify-content:space-between; gap:8px; font-size:12px; color:var(--color-muted); }
 .agent-task-heading strong { font-size:15px; font-weight:600; color:var(--color-text); }
 .agent-task-heading small { font-weight:400; margin-left:4px; }
-.agent-task-bar { display:flex; height:5px; border-radius:4px; overflow:hidden; background:#eee5dc; margin-top:6px; }
+.agent-task-bar { display:flex; height:5px; border-radius:4px; overflow:hidden; background:var(--color-selected); margin-top:6px; }
 .agent-task-bar span { height:100%; flex-shrink:0; }
 .agent-result { font-size:12px; margin:6px 0 0; color:var(--color-muted); }
 .agent-values { display:grid; grid-template-columns:1.4fr repeat(3,1fr); gap:12px; margin:0; }

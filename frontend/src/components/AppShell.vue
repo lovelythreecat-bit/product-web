@@ -4,6 +4,8 @@ import { useRoute } from 'vue-router'
 import AppIcon from './AppIcon.vue'
 import BrandMark from './BrandMark.vue'
 import UserMenu from './UserMenu.vue'
+import ThemeToggle from './ThemeToggle.vue'
+import { brandName } from '../features/site/brand'
 import ConversationList from '../features/workspace/ConversationList.vue'
 import { session } from '../features/auth/session'
 import '../styles/app-header.css'
@@ -24,7 +26,7 @@ watch(session.epoch, () => { if (session.profile.value) void session.refreshAcco
   <div class="app-shell" :class="{ 'app-shell--auth': isAuth, 'app-shell--workspace': showSidebar && inWorkspace, 'app-shell--admin': showSidebar && inAdmin, 'app-shell--admin-list': showSidebar && adminListPage, 'app-shell--collection': inCollection }">
   <a class="skip-link" href="#main-content">跳到主要内容</a>
   <header v-if="!isHome" class="app-header" :class="{ 'app-header--authenticated': !!session.profile.value, 'app-header--studio': !!session.profile.value && (inWorkspace || inCollection || inAdmin) }">
-    <RouterLink class="brand" to="/" target="_blank" rel="noopener noreferrer" aria-label="映作首页（新标签页打开）"><BrandMark class="brand-mark" /><span>映作</span></RouterLink>
+    <RouterLink class="brand" to="/" target="_blank" rel="noopener noreferrer" :aria-label="brandName + '首页（新标签页打开）'"><BrandMark class="brand-mark" /><span class="brand-name" :title="brandName">{{ brandName }}</span></RouterLink>
     <nav v-if="session.profile.value" aria-label="主要导航">
       <RouterLink to="/workspace" :class="{ 'router-link-active': inWorkspace }" :aria-current="inWorkspace ? 'page' : undefined">创作工作台</RouterLink>
       <RouterLink to="/works">我的作品</RouterLink>
@@ -32,9 +34,9 @@ watch(session.epoch, () => { if (session.profile.value) void session.refreshAcco
       <RouterLink v-if="session.profile.value.role === 'admin'" to="/admin" :class="{ 'router-link-active': inAdmin }" :aria-current="inAdmin ? 'page' : undefined">管理后台</RouterLink>
     </nav>
     <div v-if="session.profile.value" class="header-actions">
-      <UserMenu class="shell-user-menu" />
+      <ThemeToggle /><UserMenu class="shell-user-menu" />
     </div>
-    <div v-else class="header-actions"><RouterLink class="button" to="/login">登录</RouterLink><RouterLink class="button primary" to="/register">注册体验</RouterLink></div>
+    <div v-else class="header-actions"><ThemeToggle /><RouterLink class="button" to="/login">登录</RouterLink><RouterLink class="button primary" to="/register">注册体验</RouterLink></div>
   </header>
 
   <div class="shell-body" :class="{ 'public-shell': !showSidebar, 'homepage-shell': isHome }">
@@ -67,7 +69,7 @@ watch(session.epoch, () => { if (session.profile.value) void session.refreshAcco
 .app-shell--admin { height:100dvh; overflow:hidden; display:flex; flex-direction:column; }
 .app-shell--admin > .app-header { flex-shrink:0; }
 .app-shell--admin > .shell-body { flex:1; min-height:0; overflow:hidden; grid-template-rows:minmax(0,1fr); }
-.app-shell--admin .shell-sidebar { min-height:0; overflow-y:auto; overscroll-behavior-y:contain; }
+.app-shell--admin .shell-sidebar { min-height:0; overflow-y:auto; overscroll-behavior-y:contain; background:var(--color-panel); }
 .app-shell--admin > .shell-body > main { min-height:0; overflow-y:auto; overscroll-behavior-y:contain; }
 .app-shell--admin-list > .shell-body > main { min-height:0; overflow:hidden; display:flex; flex-direction:column; }
 .app-shell--admin .admin-nav { margin:0; }
@@ -80,7 +82,7 @@ watch(session.epoch, () => { if (session.profile.value) void session.refreshAcco
 }
 .app-shell--workspace .sidebar-bottom { border-top:1px solid var(--color-border); padding-top:16px }
 .app-shell--workspace .sidebar-balance { gap:6px }
-.app-shell--workspace .sidebar-balance>strong { font-size:32px; letter-spacing:-.03em }
+.app-shell--workspace .sidebar-balance>strong { font-size:24px; letter-spacing:-.02em }
 .app-shell--workspace .sidebar-bottom>.button { background:var(--color-panel); font-weight:600 }
 @media(min-width:701px) {
   .app-shell--workspace { height:100dvh; display:flex; flex-direction:column; }

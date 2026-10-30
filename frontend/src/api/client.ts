@@ -27,8 +27,9 @@ export async function request<T>(path: string, options: {method?: 'GET'|'POST'|'
   if (options.body instanceof Blob && options.body.type) headers.set('Content-Type', options.body.type)
   if (typeof options.body === 'string') headers.set('Content-Type', 'application/json')
   if (options.key) headers.set('Idempotency-Key', options.key)
+  // Bypass cached HTTP redirects and private responses after deployment changes.
   let response: Response
-  try { response = await fetch(path, {method, headers, body:options.body, signal:options.signal, credentials:'same-origin', redirect:'error'}) }
+  try { response = await fetch(path, {method, headers, body:options.body, signal:options.signal, credentials:'same-origin', redirect:'error', cache:'no-store'}) }
   catch { throw new ApiError('网络连接失败，请核查原请求状态。') }
   const payload: unknown = await response.json().catch(() => null)
   if (epoch !== identityBoundary?.epoch()) throw new ApiError('登录身份已变更，请重新读取。', 0, 'IDENTITY_CHANGED')
@@ -50,7 +51,7 @@ export async function requestBlob(path: string, options: { signal?: AbortSignal 
   const epoch = identityBoundary?.epoch()
   if (!path.startsWith('/api/v1/') || path.includes('\\') || new URL(path, location.origin).origin !== location.origin) throw new ApiError('仅允许同源平台接口。')
   let response: Response
-  try { response = await fetch(path, { headers: { Accept: 'image/*,application/octet-stream' }, signal: options.signal, credentials: 'same-origin', redirect: 'error' }) }
+  try { response = await fetch(path, { headers: { Accept: 'image/*,application/octet-stream' }, signal: options.signal, credentials: 'same-origin', redirect: 'error', cache: 'no-store' }) }
   catch { throw new ApiError('图片暂时无法读取，请重试。') }
   if (epoch !== identityBoundary?.epoch()) throw new ApiError('登录身份已变更，请重新读取。', 0, 'IDENTITY_CHANGED')
   if (response.status === 401) identityBoundary?.unauthorized()

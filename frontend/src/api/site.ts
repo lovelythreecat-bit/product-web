@@ -1,5 +1,7 @@
 import { request, jsonRequest, id } from './client'
 import type { Schema } from '../types/api'
+export const getSiteBrand = () => request<Schema<'SiteBrandView'>>('/api/v1/site/brand')
+export const updateSiteBrand = (body: Schema<'SiteBrandUpdate'>) => jsonRequest<Schema<'SiteBrandView'>>('/api/v1/admin/site/brand', 'PATCH', body)
 export const getPublicSite = () => request<Schema<'PublicSiteView'>>('/api/v1/site/content')
 export const getPublicCases = () => request<Schema<'PublicCaseView'>[]>('/api/v1/site/cases')
 export const getAdminSiteContent = () => request<Schema<'SiteContentView'>>('/api/v1/admin/site/content')

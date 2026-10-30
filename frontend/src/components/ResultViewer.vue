@@ -86,7 +86,7 @@ function downloadLabel(index: number) {
 .result-item>img { cursor:zoom-in }
 .result-item>img:focus-visible { outline:2px solid var(--color-primary); outline-offset:3px }
 .preview-image { width:100%; height:auto; max-height:none; object-fit:contain }
-.preview-navigation { position:sticky; top:0; z-index:1; display:flex; align-items:center; justify-content:space-between; gap:12px; padding:0 0 12px; background:var(--color-surface,#fffdfa) }
+.preview-navigation { position:sticky; top:0; z-index:1; display:flex; align-items:center; justify-content:space-between; gap:12px; padding:0 0 12px; background:var(--color-panel) }
 .preview-navigation span { color:var(--color-muted); font-size:13px; font-variant-numeric:tabular-nums }
 .result-actions { padding-top:14px; border-top:1px solid var(--color-border); margin-top:14px; gap:8px }
 .result-actions .button { font-size:13px; padding:8px 12px }

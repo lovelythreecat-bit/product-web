@@ -180,9 +180,9 @@ const retryHistory = () => quickMode.value ? loadQuick() : load()
 
 <style scoped>
 .conversation-nav>.primary { min-height:44px; font-weight:600 }
-.workspace-mode-switch { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); flex-shrink:0; gap:4px; padding:4px; border:1px solid var(--color-border); border-radius:10px; background:var(--color-background) }
-.workspace-mode-switch>a { display:flex; align-items:center; justify-content:center; min-height:44px; padding:6px 4px; border-radius:6px; text-decoration:none; color:var(--color-muted); font-size:13px; font-weight:600 }
-.workspace-mode-switch>a.is-active { background:var(--color-panel); color:var(--color-primary); box-shadow:0 1px 3px color-mix(in srgb,var(--color-text) 8%,transparent) }
+.workspace-mode-switch { display:grid; grid-template-columns:minmax(0,1fr); flex-shrink:0; gap:3px; padding:0 0 18px; border:0; border-bottom:1px solid var(--color-border); border-radius:0; background:transparent }
+.workspace-mode-switch>a { display:flex; align-items:center; justify-content:flex-start; min-height:44px; padding:8px 12px; border-radius:7px; text-decoration:none; color:var(--color-muted); font-size:13px; font-weight:500 }
+.workspace-mode-switch>a.is-active { background:var(--color-selected); color:var(--color-primary); font-weight:600 }
 .workspace-mode-switch>a:hover { color:var(--color-primary) }
 .new-task-button { margin-top:12px }
 @media(min-width:901px) and (pointer:fine) { .workspace-mode-switch>a { min-height:32px } }
@@ -204,7 +204,7 @@ const retryHistory = () => quickMode.value ? loadQuick() : load()
 .task-state { display:inline-flex; align-items:center; gap:5px }
 .task-state::before { content:''; width:5px; height:5px; border-radius:50%; background:currentColor; opacity:.5 }
 .task-state.is-running { color:var(--color-primary) }
-.task-state.is-warning { color:var(--color-warning, #8b5d31) }
+.task-state.is-warning { color:var(--color-warning) }
 .desktop-history .task-history-item.is-selected { background:var(--color-panel); border-color:var(--color-border); box-shadow:0 1px 3px color-mix(in srgb,var(--color-text) 4%,transparent) }
 .task-history-item.is-selected .task-title { color:var(--color-primary) }
 .task-history-item.is-selected::before { content:''; position:absolute; left:-1px; top:16px; bottom:16px; width:3px; border-radius:0 3px 3px 0; background:var(--color-primary) }
@@ -219,5 +219,5 @@ const retryHistory = () => quickMode.value ? loadQuick() : load()
 @media(min-width:901px) and (pointer:fine) { .conversation-nav>.primary { min-height:36px; font-size:13px; padding:6px 12px } }
 @media(prefers-reduced-motion:no-preference) { .task-history-item { transition:background-color 160ms,border-color 160ms } }
 @media(max-width:700px) { .conversation-nav>.primary { grid-column:1; grid-row:1 } .conversation-nav>label { grid-column:2; grid-row:1; text-align:right; font-size:13px } .history-error { grid-column:1/-1; margin-top:0 } }
-@media(max-width:700px) { .workspace-mode-switch,.conversation-nav>.new-task-button { grid-column:1 / -1 } .workspace-mode-switch { grid-row:1 } .conversation-nav>.new-task-button { grid-row:2; margin-top:0 } .conversation-nav>label.mobile-history { grid-row:auto; grid-column:1 / -1; text-align:left } }
+@media(max-width:700px) { .workspace-mode-switch { grid-template-columns:repeat(2,minmax(0,1fr)); padding-bottom:10px } .workspace-mode-switch>a { justify-content:center } .workspace-mode-switch,.conversation-nav>.new-task-button { grid-column:1 / -1 } .workspace-mode-switch { grid-row:1 } .conversation-nav>.new-task-button { grid-row:2; margin-top:0 } .conversation-nav>label.mobile-history { grid-row:auto; grid-column:1 / -1; text-align:left } }
 </style>

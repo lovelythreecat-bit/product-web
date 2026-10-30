@@ -9,6 +9,13 @@ from sqlalchemy.orm import Mapped, mapped_column
 from app.db import Base
 
 
+class SiteBrand(Base):
+    __tablename__ = "site_brands"
+    mode: Mapped[str] = mapped_column(String(16), primary_key=True)
+    name: Mapped[str] = mapped_column(String(24))
+    version: Mapped[int] = mapped_column(BigInteger)
+
+
 class SiteContentVersion(Base):
     __tablename__ = "site_content_versions"
     mode: Mapped[str] = mapped_column(String(16), primary_key=True)

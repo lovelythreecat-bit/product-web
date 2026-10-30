@@ -1,5 +1,5 @@
 {
-  "status": "Local development design samples only; not approved public case imagery",
+  "status": "Approved homepage illustrative artwork; not real customer case imagery",
   "method": "built-in image_gen",
   "created": "2026-10-13",
   "assets": [
@@ -11,5 +11,9 @@
       "file": "commerce-categories-v3.png",
       "prompt": "Use case: product-mockup. Asset type: three-category photographic atlas for a fictional ecommerce platform design preview. Generate a very wide 3:1 landscape image at 3072x1024 if possible. Three precisely equal-width square photographic panels arranged side by side, each completely self-contained. Panel LEFT: cream running sneaker with beautiful mesh/suede details, plus a softly draped cream hoodie behind it, on warm beige stone studio plinth. Panel CENTER: upright amber skincare dropper bottle with black top, plus a cream cosmetic jar, a restrained tiny botanical stem, warm beige studio. Panel RIGHT: premium matte charcoal over-ear headphones with a small closed wireless earbud case, warm beige stone studio. Every object fits fully within its own panel, with 15 percent generous margin on all sides. Main products centered in respective panels. Absolutely no object or shadow crosses the boundary into adjacent panel. Background consistent warm cream #F8F3ED, same sophisticated natural studio sunlight with soft architectural shadows and premium tactile realism. Editorial product photography, high-end ecommerce, refined warm terracotta highlights. No copper orb, no light trails, no futuristic rings. No brands, no writing on bottle, no text, no labels, no borders, no webpage, no UI, no caption, no people, no food or drink. Output one wide image with exactly three side-by-side scenes of equal width, not a webpage mockup."
     }
-  ]
+  ],
+  "publication_approval": {
+    "date": "2026-10-29",
+    "scope": "User requested the deployed homepage match the local homepage, including its existing images and copy. Real user materials and works are excluded."
+  }
 }

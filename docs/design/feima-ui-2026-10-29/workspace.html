@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="zh-CN" data-theme="light">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>飞马 · 专业工作台设计提案</title><link rel="stylesheet" href="workspace.css"><script>try{document.documentElement.dataset.theme=new URLSearchParams(location.search).get('theme')==='dark'?'dark':'light'}catch(e){}</script></head>
+<body>
+<svg class="symbols" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><symbol id="plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol><symbol id="copy" viewBox="0 0 24 24"><rect x="8" y="8" width="12" height="13" rx="2"/><path d="M16 8V3H3v13h5"/></symbol><symbol id="arrow" viewBox="0 0 24 24"><path d="M5 12h14m-5-5 5 5-5 5"/></symbol><symbol id="chevron" viewBox="0 0 24 24"><path d="m7 10 5 5 5-5"/></symbol><symbol id="sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v2m0 16v2M2 12h2m16 0h2M5 5l1.5 1.5m11 11L19 19M5 19l1.5-1.5m11-11L19 5"/></symbol><symbol id="moon" viewBox="0 0 24 24"><path d="M20 15.5A9 9 0 0 1 8.5 4 9 9 0 1 0 20 15.5Z"/></symbol><symbol id="check" viewBox="0 0 24 24"><path d="m5 12 4 4L19 6"/></symbol><symbol id="file" viewBox="0 0 24 24"><path d="M5 3h9l5 5v13H5V3Zm9 0v6h5M8 13h8m-8 4h6"/></symbol><symbol id="download" viewBox="0 0 24 24"><path d="M12 3v12m-5-5 5 5 5-5M4 16v5h16v-5"/></symbol><symbol id="close" viewBox="0 0 24 24"><path d="m6 6 12 12M6 18 18 6"/></symbol><symbol id="edit" viewBox="0 0 24 24"><path d="m14 5 5 5M4 20l1-6L16 3l5 5-11 11-6 1Z"/></symbol><symbol id="image" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="3"/><path d="m3 16 5-5 4 4 4-6 5 7M8 8h.01"/></symbol><symbol id="video" viewBox="0 0 24 24"><rect x="3" y="5" width="13" height="14" rx="2"/><path d="m16 10 5-3v10l-5-3"/></symbol><symbol id="history" viewBox="0 0 24 24"><path d="M3 10a9 9 0 1 1 1 7M3 4v6h6m3-3v6l4 2"/></symbol></svg>
+<header class="topbar">
+  <a class="brand" href="index.html" aria-label="飞马首页方案"><span class="logo-surface"><img src="../../../frontend/src/assets/feima-logo-blue.png" alt=""></span><strong>飞马</strong></a>
+  <nav aria-label="主导航"><a href="index.html">首页方案</a><a class="current" href="workspace.html" aria-current="page">创作工作台</a><button data-unavailable="我的作品">我的作品</button></nav>
+  <div class="header-end"><span class="proposal-label">设计提案</span><button class="icon-button theme-toggle" aria-label="切换为深色主题" title="切换主题"><svg><use href="#moon"/></svg></button><button class="avatar" data-unavailable="个人中心" aria-label="个人中心预览未包含">林</button></div>
+</header>
+<main class="workspace">
+<aside class="sidebar" aria-label="任务导航">
+  <button class="new-task primary" data-new><svg><use href="#plus"/></svg>新建任务</button>
+  <div class="workspace-modes"><button class="active"><svg><use href="#file"/></svg>专业工作台<span class="active-dot"></span></button><button data-unavailable="快速生成"><svg><use href="#arrow"/></svg>快速生成<span class="muted">未含预览</span></button></div>
+  <div class="history-heading"><h2>最近任务</h2><span>示例记录</span></div>
+  <div class="history-group-label">今天</div>
+  <div class="task-list" role="list">
+    <button class="task selected" data-task="0" role="listitem" aria-current="true"><span class="task-name">轻量缓震运动鞋</span><span class="task-meta"><span class="status-dot"></span>文案 · 已完成<span>14:32</span></span></button>
+    <button class="task" data-task="1" role="listitem"><span class="task-name">日常通勤帆布包</span><span class="task-meta"><span class="status-dot"></span>文案 · 已完成<span>11:06</span></span></button>
+    <button class="task" data-task="2" role="listitem"><span class="task-name">无香保湿面霜</span><span class="task-meta"><span class="status-dot"></span>文案 · 已完成<span>09:48</span></span></button>
+  </div>
+  <div class="history-group-label">昨天</div>
+  <button class="task" data-unavailable="昨日任务"><span class="task-name">便携蓝牙音箱</span><span class="task-meta"><span class="status-dot"></span>图片 · 已完成<span>16:20</span></span></button>
+  <button class="load-history" data-unavailable="更多历史任务">加载更多<svg><use href="#chevron"/></svg></button>
+  <div class="sidebar-foot"><svg><use href="#history"/></svg><p>每一次创作，都有迹可循。<small>此处任务与账户均为设计示例</small></p></div>
+</aside>
+<section class="result-column" aria-label="创作成果">
+  <div class="mobile-history"><label for="mobile-task">最近任务</label><select id="mobile-task"><option value="0">轻量缓震运动鞋 · 今天 14:32</option><option value="1">日常通勤帆布包 · 今天 11:06</option><option value="2">无香保湿面霜 · 今天 09:48</option></select><button class="icon-button" data-new aria-label="新建任务"><svg><use href="#plus"/></svg></button></div>
+  <div class="result-heading"><div><h1>创作成果</h1><p><span id="result-product">轻量缓震运动鞋</span><span class="dot-separator">·</span>宣传文案</p></div><span class="status-tag"><svg><use href="#check"/></svg>已完成</span></div>
+  <div class="result-scroll">
+    <div class="result-toolbar"><span><svg><use href="#file"/></svg>文案成果<span class="file-type">TXT</span></span><button class="text-button" id="task-detail">任务详情<svg><use href="#arrow"/></svg></button></div>
+    <article class="copy-paper" id="copy-paper">
+      <div class="paper-top"><span>宣传文案</span><span>小红书 · 自然</span></div>
+      <h2 id="copy-title">每一步，都轻一点。</h2>
+      <div class="copy-content" id="copy-content"><p>早高峰的赶路，午后的一小段散步，<br>把日常交给一双轻盈的鞋。</p><p>柔软的针织鞋面，贴合双脚，也留出呼吸的空间。<br>缓震中底接住每一次落地，让出门这件小事，多一点自在。</p><h3>轻装出发，走自己的节奏。</h3><p>奶油白配色，搭配牛仔裤、运动裤都干净利落。<br>从通勤到周末，一双鞋，陪你走过日常的不同场景。</p><p>选一双舒服的鞋，去看看今天的风景。</p><p class="hashtags">#日常穿搭 #轻量运动鞋 #通勤好物</p></div>
+      <div class="paper-bottom"><span>以上为人工编写的设计样例</span><span>非真实任务产出</span></div>
+    </article>
+    <div class="result-actions"><div><button id="copy-result"><svg><use href="#copy"/></svg>复制全文</button><button id="download-result"><svg><use href="#download"/></svg>下载</button><button id="preview-result">预览</button></div><button class="text-button" id="history-result">历史版本</button></div>
+    <div class="completion-note"><svg><use href="#check"/></svg><span>成果已完成<span class="dot-separator">·</span>任务及结算状态仅作展示</span><button class="text-button" data-regenerate>再次生成<svg><use href="#arrow"/></svg></button></div>
+    <div class="canvas-note">飞马界面设计提案 · 示例内容用于评阅布局、主题与交互</div>
+  </div>
+  <div class="draft-empty" hidden><div class="empty-icon"><svg><use href="#file"/></svg></div><h2>开始一项新创作</h2><p>准备商品资料并确认费用，<br>成果会集中展示在这里。</p><span>本提案仅演示，不会发起生成或扣除积分。</span></div>
+</section>
+<aside class="settings-column" aria-label="商品资料与生成设置">
+  <div class="creation-tabs" role="tablist" aria-label="创作类型"><button class="active" role="tab" aria-selected="true" data-kind="copy"><svg><use href="#file"/></svg>文案</button><button role="tab" aria-selected="false" data-kind="image"><svg><use href="#image"/></svg>图片</button><button role="tab" aria-selected="false" data-kind="video"><svg><use href="#video"/></svg>视频</button></div>
+  <div class="settings-scroll">
+    <div class="readonly-note" id="readonly-note"><svg><use href="#history"/></svg>当前为历史任务，资料只读</div>
+    <section class="setting-section"><div class="section-title"><h2>商品资料</h2><button class="text-button" id="edit-product">查看资料</button></div><div class="product-summary"><div class="product-symbol"><svg><use href="#file"/></svg></div><div><h3 id="summary-product">轻量缓震运动鞋</h3><p>鞋靴箱包 / 运动鞋</p></div></div><dl class="product-specs"><div><dt>材质</dt><dd>针织鞋面 · EVA 中底</dd></div><div><dt>颜色</dt><dd>奶油白</dd></div><div><dt>核心卖点</dt><dd>轻量鞋身、透气、日常缓震</dd></div></dl><div class="reference-line"><span>参考图片 <small>选填</small></span><span>未添加</span></div></section>
+    <section class="setting-section"><div class="section-title"><h2>生成设置</h2><button class="text-button" id="expand-settings" aria-expanded="false" aria-controls="expanded-settings">展开<svg><use href="#chevron"/></svg></button></div><p class="settings-summary">宣传文案<span>小红书</span><span>自然</span></p><div id="expanded-settings" hidden><div class="form-grid"><label>文案类型<input name="copy-type" value="宣传文案" readonly></label><label>目标平台<input name="platform" value="小红书" readonly></label><label>语气<input name="tone" value="自然" readonly></label><label>最大字符数<input name="max-chars" type="number" min="1" value="500" readonly></label></div><p class="field-help">标点、空格和换行均计入字符数。</p><label class="field-label" for="extra-instructions">额外协作要求</label><textarea id="extra-instructions" rows="3" readonly>从日常穿着场景切入，避免夸大表述。</textarea></div></section>
+    <section class="setting-section instruction-section"><div class="section-title"><h2>创作指令</h2><span class="muted">选填</span></div><label class="sr-only" for="instructions">创作指令</label><textarea id="instructions" rows="4" readonly>为这款运动鞋写一篇小红书宣传文案。突出轻量、透气和日常搭配，语气自然，有生活感。</textarea><p class="field-help">具体商品事实以已保存资料为准。</p></section>
+  </div>
+  <div class="fee-footer"><div class="fee-row"><span id="fee-label">本次任务费用 <small>示例</small></span><strong>10 <span>积分</span></strong></div><p id="fee-note">示例报价，不代表实际平台价格。</p><button class="primary generate-button" id="create-action">基于此任务新建草稿<svg><use href="#arrow"/></svg></button></div>
+</aside>
+</main>
+<div class="overlay" id="drawer-overlay" hidden><section class="drawer" role="dialog" aria-modal="true" aria-labelledby="drawer-title"><header><div><h2 id="drawer-title">商品资料</h2><p id="drawer-subtitle">示例任务的只读资料</p></div><button class="icon-button" data-close="drawer-overlay" aria-label="关闭商品资料"><svg><use href="#close"/></svg></button></header><div class="drawer-content" id="drawer-content"><form id="product-form"><h3>基本信息</h3><label>商品名称<input id="product-name" value="轻量缓震运动鞋" required maxlength="60" readonly></label><div class="form-grid"><label>商品类型<select disabled><option>鞋靴箱包</option></select></label><label>商品分类<input value="运动鞋" readonly></label><label>品牌<input value="未填写" readonly></label><label>产地<input value="未填写" readonly></label></div><h3>规格参数</h3><div class="form-grid"><label>材质<input value="针织鞋面 / EVA 中底" readonly></label><label>颜色<input value="奶油白" readonly></label><label>尺码<input value="36–44" readonly></label><label>鞋底材质<input value="EVA" readonly></label></div><h3>卖点与使用场景</h3><label>商品描述<textarea rows="3" readonly>轻量鞋身，针织鞋面透气，日常行走缓震。</textarea></label><label>使用场景<input value="日常通勤、休闲散步" readonly></label><p class="field-help">演示表单仅在当前页面内暂存，不修改真实商品。</p></form></div><footer><button data-close="drawer-overlay">关闭</button><button class="primary" type="submit" form="product-form" id="save-product" hidden>保存商品资料</button></footer></section></div>
+<div class="overlay" id="modal-overlay" hidden><section class="modal" role="dialog" aria-modal="true" aria-labelledby="modal-title"><header><h2 id="modal-title">文案预览</h2><button class="icon-button" data-close="modal-overlay" aria-label="关闭弹窗"><svg><use href="#close"/></svg></button></header><div class="modal-content" id="modal-content"></div><footer><button data-close="modal-overlay">关闭</button></footer></section></div>
+<div class="toast" role="status" aria-live="polite" hidden></div>
+<script src="workspace.js"></script></body></html>

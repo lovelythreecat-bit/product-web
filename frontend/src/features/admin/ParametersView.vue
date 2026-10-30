@@ -5,6 +5,7 @@ import { onMounted, ref } from 'vue'
 import * as api from '../../api/admin'
 import type { Schema } from '../../types/api'
 import AppDrawer from '../../components/AppDrawer.vue'
+import BrandSettings from './BrandSettings.vue'
 import { useAdminRequest } from './shared'
 const { busy, error, run } = useAdminRequest()
 const current = ref<Schema<'ParameterConfigView'> | null>(null), open = ref(false), notice = ref('')
@@ -32,6 +33,7 @@ onMounted(load)
 </script>
 <template>
   <div class="admin-page">
+    <BrandSettings />
     <p v-if="error && !open" class="field-error" role="alert">{{ error }}</p><p v-if="notice" role="status">{{ notice }}</p>
     <section class="panel"><div class="section-heading"><h2>创作价格</h2><div class="action-row"><UiButton class="button" :disabled="busy" @click="load">刷新参数</UiButton><UiButton class="button primary" :disabled="busy || !current" @click="edit">编辑参数</UiButton></div></div>
       <dl v-if="current" class="detail-list"><template v-for="field in fields" :key="field.key"><dt>{{ field.label }}</dt><dd>{{ current[field.key] === null ? '未配置' : current[field.key] + ' 积分 / 次' }}</dd></template></dl><p v-else role="status">{{ busy ? '正在读取参数…' : '暂时无法读取参数。' }}</p><p>未配置价格时无法生成；0 表示本次不收取积分。</p>

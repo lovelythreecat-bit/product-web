@@ -1,0 +1,134 @@
+[
+  {
+    "name": "home",
+    "size": "desktop",
+    "theme": "light",
+    "actual": "light",
+    "overflow": false,
+    "broken": 0,
+    "mainPadding": "0px",
+    "reviewChrome": false,
+    "headlineFont": null
+  },
+  {
+    "name": "home",
+    "size": "desktop",
+    "theme": "dark",
+    "actual": "dark",
+    "overflow": false,
+    "broken": 0,
+    "mainPadding": "0px",
+    "reviewChrome": false,
+    "headlineFont": null
+  },
+  {
+    "name": "home",
+    "size": "mobile",
+    "theme": "light",
+    "actual": "light",
+    "overflow": false,
+    "broken": 0,
+    "mainPadding": "0px",
+    "reviewChrome": false,
+    "headlineFont": null
+  },
+  {
+    "name": "home",
+    "size": "mobile",
+    "theme": "dark",
+    "actual": "dark",
+    "overflow": false,
+    "broken": 0,
+    "mainPadding": "0px",
+    "reviewChrome": false,
+    "headlineFont": null
+  },
+  {
+    "name": "workspace",
+    "size": "desktop",
+    "theme": "light",
+    "actual": "light",
+    "overflow": false,
+    "broken": 0,
+    "mainPadding": "0px",
+    "reviewChrome": false,
+    "headlineFont": "\"Microsoft YaHei UI\", \"PingFang SC\", \"Noto Sans SC\", sans-serif"
+  },
+  {
+    "name": "workspace",
+    "size": "desktop",
+    "theme": "dark",
+    "actual": "dark",
+    "overflow": false,
+    "broken": 0,
+    "mainPadding": "0px",
+    "reviewChrome": false,
+    "headlineFont": "\"Microsoft YaHei UI\", \"PingFang SC\", \"Noto Sans SC\", sans-serif"
+  },
+  {
+    "name": "workspace",
+    "size": "mobile",
+    "theme": "light",
+    "actual": "light",
+    "overflow": false,
+    "broken": 0,
+    "mainPadding": "0px",
+    "reviewChrome": false,
+    "headlineFont": "\"Microsoft YaHei UI\", \"PingFang SC\", \"Noto Sans SC\", sans-serif"
+  },
+  {
+    "name": "workspace",
+    "size": "mobile",
+    "theme": "dark",
+    "actual": "dark",
+    "overflow": false,
+    "broken": 0,
+    "mainPadding": "0px",
+    "reviewChrome": false,
+    "headlineFont": "\"Microsoft YaHei UI\", \"PingFang SC\", \"Noto Sans SC\", sans-serif"
+  },
+  {
+    "name": "quick",
+    "size": "desktop",
+    "theme": "light",
+    "actual": "light",
+    "overflow": false,
+    "broken": 0,
+    "mainPadding": "24px",
+    "reviewChrome": false,
+    "headlineFont": null
+  },
+  {
+    "name": "quick",
+    "size": "desktop",
+    "theme": "dark",
+    "actual": "dark",
+    "overflow": false,
+    "broken": 0,
+    "mainPadding": "24px",
+    "reviewChrome": false,
+    "headlineFont": null
+  },
+  {
+    "name": "quick",
+    "size": "mobile",
+    "theme": "light",
+    "actual": "light",
+    "overflow": false,
+    "broken": 0,
+    "mainPadding": "16px",
+    "reviewChrome": false,
+    "headlineFont": null
+  },
+  {
+    "name": "quick",
+    "size": "mobile",
+    "theme": "dark",
+    "actual": "dark",
+    "overflow": false,
+    "broken": 0,
+    "mainPadding": "16px",
+    "reviewChrome": false,
+    "headlineFont": null
+  }
+]

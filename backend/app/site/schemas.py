@@ -3,12 +3,28 @@
 from typing import Annotated, Literal
 from uuid import UUID
 
-from pydantic import Field
+from pydantic import Field, StringConstraints
 
 from app.common.types import DTO, NonNegativeInt
 from app.policies.schemas import Version
 
 Text = Annotated[str, Field(min_length=1, max_length=5000, pattern=r"\S")]
+
+BrandName = Annotated[
+    str, StringConstraints(
+        strip_whitespace=True, min_length=1, max_length=24, pattern=r"^[^\x00-\x1f\x7f]+$"
+    )
+]
+
+
+class SiteBrandView(DTO):
+    name: BrandName
+    version: NonNegativeInt
+
+
+class SiteBrandUpdate(DTO):
+    name: BrandName
+    expected_version: NonNegativeInt
 
 
 class AgentDescriptions(DTO):

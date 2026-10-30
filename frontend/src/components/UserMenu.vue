@@ -65,13 +65,13 @@ onBeforeUnmount(() => document.removeEventListener('click', outsideClick))
 .user-menu-trigger:hover,.user-menu-trigger[aria-expanded="true"] { background:var(--color-selected,#f2dfcf); border-color:var(--color-border,#e7d9ca); }
 .user-menu-name { min-width:0; max-width:128px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; font-size:14px; }
 .user-menu-chevron { width:16px; height:16px; flex-shrink:0; }
-.user-menu-panel { position:absolute; z-index:30; top:calc(100% + 8px); right:0; width:208px; max-width:calc(100vw - 32px); padding:8px; background:var(--color-panel,#fffdfa); border:1px solid var(--color-border,#e7d9ca); border-radius:12px; box-shadow:0 12px 30px #32282318; }
+.user-menu-panel { position:absolute; z-index:30; top:calc(100% + 8px); right:0; width:208px; max-width:calc(100vw - 32px); padding:8px; background:var(--color-panel,#fffdfa); border:1px solid var(--color-border,#e7d9ca); border-radius:12px; box-shadow:var(--shadow-overlay); }
 .user-menu-panel a,.user-menu-panel button { display:flex; align-items:center; width:100%; min-height:44px; padding:10px 12px; border:0; border-radius:6px; background:transparent; color:inherit; text-decoration:none; font:inherit; font-size:14px; text-align:left; }
 .user-menu-panel a:hover,.user-menu-panel button:hover { background:var(--color-selected,#f2dfcf); }
 .user-menu-panel .user-menu-logout { margin-top:6px; border-top:1px solid var(--color-border,#e7d9ca); border-radius:0 0 6px 6px; color:var(--color-danger,#a52b28); }
 .user-menu-trigger:focus-visible,.user-menu-panel a:focus-visible,.user-menu-panel button:focus-visible { outline:2px solid var(--color-primary,#a94e32); outline-offset:2px; }
 .user-menu-error { margin:6px 12px; color:var(--color-danger,#a52b28); font-size:13px; }
-.user-menu-error--closed { position:absolute; z-index:30; top:calc(100% + 8px); right:0; width:208px; max-width:calc(100vw - 32px); margin:0; padding:10px 12px; border:1px solid var(--color-border,#e7d9ca); border-radius:8px; background:var(--color-panel,#fffdfa); box-shadow:0 8px 24px #32282318; }
+.user-menu-error--closed { position:absolute; z-index:30; top:calc(100% + 8px); right:0; width:208px; max-width:calc(100vw - 32px); margin:0; padding:10px 12px; border:1px solid var(--color-border,#e7d9ca); border-radius:8px; background:var(--color-panel,#fffdfa); box-shadow:var(--shadow-overlay); }
 @media(max-width:600px) { .user-menu-trigger { max-width:160px; padding:4px; gap:6px; } .user-menu-name { max-width:85px; } }
 @media(max-width:700px) { .user-menu.shell-user-menu .user-menu-name { display:none; } .user-menu.shell-user-menu .user-menu-trigger { padding:4px; gap:4px; } }
 </style>

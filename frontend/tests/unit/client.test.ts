@@ -6,6 +6,21 @@ async function client() {
 }
 afterEach(() => { vi.unstubAllGlobals(); document.cookie = 'csrf_token=; Max-Age=0' })
 describe('same-origin API boundary', () => {
+  it('bypasses cached redirects for work lists and private media without following redirects', async () => {
+    const api = await client()
+    vi.stubGlobal('fetch', async (url: string, init: RequestInit) => {
+      // Browser redirect:error rejects an old cached redirect before contacting the API.
+      if (init.cache !== 'no-store') throw new TypeError('cached redirect')
+      expect(init.redirect).toBe('error')
+      expect(init.credentials).toBe('same-origin')
+      return url.includes('/works')
+        ? new Response(JSON.stringify({ items: [], total: 0 }))
+        : new Response(new Blob(['private-media'], { type: 'image/png' }))
+    })
+    await expect(api.request('/api/v1/works?page=1&limit=10')).resolves.toEqual({ items: [], total: 0 })
+    expect((await api.requestBlob('/api/v1/files/test/content')).size).toBe(13)
+  })
+
   it('sends cookie CSRF and keeps an intent immutable across explicit retries', async () => {
     const api = await client()
     document.cookie = 'csrf_token=TEST_ONLY_csrf'
