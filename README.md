@@ -1,35 +1,42 @@
-<p align="center">
-  <img src="assets/readme/hero.svg" width="100%" alt="映作：围绕商品资料，分步完成文案、图片与视频创作">
-</p>
+# 电商 AI 创作平台 · 飞马 UI
 
-# 映作 · 电商 AI 创作平台
-
-把商品资料、创作指令和生成成果放在同一个工作台。支持分步完成文案、图片与视频的**快速生成**，也可通过**普通任务**单独创作；任务、作品与积分记录统一管理。
+**让好商品，亮眼登场。** 从一份商品资料出发，创作文案、图片与视频，在同一个工作台管理任务、作品与积分。
 
 [界面预览](#界面预览) · [核心能力](#核心能力) · [本地启动](#本地启动) · [技术结构](#技术结构) · [项目文档](#项目文档)
 
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="assets/readme/feima-home-dark.png">
+  <img src="assets/readme/feima-home-light.png" width="100%" alt="飞马蓝色首页：让好商品，亮眼登场；围绕鞋服、美妆、数码商品展示文案、图片和视频创作入口">
+</picture>
+
+本分支采用 2026-10-30 确认的**飞马蓝色浅色／深色 UI**，覆盖首页、创作工作台、账户与后台。平台名称可由管理员设置；截图使用“飞马”作为展示名称。[设计规范](DESIGN.md) · [浅色首页原图](assets/readme/feima-home-light.png) · [深色首页原图](assets/readme/feima-home-dark.png)
+
 ## 界面预览
 
-**快速生成 · 文案确认** — 围绕同一份商品资料，查看和编辑文案，再继续图片创作。
+**专业工作台 · 从资料到成果** — 左侧保留任务历史，中间阅读文案，右侧查看商品资料与创作要求。
 
-<p align="center">
-  <a href="assets/readme/quick-copy.png"><img src="assets/readme/quick-copy.png" width="100%" alt="快速生成的文案确认页：左侧任务列表，中间为宣传文案、商品标题、卖点描述和详情介绍，底部确认后进入图片生成"></a>
-</p>
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="docs/verification/feima-ui-2026-10-30/workspace-dark-desktop.png">
+  <img src="docs/verification/feima-ui-2026-10-30/workspace-light-desktop.png" width="100%" alt="飞马专业工作台：任务历史、运动鞋文案成果、商品资料与创作参数分区展示">
+</picture>
 
-点击截图查看原图。以上为实际前端组件的合成界面测试截图，商品、文案、余额与费用均为测试数据；不代表客户案例或真实模型效果。详见[本次界面验证](docs/verification/quick-generation-ui-v1.1-2026-10-21.md)。
+[浅色原图](docs/verification/feima-ui-2026-10-30/workspace-light-desktop.png) · [深色原图](docs/verification/feima-ui-2026-10-30/workspace-dark-desktop.png)。以上及下方均为实际前端组件配合合成数据的界面截图；商品、文案、账户、积分与费用为测试样例，不代表客户案例、模型效果或生产报价。[素材来源](assets/readme/README.md) · [界面验证](docs/verification/feima-ui-2026-10-30.md)
 
 <details>
-<summary>查看更多：图片成果与普通任务工作台</summary>
+<summary>查看更多：快速生成、深色界面与手机布局</summary>
 
-**快速生成 · 图片成果** — 展示完整图片，确认后继续视频步骤。
+**快速生成 · 分步确认** — 商品确认、营销文案、图片生成、视频生成与完成汇总保留清晰的步骤状态。
 
-<a href="assets/readme/quick-images.png"><img src="assets/readme/quick-images.png" width="100%" alt="快速生成图片页：商品主图完整预览，底部提供确认图片并继续视频的操作；耳机图为测试示意"></a>
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="docs/verification/feima-ui-2026-10-30/quick-dark-desktop.png">
+  <img src="docs/verification/feima-ui-2026-10-30/quick-light-desktop.png" width="100%" alt="飞马快速生成文案确认页：五步进度、宣传文案、商品标题、卖点描述、详情介绍，以及确认文案并生成图片的操作">
+</picture>
 
-**普通任务 · 文案创作** — 商品资料、创作参数与成果阅读分区展示。
+**深色界面** — 墨蓝画布、浅蓝操作，商品图片保留自然色彩。
 
-<a href="assets/readme/workspace.png"><img src="assets/readme/workspace.png" width="100%" alt="普通任务工作台：左侧任务历史，中间文案成果与复制下载操作，右侧商品资料和创作参数"></a>
+<a href="assets/readme/feima-home-dark.png"><img src="assets/readme/feima-home-dark.png" width="100%" alt="飞马首页深色主题：墨蓝背景、浅色文字与蓝色按钮，商品摄影保持原色"></a>
 
-截图分别来自 2026-10-21 与 2026-10-17 的界面验证，均使用测试数据。[素材来源](assets/readme/README.md)
+**手机布局** — 查看 [浅色工作台](docs/verification/feima-ui-2026-10-30/workspace-light-mobile.png)、[深色快速生成](docs/verification/feima-ui-2026-10-30/quick-dark-mobile.png) 与 [完整首页](docs/verification/feima-ui-2026-10-30/home-light-mobile.png)。保留单列操作流程，长内容可滚动阅读。
 
 </details>
 
@@ -42,7 +49,7 @@
 | 图片创作 | 按平台与用途生成商品图片，预览完整成果并查看历史版本 |
 | 视频创作 | 提交商品与首帧资料，查看或修改方案，显式确认后生成视频 |
 | 任务与作品 | 查看持久化进度、恢复已有任务、管理和下载自己的成果 |
-| 账户与后台 | 查看积分及流水，管理用户、Agent 连接、生成参数和审计记录 |
+| 账户与后台 | 查看积分及流水，管理用户、Agent 连接、生成参数、品牌名称和审计记录 |
 
 快速生成按 **商品确认 → 营销文案 → 图片生成 → 视频生成 → 完成汇总** 推进，关键步骤保留确认。普通任务用于独立选择文案、图片或视频创作。
 
@@ -153,10 +160,11 @@ Vue 3 / TypeScript / Element Plus
 
 | 想了解什么 | 从这里开始 |
 | --- | --- |
-| 产品范围与已确认设计 | [需求终稿](docs/电商AI创作平台-首版需求终稿-2026-10-09.md) · [产品设计入口及后续变更](docs/product-design.md) · [V2 视觉基准](docs/design/high-fidelity-2026-10-11/visual-reference.md) |
+| 产品范围与已确认设计 | [需求终稿](docs/电商AI创作平台-首版需求终稿-2026-10-09.md) · [产品设计入口及后续变更](docs/product-design.md) · [飞马设计规范](DESIGN.md) · [双主题设计稿](docs/design/feima-ui-2026-10-29/README.md) |
 | 页面开发与共享组件 | [前端说明](frontend/README.md) · [公共控件约定](docs/development/frontend-ui.md) |
 | 文案、图片、视频接入证据 | [文案真实链路](docs/verification/local-text-generation-2026-10-16.md) · [图片配置与受理核查](docs/verification/local-image-generation-2026-10-16.md) · [视频真实链路](docs/verification/local-video-generation-2026-10-17.md) |
-| 快速生成与工作台 | [快速生成验证](docs/verification/quick-generation-2026-10-18.md) · [新版界面验证](docs/verification/quick-generation-ui-v1.1-2026-10-21.md) · [工作台重设计](docs/verification/workspace-redesign-2026-10-17.md) |
+| 当前 UI 与品牌设置 | [飞马双主题验证](docs/verification/feima-ui-2026-10-30.md) · [品牌配置验证](docs/verification/brand-theme-2026-10-27.md) · [本次发布检查](docs/verification/feima-github-readme-2026-10-30.md) |
+| 快速生成与工作台 | [快速生成验证](docs/verification/quick-generation-2026-10-18.md) · [快速生成流程验证](docs/verification/quick-generation-ui-v1.1-2026-10-21.md) · [工作台重设计](docs/verification/workspace-redesign-2026-10-17.md) |
 | 验收与上线 | [交付待办](docs/release-checklist.md) · [AC-01～30 追踪](docs/verification/acceptance.csv) · [全部专项记录](docs/verification) |
 | 历史运行与排障细节 | [美化前 README 归档](docs/development/readme-history-2026-10-21.md) · [历史开发范围](docs/development-scope-2026-10-13.md) |
 
