@@ -10,6 +10,7 @@ import { taskMedia } from '../../types/media'
 export function useTaskStream(conversationId: MaybeRefOrGetter<string>) {
   const tasks = shallowRef<Schema<'TaskView'>[]>([])
   const latestTaskId = ref('')
+  const initialReadComplete = ref(false)
   const details = shallowRef<Record<string, Schema<'TaskDetail'>>>({})
   const fragments = ref<Record<string, string>>({})
   const connectionState = ref<'connecting' | 'open' | 'recovering' | 'closed'>('closed')
@@ -166,6 +167,7 @@ export function useTaskStream(conversationId: MaybeRefOrGetter<string>) {
     try {
       await reconcile(t)
       if (!current(t)) return
+      initialReadComplete.value = true
       connectionState.value = 'connecting'
       open(t)
     } catch {
@@ -176,9 +178,28 @@ export function useTaskStream(conversationId: MaybeRefOrGetter<string>) {
     }
   }
   function reconnect() { return recover() }
-  function clear() { revision++; close(); requests.clear(); unrelatedTasks.clear(); cursor = ''; retryAttempt = 0; listedOrder = []; latestTaskId.value = ''; tasks.value = []; details.value = {}; fragments.value = {}; error.value = ''; connectionState.value = 'closed' }
+  function clear() { revision++; close(); requests.clear(); unrelatedTasks.clear(); cursor = ''; retryAttempt = 0; listedOrder = []; initialReadComplete.value = false; latestTaskId.value = ''; tasks.value = []; details.value = {}; fragments.value = {}; error.value = ''; connectionState.value = 'closed' }
   const unsubscribe = onIdentityChange(clear)
   watch(() => toValue(conversationId), () => { clear(); void reconnect() }, { immediate: true, flush: 'sync' })
+  // SSE can stay apparently connected while a proxy or sleeping tab delays events.
+  // Re-read only unfinished originals as a fallback; never submit replacement work.
+  watch(() => tasks.value.filter(task => !terminal(task.state)).map(task => task.task_id).join(','), (ids, _, onCleanup) => {
+    if (!ids) return
+    let stopped = false
+    let pollingTimer: ReturnType<typeof setTimeout>
+    const poll = async () => {
+      const t = token(), pending = tasks.value.filter(task => !terminal(task.state))
+      let index = 0
+      await Promise.allSettled(Array.from({ length: Math.min(4, pending.length) }, async () => {
+        while (!stopped && current(t) && index < pending.length) {
+          try { await refreshTask(pending[index++].task_id, t) } catch { /* Retain the last persisted result and retry. */ }
+        }
+      }))
+      if (!stopped) pollingTimer = setTimeout(() => { void poll() }, 5000)
+    }
+    pollingTimer = setTimeout(() => { void poll() }, 5000)
+    onCleanup(() => { stopped = true; clearTimeout(pollingTimer) })
+  }, { flush: 'sync' })
   onScopeDispose(() => { disposed = true; clear(); unsubscribe() })
-  return { tasks, latestTaskId, details, fragments, connectionState, error, reconnect, refreshTask }
+  return { tasks, latestTaskId, initialReadComplete, details, fragments, connectionState, error, reconnect, refreshTask }
 }

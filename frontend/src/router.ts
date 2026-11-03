@@ -18,6 +18,7 @@ import { session, onIdentityChange } from './features/auth/session'
 import { resumeWorkspace } from './features/workspace/resumeWorkspace'
 export const router = createRouter({ history:createWebHistory(), routes:[
   {path:'/',component:HomeView,meta:{public:true}},
+  {path:'/ai-customer-service',component:() => import('./features/site/customer-service/CustomerServiceView.vue'),meta:{public:true}},
   {path:'/login',component:LoginView,meta:{public:true}},
   {path:'/register',component:RegisterView,meta:{public:true}},
   {path:'/account',component:AccountView},

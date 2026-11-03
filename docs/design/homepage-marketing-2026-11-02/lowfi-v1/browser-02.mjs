@@ -1,0 +1,4 @@
+const task=await taskSpace('feima-home-lowfi-20261102');
+console.log({spaceId:task.spaceId,pages:await task.pages()});
+console.log(await task.page('p1').snapshot());
+help('page.screenshot');

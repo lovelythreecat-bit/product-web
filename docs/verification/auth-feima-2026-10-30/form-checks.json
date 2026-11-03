@@ -1,0 +1,21 @@
+{
+  "invalid": {
+    "account": "账号需要 3–64 个字符。",
+    "password": "密码需要 10–128 个字符。",
+    "requests": 0
+  },
+  "busy": {
+    "busy": "true",
+    "disabled": true
+  },
+  "sameIntent": true,
+  "small": {
+    "overflow": false,
+    "fields": 3
+  },
+  "notice": {
+    "text": "密码已修改，请使用新密码重新登录。",
+    "inside": true
+  },
+  "scope": "Production bundle; browser-only API fixtures; no real account created"
+}

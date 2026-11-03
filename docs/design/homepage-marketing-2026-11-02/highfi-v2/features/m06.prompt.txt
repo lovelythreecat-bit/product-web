@@ -1,0 +1,20 @@
+Use case: ui-mockup
+Asset type: Feima ecommerce AI creation platform marketing homepage, individual high-fidelity desktop section, NOT an entire website.
+Primary request: Render an actual finished premium Chinese website design image from the confirmed low-fidelity layout, with realistic product photography, meticulous Chinese typography and generous whitespace.
+Reference image 1 is ONLY the approved lowfi layout. Inherit its composition, never render its gray placeholder labels, crossed boxes, review notes or wireframe appearance. Reference image 2 is the newly generated Feima hero style anchor ONLY, do not inherit its page structure or extra copy. Additional character reference (when present) is the exact Lingling identity to preserve.
+Palette and visual system: cool off-white #F3F6FB and white, brand blue #1559D6, dark navy headings #182843, body blue-gray #586B85, thin border #DBE3EF. 1440px desktop design, 1240px content, ~100px side margins. Chinese sans-serif, headings 40–56px, body 18–22px, line-height 1.7. Controls 8px radius, panels 14px, very restrained soft shadow. Natural material product photography, warm product reflections allowed but never a warm primary UI.
+Constraints: One module only. No browser chrome, no site navigation, no footer, no review tags, no giant fake logo, no purple gradients, no cyber neon, no robots, no real human models, no omitted/rewritten/shortened copy. Do not use generic English lorem ipsum. Do not print copy IDs or HTML tags. Every source string below must be visibly typeset verbatim, including headings, badges, emoji, punctuation, numbers and labels. Preserve full body text; increase canvas height if necessary instead of shrinking or deleting. Text blocks can wrap freely while exact wording remains. Any additional visual sample is subtly labeled 创作示例.
+
+Composition:
+1440 × 1060 desktop module. Follow m06 wireframe EXACTLY: left-aligned blue eyebrow at top, bold dark heading below, COMPLETE paragraph spanning a readable 900px measure, then ONE large wide 16:9 cinematic still that dominates the section. Premium dark headphones as hero product on a quiet neutral photographic set with warm natural highlights and cool UI framing. No person. Add a small play triangle only as a visual hint, not a video player with status. Below the wide still just a very restrained horizontal three-point shot-rhythm line, no progress percentages or success. Tiny 创作示例 caption. Give the large photography region enough room, preserve outer whitespace.
+
+Text (verbatim; source HTML encodes hierarchy only, print all text and NO tags):
+[C04-03]
+卖点 2 · 文生视频
+      抖店带货的流量引擎
+      一句话描述卖点，飞马生成带货短视频。口播、种草、测评多风格任选，适配抖音 / 抖店投放节奏，视频带货从想创意到出片只隔十分钟。
+Hierarchy: <div class="source-card">
+      <span class="source-tag">卖点 2 · 文生视频</span>
+      <h3>抖店带货的流量引擎</h3>
+      <p>一句话描述卖点，飞马生成带货短视频。口播、种草、测评多风格任选，适配抖音 / 抖店投放节奏，视频带货从想创意到出片只隔十分钟。</p>
+    </div>

@@ -1,0 +1,24 @@
+{
+  "module": "m11",
+  "source": "../../lowfi-v1/copy-data.json",
+  "copy_ids": [
+    "C06-08",
+    "C06-09"
+  ],
+  "blocks": [
+    {
+      "id": "C06-08",
+      "group": "C06",
+      "tag": "div",
+      "text": "信任区（占位数据，上线后替换）\n      已有 X 万 电商人用飞马出片　·　平均出片时长 10 分钟　·　支持 X 个 电商平台一键发布",
+      "html": "<div class=\"source-card\">\n      <span class=\"source-tag\">信任区（占位数据，上线后替换）</span>\n      <p>已有 <b>X 万</b> 电商人用飞马出片　·　平均出片时长 <b>10 分钟</b>　·　支持 <b>X 个</b> 电商平台一键发布</p>\n    </div>"
+    },
+    {
+      "id": "C06-09",
+      "group": "C06",
+      "tag": "div",
+      "text": "别再为出片发愁。飞马，让你专心卖货。\n      按钮：立即免费体验",
+      "html": "<div class=\"source-card\">\n      <h3>别再为出片发愁。飞马，让你专心卖货。</h3>\n      <p>按钮：立即免费体验</p>\n    </div>"
+    }
+  ]
+}

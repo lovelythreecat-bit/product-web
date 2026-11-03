@@ -11,7 +11,7 @@ import { session } from '../features/auth/session'
 import '../styles/app-header.css'
 
 const route = useRoute()
-const isHome = computed(() => route.path === '/')
+const isHome = computed(() => route.path === '/' || route.path.replace(/\/$/, '') === '/ai-customer-service')
 const isAuth = computed(() => ['/login', '/register'].includes(route.path))
 const inWorkspace = computed(() => route.path.startsWith('/workspace'))
 const inAdmin = computed(() => route.path.startsWith('/admin'))
@@ -56,12 +56,24 @@ watch(session.epoch, () => { if (session.profile.value) void session.refreshAcco
 </template>
 
 <style scoped>
-.app-shell--auth { display:flex; flex-direction:column; min-height:100dvh; }
-.app-shell--auth > .app-header { flex-shrink:0; }
-.app-shell--auth > .shell-body { display:flex; flex:1; }
-.app-shell--auth > .shell-body > main { display:flex; align-items:center; flex:1; min-width:0; padding:32px; }
-@media(max-width:800px) { .app-shell--auth > .shell-body > main { align-items:flex-start; padding:28px 20px; } }
-@media(max-width:420px) { .app-shell--auth > .shell-body > main { padding:20px 16px; } }
+.app-shell--auth { display:flex; flex-direction:column; width:calc(100% - 64px); max-width:1216px; margin:0 auto 40px; }
+.app-shell--auth > .app-header { flex-shrink:0; min-height:104px; padding:20px 0; background:transparent; border:0; }
+.app-shell--auth > .shell-body { display:flex; min-height:0; border-radius:var(--radius-panel); overflow:hidden; background:var(--color-panel); }
+.app-shell--auth > .shell-body > main { display:flex; align-items:stretch; flex:1; min-width:0; max-width:none; padding:0; }
+@media(min-height:880px) and (min-width:801px) { .app-shell--auth > .app-header { min-height:120px; } }
+@media(max-width:1100px) { .app-shell--auth { width:calc(100% - 48px); } }
+@media(max-width:800px) {
+  .app-shell--auth { width:100%; min-height:100dvh; margin:0; background:var(--color-panel); }
+  .app-shell--auth > .app-header { min-height:88px; padding:14px 24px; gap:12px; flex-wrap:wrap; }
+  .app-shell--auth > .shell-body { border-radius:0; }
+  .app-shell--auth > .shell-body > main { align-items:flex-start; }
+  .app-shell--auth .header-actions { order:initial; width:auto; margin-left:auto; gap:8px; }
+  .app-shell--auth .brand { font-size:18px; gap:8px; }
+  .app-shell--auth .brand-mark { width:32px; height:32px; }
+  .app-shell--auth .brand-name { max-width:8em; }
+  .app-shell--auth .header-actions .button { flex:none; padding-inline:12px; font-size:13px; }
+}
+@media(max-width:380px) { .app-shell--auth > .app-header { padding-inline:16px; } .app-shell--auth .header-actions { gap:6px; } .app-shell--auth .header-actions .button { padding-inline:8px; } }
 .app-shell--collection { height:100dvh; overflow:hidden; display:flex; flex-direction:column; }
 .app-shell--collection > .app-header { flex-shrink:0; }
 .app-shell--collection > .shell-body { flex:1; min-height:0; overflow:hidden; display:flex; flex-direction:column; }

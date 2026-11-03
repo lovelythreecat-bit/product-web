@@ -1,0 +1,217 @@
+{
+  "pro": {
+    "mode": "beginner",
+    "visible": true,
+    "beginnerHidden": true
+  },
+  "pauseStable": true,
+  "pausedBefore": {
+    "renderer": "WebGL",
+    "scene": 3,
+    "progress": 3.005,
+    "time": 103.35,
+    "camera": [
+      0.14603152006827372,
+      0.5,
+      12.803763212330852
+    ],
+    "productRotation": [
+      0.05,
+      1.83419892979583,
+      -0.22
+    ],
+    "drawCalls": 67,
+    "triangles": 21990,
+    "mode": "beginner",
+    "paused": false,
+    "reduced": false,
+    "texturesPending": 0
+  },
+  "pausedAfter": {
+    "renderer": "WebGL",
+    "scene": 3,
+    "progress": 3,
+    "time": 103.35,
+    "camera": [
+      0.20514234251223828,
+      0.5,
+      12.8
+    ],
+    "productRotation": [
+      0.05,
+      1.8304357174649797,
+      -0.22
+    ],
+    "drawCalls": 15,
+    "triangles": 16560,
+    "mode": "beginner",
+    "paused": true,
+    "reduced": false,
+    "texturesPending": 0
+  },
+  "dialog": {
+    "open": true,
+    "focus": "close-dialog"
+  },
+  "theme": {
+    "theme": "light",
+    "label": "切换深色主题"
+  },
+  "mobile": [
+    {
+      "id": "home",
+      "theme": "dark",
+      "width": 390,
+      "overflow": false,
+      "copyBottom": 482.0625,
+      "sceneTop": 405.109375,
+      "renderer": "webgl"
+    },
+    {
+      "id": "pictures",
+      "theme": "dark",
+      "width": 390,
+      "overflow": false,
+      "copyBottom": 499.09375,
+      "sceneTop": 405.109375,
+      "renderer": "webgl"
+    },
+    {
+      "id": "film",
+      "theme": "dark",
+      "width": 390,
+      "overflow": false,
+      "copyBottom": 469.515625,
+      "sceneTop": 337.59375,
+      "renderer": "webgl"
+    },
+    {
+      "id": "guide",
+      "theme": "dark",
+      "width": 390,
+      "overflow": false,
+      "copyBottom": 508.140625,
+      "sceneTop": 413.546875,
+      "renderer": "webgl"
+    },
+    {
+      "id": "distribution",
+      "theme": "dark",
+      "width": 390,
+      "overflow": false,
+      "copyBottom": 423,
+      "sceneTop": 337.59375,
+      "renderer": "webgl"
+    },
+    {
+      "id": "start",
+      "theme": "dark",
+      "width": 390,
+      "overflow": false,
+      "copyBottom": 388.3125,
+      "sceneTop": 337.59375,
+      "renderer": "webgl"
+    },
+    {
+      "id": "home",
+      "theme": "light",
+      "width": 390,
+      "overflow": false,
+      "copyBottom": 482.0625,
+      "sceneTop": 405.109375,
+      "renderer": "webgl"
+    },
+    {
+      "id": "pictures",
+      "theme": "light",
+      "width": 390,
+      "overflow": false,
+      "copyBottom": 499.09375,
+      "sceneTop": 405.109375,
+      "renderer": "webgl"
+    },
+    {
+      "id": "film",
+      "theme": "light",
+      "width": 390,
+      "overflow": false,
+      "copyBottom": 469.515625,
+      "sceneTop": 337.59375,
+      "renderer": "webgl"
+    },
+    {
+      "id": "guide",
+      "theme": "light",
+      "width": 390,
+      "overflow": false,
+      "copyBottom": 508.140625,
+      "sceneTop": 413.546875,
+      "renderer": "webgl"
+    },
+    {
+      "id": "distribution",
+      "theme": "light",
+      "width": 390,
+      "overflow": false,
+      "copyBottom": 423,
+      "sceneTop": 337.59375,
+      "renderer": "webgl"
+    },
+    {
+      "id": "start",
+      "theme": "light",
+      "width": 390,
+      "overflow": false,
+      "copyBottom": 388.3125,
+      "sceneTop": 337.59375,
+      "renderer": "webgl"
+    }
+  ],
+  "reducedBefore": {
+    "renderer": "WebGL",
+    "scene": 0,
+    "progress": 0,
+    "time": 113.04,
+    "camera": [
+      0,
+      0.5,
+      12.4
+    ],
+    "productRotation": [
+      0.05,
+      0.31066133891801334,
+      -0.22
+    ],
+    "drawCalls": 21,
+    "triangles": 26994,
+    "mode": "beginner",
+    "paused": true,
+    "reduced": true,
+    "texturesPending": 0
+  },
+  "reducedAfter": {
+    "diagnostics": {
+      "renderer": "WebGL",
+      "scene": 0,
+      "progress": 0,
+      "time": 113.04,
+      "camera": [
+        0,
+        0.5,
+        12.4
+      ],
+      "productRotation": [
+        0.05,
+        0.31066133891801334,
+        -0.22
+      ],
+      "drawCalls": 21,
+      "triangles": 26994,
+      "mode": "beginner",
+      "paused": true,
+      "reduced": true,
+      "texturesPending": 0
+    },
+    "disabled": true
+  }
+}

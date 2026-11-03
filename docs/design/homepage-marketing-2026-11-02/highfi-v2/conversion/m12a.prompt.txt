@@ -1,0 +1,15 @@
+Use case: ui-mockup. Asset type: one independent desktop homepage section for 飞马, polished high fidelity design, raster PNG. This is a design mockup only.
+Visual system: 1440px wide desktop canvas, natural height; 1240px content area and 100px horizontal margins. White and #F3F6FB cool white background, primary #1559D6, navy #182843 headings, body #586B85, border #DBE3EF. Elegant Chinese sans-serif typography, main headings 40–56px, body 20–22px with 1.7 line-height. Calm spacious editorial composition, refined small blue line icons, 8px controls and 14px panels, delicate borders and restrained shadow. Natural commercial product photography of cream sneaker, amber serum bottle, charcoal headphones. No purple, neon, warm overall theme, fake testimonials, made-up numbers, people or redesigned mascots. Do not render low-fidelity annotations, wireframe labels, IDs, measurements or this instruction text. All supplied marketing text must be visible, with no summary, truncation, scrollbar or accordion. Increase canvas height if needed. Any new product demonstration visual gets a tiny label “创作示例”. Do not add a header/nav or unrelated modules.
+Module m12a. Exact prototype arrangement: chapter heading at top, then left video preview and right complete script in spacious columns. 1440 × 1100 or taller. Left visual bounded within left column, editorial product film still of cream sneaker, amber serum bottle, charcoal headphones, soft natural light, a discreet central play icon and tiny “创作示例”; no people/characters. Right column contains title and all six script paragraphs, naturally wrapped to around 24 Chinese characters per line, full text without abbreviation. Chapter heading 42px, script title 28px, body 22px. Give text height priority.
+Text (verbatim, chapter heading):
+“07短视频 / 社群 / 商店文案”
+Right title:
+“30 秒短视频口播脚本”
+Six paragraphs in this precise order:
+“做电商最累的是什么？出图、拍视频、上架、再上架……”
+“试试飞马电商工作台。”
+“文生图，主图详情一键出；文生视频，抖店带货片十分钟搞定。”
+“怕不会用？有玲玲，AI 数字人客服一步一步带你走，卡哪步教哪步。”
+“最后还能一键发到你所有店铺。”
+“小白十分钟，也能出专业片。飞马，电商人的内容工厂。”
+No duplicate script on left. No invented short summaries or added captions except 创作示例.

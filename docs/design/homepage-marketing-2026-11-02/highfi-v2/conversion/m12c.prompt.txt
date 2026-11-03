@@ -1,0 +1,14 @@
+Use case: ui-mockup. Asset type: one independent desktop homepage section for 飞马, polished high fidelity design, raster PNG. This is a design mockup only.
+Visual system: 1440px wide desktop canvas, natural height; 1240px content area and 100px horizontal margins. White and #F3F6FB cool white background, primary #1559D6, navy #182843 headings, body #586B85, border #DBE3EF. Elegant Chinese sans-serif typography, main headings 40–56px, body 20–22px with 1.7 line-height. Calm spacious editorial composition, refined small blue line icons, 8px controls and 14px panels, delicate borders and restrained shadow. Natural commercial product photography of cream sneaker, amber serum bottle, charcoal headphones. No purple, neon, warm overall theme, fake testimonials, made-up numbers, people or redesigned mascots. Do not render low-fidelity annotations, wireframe labels, IDs, measurements or this instruction text. All supplied marketing text must be visible, with no summary, truncation, scrollbar or accordion. Increase canvas height if needed. Any new product demonstration visual gets a tiny label “创作示例”. Do not add a header/nav or unrelated modules.
+Module m12c only. Exact prototype layout: left application-store concept graphic and right FULL description with title, introductory sentence, five bullet entries, and closing sentence. No chapter heading, nav, footer. Canvas 1440 × 1100 or taller. Left illustration occupies 45%, text 50%, roomy column gap. Body 23px, line-height 1.7, source text must be complete including all bullets; extend height instead of shrinking.
+Left graphic is only a design concept: a simple blue abstract application tile and two product creation screenshot frames, including image preview of cream sneaker/amber serum/headphones. Label “创作示例”. No real app-store brand, no installed/download badges, no app rating, no fabricated user counts or real publishing state. No new mascots, no human characters, no rewritten logo.
+Text (verbatim) on right:
+Title “应用商店描述”
+“飞马电商工作台——一站式电商内容创作工具。”
+“· 文生图：为传统电商生成主图、详情、海报”
+“· 文生视频：为抖店等视频带货场景生成短视频”
+“· 小白工作台：智能体对话式创作，零基础友好”
+“· 玲玲 AI 数字人：分步指引，操作零卡点”
+“· 一键多店铺发布：素材生成即分发”
+“无论你是电商老手还是刚入行的小白，飞马都能让你十分钟产出专业级电商素材。”
+Treat bullets as a readable document, not tiny compact cards. No other marketing text.

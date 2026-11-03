@@ -1,0 +1,20 @@
+Use case: ui-mockup
+Asset type: Feima ecommerce AI creation platform marketing homepage, individual high-fidelity desktop section, NOT an entire website.
+Primary request: Render an actual finished premium Chinese website design image from the confirmed low-fidelity layout, with realistic product photography, meticulous Chinese typography and generous whitespace.
+Reference image 1 is ONLY the approved lowfi layout. Inherit its composition, never render its gray placeholder labels, crossed boxes, review notes or wireframe appearance. Reference image 2 is the newly generated Feima hero style anchor ONLY, do not inherit its page structure or extra copy. Additional character reference (when present) is the exact Lingling identity to preserve.
+Palette and visual system: cool off-white #F3F6FB and white, brand blue #1559D6, dark navy headings #182843, body blue-gray #586B85, thin border #DBE3EF. 1440px desktop design, 1240px content, ~100px side margins. Chinese sans-serif, headings 40–56px, body 18–22px, line-height 1.7. Controls 8px radius, panels 14px, very restrained soft shadow. Natural material product photography, warm product reflections allowed but never a warm primary UI.
+Constraints: One module only. No browser chrome, no site navigation, no footer, no review tags, no giant fake logo, no purple gradients, no cyber neon, no robots, no real human models, no omitted/rewritten/shortened copy. Do not use generic English lorem ipsum. Do not print copy IDs or HTML tags. Every source string below must be visibly typeset verbatim, including headings, badges, emoji, punctuation, numbers and labels. Preserve full body text; increase canvas height if necessary instead of shrinking or deleting. Text blocks can wrap freely while exact wording remains. Any additional visual sample is subtly labeled 创作示例.
+
+Composition:
+1440 × 1060 desktop module. Follow m08 wireframe EXACTLY: blue eyebrow, left-aligned dark heading and complete readable paragraph at top. Beneath, ONE broad relationship illustration: at top center a single package of creative assets containing a cream sneaker square photo, amber serum vertical photo and dark headphones video still; below elegant thin blue branching lines split to three GENERIC anonymous store backend windows along one baseline. This is one cohesive large diagram with lots of whitespace, not repeated feature cards. Generic storefront symbols, neutral blue UI, no real marketplace logos, no success checks, no published confirmations. No platform names. Label illustration 创作示例; minimalist generic panels can use labels 店铺 A, 店铺 B, 店铺 C. Original copy unchanged.
+
+Text (verbatim; source HTML encodes hierarchy only, print all text and NO tags):
+[C04-06]
+卖点 5 · 一键多店（支线）
+      一键多店发布 · 素材即生产力
+      生成即分发。一套素材，一键同步到多个店铺后台，省去反复上传、格式调整的重复劳动，出片与上新同频。
+Hierarchy: <div class="source-card">
+      <span class="source-tag">卖点 5 · 一键多店（支线）</span>
+      <h3>一键多店发布 · 素材即生产力</h3>
+      <p>生成即分发。一套素材，一键同步到多个店铺后台，省去反复上传、格式调整的重复劳动，出片与上新同频。</p>
+    </div>

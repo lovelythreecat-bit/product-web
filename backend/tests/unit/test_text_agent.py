@@ -145,18 +145,49 @@ def test_unsupported_parameters_are_rejected(profile, snapshot, parameters):
         build_copy_request(snapshot, profile)
 
 
-def test_images_are_not_silently_dropped(profile, snapshot):
-    snapshot["input_snapshot"]["material_versions"] = [{"file_id": str(uuid4()), "version": "v1"}]
-    with pytest.raises(ValueError):
-        build_copy_request(snapshot, profile)
+@pytest.mark.parametrize("supports_images", [False, True])
+def test_images_follow_model_capability_without_changing_text(
+    profile, snapshot, supports_images,
+):
+    profile = profile.model_copy(update={"supports_images": supports_images})
+    text_body = build_copy_request(snapshot, profile)
+    materials = [{"file_id": str(uuid4()), "version": "v1"}]
+    snapshot["input_snapshot"]["material_versions"] = materials.copy()
+    image = BytesIO()
+    Image.new("RGB", (4, 4), "red").save(image, format="PNG")
+    loaded = []
+
+    def loader(material):
+        loaded.append(material)
+        return image.getvalue(), "image/png"
+
+    body = build_copy_request(snapshot, profile, loader)
+    assert loaded == (materials if supports_images else [])
+    assert len(body["images"]) == int(supports_images)
+    assert dict(body, images=[]) == text_body
+    assert snapshot["input_snapshot"]["material_versions"] == materials
+    if supports_images:
+        import base64
+
+        assert base64.urlsafe_b64decode(body["images"][0]["data"]) == image.getvalue()
+    else:
+        assert build_copy_request(snapshot, profile) == text_body
 
 
 def test_preflight_checks_image_capability_without_loading_bytes(profile, snapshot):
     enabled = profile.model_copy(update={"supports_images": True})
     snapshot["input_snapshot"]["material_versions"] = [{"file_id": str(uuid4()), "version": "v1"}]
     assert build_copy_request(snapshot, enabled, validate_only=True)["images"] == []
+    assert build_copy_request(snapshot, profile, validate_only=True)["images"] == []
+
+
+def test_vision_model_still_rejects_too_many_images(profile, snapshot):
+    enabled = profile.model_copy(update={"supports_images": True})
+    snapshot["input_snapshot"]["material_versions"] = [
+        {"file_id": str(uuid4()), "version": "v1"} for _ in range(5)
+    ]
     with pytest.raises(ValueError):
-        build_copy_request(snapshot, profile, validate_only=True)
+        build_copy_request(snapshot, enabled, validate_only=True)
 
 
 @pytest.mark.parametrize(

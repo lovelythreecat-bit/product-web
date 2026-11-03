@@ -1,0 +1,58 @@
+[
+  {
+    "id": "C02-01",
+    "group": "C02",
+    "tag": "h2",
+    "text": "02Slogan 体系（多版本备用）",
+    "html": "<h2><span class=\"source-num\">02</span>Slogan 体系（多版本备用）</h2>"
+  },
+  {
+    "id": "C02-02",
+    "group": "C02",
+    "tag": "p",
+    "text": "主 Slogan 已定，以下为不同触点下的变体，保持「快 + 简 + 专业」的一致性。",
+    "html": "<p class=\"source-lead\">主 Slogan 已定，以下为不同触点下的变体，保持「快 + 简 + 专业」的一致性。</p>"
+  },
+  {
+    "id": "C02-03",
+    "group": "C02",
+    "tag": "div",
+    "text": "主 Slogan一站式电商内容工具，小白十分钟高效出片",
+    "html": "<div class=\"source-pill\"><b>主 Slogan</b><br>一站式电商内容工具，小白十分钟高效出片</div>"
+  },
+  {
+    "id": "C02-04",
+    "group": "C02",
+    "tag": "div",
+    "text": "价值版不会设计？飞马替你想好了。",
+    "html": "<div class=\"source-pill\"><b>价值版</b><br>不会设计？飞马替你想好了。</div>"
+  },
+  {
+    "id": "C02-05",
+    "group": "C02",
+    "tag": "div",
+    "text": "结果版从 0 到爆款素材，只差一个飞马。",
+    "html": "<div class=\"source-pill\"><b>结果版</b><br>从 0 到爆款素材，只差一个飞马。</div>"
+  },
+  {
+    "id": "C02-06",
+    "group": "C02",
+    "tag": "div",
+    "text": "速度版飞马一拍，出片即来。",
+    "html": "<div class=\"source-pill\"><b>速度版</b><br>飞马一拍，出片即来。</div>"
+  },
+  {
+    "id": "C02-07",
+    "group": "C02",
+    "tag": "div",
+    "text": "小白版小白也能拍大片，飞马陪你十分钟出片。",
+    "html": "<div class=\"source-pill\"><b>小白版</b><br>小白也能拍大片，飞马陪你十分钟出片。</div>"
+  },
+  {
+    "id": "C02-08",
+    "group": "C02",
+    "tag": "div",
+    "text": "带货版抖店缺片子？飞马十分钟给你一条。",
+    "html": "<div class=\"source-pill\"><b>带货版</b><br>抖店缺片子？飞马十分钟给你一条。</div>"
+  }
+]

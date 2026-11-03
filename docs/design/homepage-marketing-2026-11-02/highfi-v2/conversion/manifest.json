@@ -1,0 +1,156 @@
+[
+  {
+    "module": "m10",
+    "copy_ids": [
+      "C06-01",
+      "C06-02",
+      "C06-03",
+      "C06-04",
+      "C06-05",
+      "C06-06",
+      "C06-07"
+    ],
+    "prompt": "m10.prompt.txt",
+    "image": "m10.png",
+    "copy_sidecar": "m10.copy.json",
+    "notes": [
+      "已对最终 PNG 调用 view_image(original)；章标题、Hero 原文、四能力标签/标题/正文均逐行目视。",
+      "初图遗漏主 CTA/次 CTA 前缀与创作示例标记，定向修复已补齐；删除装饰 UI 内模型擅加的清单文案。",
+      "商品瓶身仍有不可读的生成微字，不属营销正文；不得用作真实包装或品牌标识。",
+      "采用内置 image_gen；工具无模型选择参数，无法验证实际为 gpt-image-2.5。",
+      "已实际查看成图；这是人工目视检查，不宣称位图逐字准确。精确实施必须从 copy sidecar 排版。"
+    ],
+    "dimensions": {
+      "width": 1487,
+      "height": 1058
+    },
+    "sha256": "E135AB3CBF1701C5F7864280691967202850092DA64711F6BCA626FFD31920C6",
+    "generation_method": "built-in image_gen",
+    "verified_visually": true,
+    "repair_prompt": "m10.repair.prompt.txt",
+    "discarded_initial": "m10-initial.png"
+  },
+  {
+    "module": "m11",
+    "copy_ids": [
+      "C06-08",
+      "C06-09"
+    ],
+    "prompt": "m11.prompt.txt",
+    "image": "m11.png",
+    "copy_sidecar": "m11.copy.json",
+    "notes": [
+      "已查看最终 PNG；占位说明、X 万、10 分钟、X 个及收尾和按钮行均可读。",
+      "初图擅加三张商品图；定向编辑已去除，恢复信任带→留白/分隔→收尾。",
+      "占位数值按原文展示，不作为核实指标。",
+      "采用内置 image_gen；工具无模型选择参数，无法验证实际为 gpt-image-2.5。",
+      "已实际查看成图；这是人工目视检查，不宣称位图逐字准确。精确实施必须从 copy sidecar 排版。"
+    ],
+    "dimensions": {
+      "width": 1487,
+      "height": 1058
+    },
+    "sha256": "CFCBBC3E71CE3D8D09EA9C3C767F9E6371DE779CEAA4751A48972B3AF666A392",
+    "generation_method": "built-in image_gen",
+    "verified_visually": true,
+    "repair_prompt": "m11.repair.prompt.txt",
+    "discarded_initial": "m11-initial.png"
+  },
+  {
+    "module": "m12a",
+    "copy_ids": [
+      "C07-01",
+      "C07-02"
+    ],
+    "prompt": "m12a.prompt.txt",
+    "image": "m12a.png",
+    "copy_sidecar": "m12a.copy.json",
+    "notes": [
+      "已查看最终 PNG；章标题、口播标签及全部六段正文均展开，未见明显缺段或错字。",
+      "左侧为商品视频静帧示例，非已有真实视频；正文被分成六个浅边框段落，保持阅读顺序。",
+      "省略号与标点字形仅目视核对，未进行 OCR 或位图字符级证明。",
+      "采用内置 image_gen；工具无模型选择参数，无法验证实际为 gpt-image-2.5。",
+      "已实际查看成图；这是人工目视检查，不宣称位图逐字准确。精确实施必须从 copy sidecar 排版。"
+    ],
+    "dimensions": {
+      "width": 1487,
+      "height": 1058
+    },
+    "sha256": "9BB7A8FED20132729FACA0FFFC5DB024BEDC5A732075DEB4ED14A70BFFF62674",
+    "generation_method": "built-in image_gen",
+    "verified_visually": true
+  },
+  {
+    "module": "m12b",
+    "copy_ids": [
+      "C07-03"
+    ],
+    "prompt": "m12b.prompt.txt",
+    "image": "m12b.png",
+    "copy_sidecar": "m12b.copy.json",
+    "notes": [
+      "已查看最终 PNG；社群标题、两段文案、PS、+ 与末尾指向 emoji 均在左侧完整展开。",
+      "右侧为商品分享构图，含创作示例；无虚构头像、评论、点赞或客户评价。",
+      "采用内置 image_gen；工具无模型选择参数，无法验证实际为 gpt-image-2.5。",
+      "已实际查看成图；这是人工目视检查，不宣称位图逐字准确。精确实施必须从 copy sidecar 排版。"
+    ],
+    "dimensions": {
+      "width": 1487,
+      "height": 1058
+    },
+    "sha256": "1F7197F9D2AB4D6F5E5C441046DBC386BAD664C748F8CEC85D86146080A3EF57",
+    "generation_method": "built-in image_gen",
+    "verified_visually": true
+  },
+  {
+    "module": "m12c",
+    "copy_ids": [
+      "C07-04"
+    ],
+    "prompt": "m12c.prompt.txt",
+    "image": "m12c.png",
+    "copy_sidecar": "m12c.copy.json",
+    "notes": [
+      "已查看最终 PNG；应用商店标题、导语、五条描述与完整结句逐行可读，未见明显缺段。",
+      "左侧为抽象应用磁贴与产品截图构图；非用户完整 Logo，也非实际商店上架页，不含评分/下载量。",
+      "采用内置 image_gen；工具无模型选择参数，无法验证实际为 gpt-image-2.5。",
+      "已实际查看成图；这是人工目视检查，不宣称位图逐字准确。精确实施必须从 copy sidecar 排版。"
+    ],
+    "dimensions": {
+      "width": 1487,
+      "height": 1058
+    },
+    "sha256": "4A1F3101348EB71753C4EABB730BD70887EC8071C21F4A9CAE084EAED2ABFFB8",
+    "generation_method": "built-in image_gen",
+    "verified_visually": true
+  },
+  {
+    "module": "m13",
+    "copy_ids": [
+      "C08-01",
+      "C08-02",
+      "C08-03",
+      "C08-04",
+      "C08-05",
+      "C08-06",
+      "C08-07",
+      "C09-01"
+    ],
+    "prompt": "m13.prompt.txt",
+    "image": "m13.png",
+    "copy_sidecar": "m13.copy.json",
+    "notes": [
+      "已查看最终 PNG；六条 CTA 按两列三行出现，完整两段页尾可读。",
+      "Slogan、v1、+、引号与标点保留视觉表达；字体形态与空白归一化无法证明字符级完全一致。",
+      "采用内置 image_gen；工具无模型选择参数，无法验证实际为 gpt-image-2.5。",
+      "已实际查看成图；这是人工目视检查，不宣称位图逐字准确。精确实施必须从 copy sidecar 排版。"
+    ],
+    "dimensions": {
+      "width": 1487,
+      "height": 1058
+    },
+    "sha256": "EC2D0FCFFFAF2BBE54370D8E968381D1A0B565F18D04FFF29C714DE5F2954344",
+    "generation_method": "built-in image_gen",
+    "verified_visually": true
+  }
+]

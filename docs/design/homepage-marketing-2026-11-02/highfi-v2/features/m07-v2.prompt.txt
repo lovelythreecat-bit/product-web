@@ -1,0 +1,9 @@
+Use case: precise-object-edit
+Reference image 1 is the EDIT TARGET, the finished m07 module. Reference image 2 is ONLY the exact original Lingling character identity. Make ONLY this precise edit to image 1: add the exact small neutral blue-gray caption “创作示例” at the upper-left of EACH of the TWO right-hand illustrated panels (one workbench comparison, one Lingling accompaniment panel). These two small captions must be readable and label all fictional UI/dialogue and character scenes as examples. Keep EVERYTHING else unchanged: typography, text, hierarchy, blue-white palette, margins, product visuals, layout, full-body character. Preserve the original silver-white/pink long hair, pegasus hairclip, pink/blue jacket, white inner shirt, pleated skirt and white boots. No real human, no wardrobe change. Keep ALL the original left-hand source text exactly verbatim:
+卖点 3 · 双工作台
+      专业与小白，各得其法
+      专业工作台给老手完整控制权；小白工作台把专业能力收进一句对话——选品类、说卖点、挑风格，智能体替你排兵布阵，零基础也能出品专业级素材。
+卖点 4 · 玲玲数字人
+      你的 AI 数字人陪练
+      卡在哪一步，玲玲就在哪一步。AI 数字人客服玲玲实时指路，操作有卡点就开口问，每一步都有人陪你走完，再也不怕「不会用」。
+Do not omit, change or add any other words. No cropping.

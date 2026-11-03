@@ -19,6 +19,7 @@ import AgentSelector from '../../components/AgentSelector.vue'
 import QuotePanel from '../../components/QuotePanel.vue'
 import TaskCard from '../../components/TaskCard.vue'
 import TaskHistory from './TaskHistory.vue'
+import WorkspaceEmptyState from './WorkspaceEmptyState.vue'
 import AppDrawer from '../../components/AppDrawer.vue'
 import AppDialog from '../../components/AppDialog.vue'
 import MediaChoices from './MediaChoices.vue'
@@ -59,7 +60,7 @@ const snapshotReady = ref(false)
 const restoredSnapshots = new WeakSet<Draft>()
 const resultsLoading = computed(() => !!conversationId.value && !selectedTask.value &&
   (selectingTaskId.value === selectedTaskId.value && !!selectingTaskId.value ||
-    ['connecting', 'recovering'].includes(connectionState.value)))
+    ['connecting', 'recovering'].includes(connectionState.value) && (!!selectedTaskId.value || !stream.initialReadComplete?.value)))
 async function refreshResults(taskId?: string) {
   if (!taskId) { await stream.reconnect(); return }
   const ownerConversation = conversationId.value
@@ -395,7 +396,7 @@ watch([conversationId, requestedTaskId], () => { confirmationOpen.value = false;
         <TaskCard v-if="selectedTask" :key="selectedTask.task.task_id" :detail="selectedTask" :agent="agents.find(a => a.agent_id === selectedTask!.agent_id)" :fragment="fragments[selectedTask.task.task_id]" @regenerate="regenerate" @media-changed="refreshResults" />
         <div v-else-if="resultsLoading" class="results-skeleton" role="status" aria-label="正在读取任务产物"><div class="skeleton-heading"><span/><span/></div><div class="skeleton-artifact"/><div class="skeleton-actions"><span/><span/></div></div>
         <div v-else-if="requestedTaskId || selectedTaskId" class="empty-state task-unavailable"><span class="empty-state-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 5h14v14H5z M8 9h8 M8 13h5" /></svg></span><h3>暂时无法展示该任务</h3><p>请重新读取，或从最近任务中选择其他任务。</p><UiButton class="button" type="button" @click="stream.reconnect">重新读取任务</UiButton></div>
-        <div v-else class="empty-state"><span class="empty-state-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="3"/><path d="m3 16 5-5 4 4 4-6 5 7 M8 8h.01" /></svg></span><h3>开始一项新创作</h3><p>准备商品资料并确认费用，生成的文案、图片或视频会集中展示在这里。</p></div>
+        <WorkspaceEmptyState v-else :kind="agent?.kind" :from-source="!!(draft.sourceTaskId || draft.sourceWorkId)" />
       </div>
     </section>
   </div>

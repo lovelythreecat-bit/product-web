@@ -1,0 +1,22 @@
+Use case: ui-mockup. Asset type: one independent desktop homepage section for 飞马, polished high fidelity design, raster PNG. This is a design mockup only.
+Visual system: 1440px wide desktop canvas, natural height; 1240px content area and 100px horizontal margins. White and #F3F6FB cool white background, primary #1559D6, navy #182843 headings, body #586B85, border #DBE3EF. Elegant Chinese sans-serif typography, main headings 40–56px, body 20–22px with 1.7 line-height. Calm spacious editorial composition, refined small blue line icons, 8px controls and 14px panels, delicate borders and restrained shadow. Natural commercial product photography of cream sneaker, amber serum bottle, charcoal headphones. No purple, neon, warm overall theme, fake testimonials, made-up numbers, people or redesigned mascots. Do not render low-fidelity annotations, wireframe labels, IDs, measurements or this instruction text. All supplied marketing text must be visible, with no summary, truncation, scrollbar or accordion. Increase canvas height if needed. Any new product demonstration visual gets a tiny label “创作示例”. Do not add a header/nav or unrelated modules.
+Module m10. Follow exact prototype structure: top chapter heading; beneath it an equal two-column hero: full source copy on left and refined multi-category product/results composition on right; beneath, “功能卡片区” and exactly four capability blocks in 2 columns × 2 rows. Keep each feature's small blue label, bold title, and body distinct. These blocks can be separated by thin horizontal rules, not heavy card clutter. Canvas 1440 × 1180 or taller; all text comfortably readable.
+Text (verbatim, retain all labels including 副标题/支撑点/CTA, spacing may reflow):
+“06落地页 / 官网分区文案”
+“Hero 区”
+“飞马电商工作台”
+“副标题：一站式电商内容工具，小白十分钟高效出片”
+“支撑点：文生图 ｜ 文生视频 ｜ 小白工作台 ｜ 玲玲陪练 ｜ 一键多发”
+“主 CTA：免费开始创作　次 CTA：看 1 分钟演示”
+“功能卡片区”
+Feature 1 label “文生图”, title “传统电商，看图说话出爆款”, body “主图、详情、海报，输入即出。”
+Feature 2 label “文生视频”, title “抖店带货，十分钟一条种草片”, body “卖点进，视频出，节奏跟上投放。”
+Feature 3 label “小白工作台”, title “零基础，对话即出片”, body “智能体帮你把专业流程走完。”
+Feature 4 label “玲玲数字人”, title “每一步都有人陪”, body “卡哪步教哪步，操作零卡点。”
+Right hero visual: cream sneaker, amber serum, dark headphones on softly lit neutral natural surfaces; behind them crisp blue UI frames for image layouts and one portrait video with a play symbol. Keep these visual examples secondary to text. No character needed.
+TARGETED CORRECTION OF PROVIDED m10 IMAGE. Preserve layout, all existing headings, feature texts, product composition and blue-white style. Correct only these details:
+1. The first CTA must read exactly “主 CTA：免费开始创作”, including the visible prefix 主 CTA： (currently missing). Make button wider or put prefix visibly directly above it, do not omit.
+2. The second CTA must read exactly “次 CTA：看 1 分钟演示”, including visible prefix 次 CTA： (currently missing).
+3. Add a small but readable “创作示例” label at bottom-right of the product/results composition.
+4. Remove invented mini check-list prose inside the little right-hand UI cards. Keep only their category titles 文生图、文生视频、小白工作台、玲玲陪练 and neutral lines or icons. Do not render extra feature promises inside these decorative visual cards.
+All source copy is listed above verbatim and must remain complete. No other changes.

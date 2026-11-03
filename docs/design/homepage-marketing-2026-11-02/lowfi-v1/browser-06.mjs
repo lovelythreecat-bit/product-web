@@ -1,0 +1,11 @@
+const task=await taskSpace(11),page=task.page('p1');
+await page.click('loc=css:#toggle-notes');
+const hidden=await page.evaluate(()=>document.body.classList.contains('review-hide'));
+await page.click('loc=css:#toggle-notes');
+await page.click('loc=css:#toggle-overview');
+const compact=await page.evaluate(()=>document.body.classList.contains('overview'));
+await page.click('loc=css:#toggle-overview');
+await page.goto('file:///F:/Work/%E7%94%B5%E5%95%86/web/docs/design/homepage-marketing-2026-11-02/lowfi-v1/gallery.html');
+await page.cdp('Emulation.setDeviceMetricsOverride',{width:1440,height:1000,deviceScaleFactor:1,mobile:false});
+console.log({notesToggle:hidden,spacingToggle:compact,gallery:await page.evaluate(()=>({modules:document.querySelectorAll('article').length,overflow:document.documentElement.scrollWidth>innerWidth}))});
+await task.finish({keep:['p1']});

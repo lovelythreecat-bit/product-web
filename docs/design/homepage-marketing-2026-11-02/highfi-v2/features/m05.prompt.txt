@@ -1,0 +1,24 @@
+Use case: ui-mockup
+Asset type: Feima ecommerce AI creation platform marketing homepage, individual high-fidelity desktop section, NOT an entire website.
+Primary request: Render an actual finished premium Chinese website design image from the confirmed low-fidelity layout, with realistic product photography, meticulous Chinese typography and generous whitespace.
+Reference image 1 is ONLY the approved lowfi layout. Inherit its composition, never render its gray placeholder labels, crossed boxes, review notes or wireframe appearance. Reference image 2 is the older Feima visual palette ONLY, do not inherit its page structure or extra copy. Additional character reference (when present) is the exact Lingling identity to preserve.
+Palette and visual system: cool off-white #F3F6FB and white, brand blue #1559D6, dark navy headings #182843, body blue-gray #586B85, thin border #DBE3EF. 1440px desktop design, 1240px content, ~100px side margins. Chinese sans-serif, headings 40–56px, body 18–22px, line-height 1.7. Controls 8px radius, panels 14px, very restrained soft shadow. Natural material product photography, warm product reflections allowed but never a warm primary UI.
+Constraints: One module only. No browser chrome, no site navigation, no footer, no review tags, no giant fake logo, no purple gradients, no cyber neon, no robots, no real human models, no omitted/rewritten/shortened copy. Do not use generic English lorem ipsum. Do not print copy IDs or HTML tags. Every source string below must be visibly typeset verbatim, including headings, badges, emoji, punctuation, numbers and labels. Preserve full body text; increase canvas height if necessary instead of shrinking or deleting. Text blocks can wrap freely while exact wording remains. Any additional visual sample is subtly labeled 创作示例.
+
+Composition:
+1440 × 1040 desktop module. Follow the attached m05 wireframe EXACTLY in overall structure: chapter heading at top left; beneath, an asymmetric two-column editorial row. Left 42% width: blue eyebrow, bold dark title and complete paragraph. Right 58%: one single large product-to-output composition: an unbranded cream sneaker original at top, a small down arrow, beneath four visually distinct same-product outputs — square hero photo, tall detail page, sell-point poster and landscape banner. Use realistic premium sneaker photography, soft blue-gray studio background. Keep all products in this composition cream sneakers, add a tiny amber serum bottle and headphones only as tiny auxiliary category thumbnails if naturally useful; don't turn the module into a coffee ad. Not many unrelated cards. Large margins, full text clearly readable.
+
+Text (verbatim; source HTML encodes hierarchy only, print all text and NO tags):
+[C04-01]
+04核心卖点（五大支柱）
+Hierarchy: <h2><span class="source-num">04</span>核心卖点（五大支柱）</h2>
+
+[C04-02]
+卖点 1 · 文生图
+      传统电商的爆款流水线
+      输入商品，飞马出图。主图、详情页、卖点海报、活动 banner，AI 一次生成多角度方案，传统电商上架不再等设计。
+Hierarchy: <div class="source-card">
+      <span class="source-tag">卖点 1 · 文生图</span>
+      <h3>传统电商的爆款流水线</h3>
+      <p>输入商品，飞马出图。主图、详情页、卖点海报、活动 banner，AI 一次生成多角度方案，传统电商上架不再等设计。</p>
+    </div>

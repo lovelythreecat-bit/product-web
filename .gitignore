@@ -3,6 +3,10 @@
 .impeccable/
 .superpowers/
 .tmp/
+/tmp/
+
+# Local export archives (source assets remain versioned)
+/output/*.zip
 
 # Dependencies and build output
 node_modules/

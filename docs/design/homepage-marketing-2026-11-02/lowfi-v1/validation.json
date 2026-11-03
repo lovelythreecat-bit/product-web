@@ -1,0 +1,15 @@
+{
+  "original_body_text_matches": true,
+  "source_blocks": 49,
+  "placed_once": 49,
+  "modules": 16,
+  "desktop_width": 1440,
+  "mobile_width": 390,
+  "overflow": false,
+  "rendered_copy_mismatch": [],
+  "character_sources": [
+    "../../../../output/figma-assets-20261102/01-character-front.png",
+    "../../../../output/figma-assets-20261102/01-character-front.png"
+  ],
+  "production_code_changed": false
+}

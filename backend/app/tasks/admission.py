@@ -141,12 +141,6 @@ class AdmissionService:
                 )
                 if validated.spec.delivery_kind != "single":
                     raise ValueError("Text service returns a single result")
-                if request.input.material_versions and not binding.adapter.profile.supports_images:
-                    from app.agents.model_configs import TextModelError
-
-                    raise TextModelError(422, public_message=(
-                        "当前默认文本模型不支持图片，请移除商品图片或更换默认模型。"
-                    ))
                 build_copy_request({"input_snapshot": request.input.model_dump(mode="json")},
                                    binding.adapter.profile, validate_only=True)
                 profile = binding.adapter.profile

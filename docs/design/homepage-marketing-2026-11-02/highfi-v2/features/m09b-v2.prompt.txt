@@ -1,0 +1,10 @@
+Use case: precise-object-edit
+Edit target: the attached finished m09b module. Add ONLY a tiny blue-gray label “创作示例” in the upper-left edge of the UPPER RIGHT professional editing panel, clearly separated from the 图层 label. Keep the lower panel's existing 创作示例 label. Do not change anything else in the whole image: original layout, margins, colors, realistic product photography, all UI, all Chinese copy and typography. Keep the source text exactly:
+🛠 专业工作台 · 面向老手
+      想要完全掌控？专业工作台给你图层、参数、批量与模板。
+      飞马不替你决定，只让你更快。
+🎬 视频带货专项 · 抖店主视角
+      抖店缺素材？飞马文生视频来补位。
+      输入卖点 → 生成多条带货视频 → 玲玲帮你挑最顺的一条 → 一键发店。
+      流量窗口不等人，飞马让你每天都有新片子。
+Only add that one label, no other edits, no crop.

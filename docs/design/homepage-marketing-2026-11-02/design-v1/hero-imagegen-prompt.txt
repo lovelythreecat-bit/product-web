@@ -1,0 +1,17 @@
+Use case: ui-mockup. Edit the supplied full-page Feima website concept into a high-resolution enlarged HERO-ONLY desktop design image. The first image is the selected full-page visual design: preserve its light Feima blue brand direction, multi-category product stage, original logo identity, and calm realistic photography. The second image is the exact original Feima logo for faithful use in navigation. Only show the navigation and first screen, with the very beginning of the brand section at the bottom. Do not cram the full page into this image. Wide landscape canvas 1792x1024 or similar 16:10, high detail. A flat direct frontal web design screenshot, not a device mockup.
+
+Make this a polished, spacious, aspirational yet practical Chinese e-commerce AI platform landing page. Icy white #F3F6FB background, cobalt #1559D6, ink #182843. Header around 90px, centered max-width composition, small logo top-left then 飞马电商工作台; top right theme icon, 登录, 免费开始创作. Header nav concise 原创 content labels 品牌定位 / 核心卖点 / 应用场景. Main hero left column around 44%, product stage right column 56%, no visible card around the entire hero, airy pale blue light across the right background. Large navy product title, TWO blue slogan lines, exact text:
+small English eyebrow "Pegasus E-commerce Studio"
+main heading "飞马电商工作台"
+slogan line 1 "一站式电商内容工具，"
+slogan line 2 "小白十分钟高效出片"
+Full readable subtitle, wrap over 3 lines without altering or omitting any character:
+"文生图搞定传统电商，文生视频拿下抖店带货；专业与小白双工作台并行，AI 数字人玲玲手把手陪你出片，最后一键发到所有店铺。"
+CTA primary "免费开始创作"; CTA secondary with subtle play icon "看 1 分钟演示".
+No replacement slogan such as 让好商品亮眼登场.
+
+Right: a sophisticated photorealistic ivory sneaker in the foreground left of the stage, silver over-ear headphones above center, small amber cosmetic bottle, pale-blue metal tumbler on right, small white limestone risers, broad pale circular pedestal. Excellent material finish, enough breathing room; not visually crowded. Above/behind the products float a product photo proof sheet labelled "文生图", a wider video thumbnail of a friendly adult Chinese woman with a tumbler labelled "文生视频", and a slim light workflow panel labelled "小白工作台" with the exact sequence "选风格 → 出图 / 出视频 → 微调 → 发布". One fine cobalt elliptical orbital line joins the composition. Panels have subtle real perspective and depth, soft shadow, white/very pale-blue backgrounds and crisp thin borders, NOT heavy glass. Mark imagery discretely "创作示例". No invented numerical KPIs, ratings, partners or progress states.
+This art direction will later use subtle pointer parallax and levitation; separate the visual layers without graphic motion arrows or implementation annotations. Keep the text static and immaculate.
+
+At bottom a fine divider and the start of brand section: small "01 品牌定位", large exact line "让每个电商人，都拥有自己的内容工厂。" with plenty of whitespace. The rest of the full document belongs below the viewport and must NOT be crammed here. This image is explicitly a close-up companion to the already generated full-page overview.
+No design annotations, no phone view, no browser chrome, no footer, no lorem ipsum, no changed Chinese characters, no purple branding, no black background, no orange CTA.

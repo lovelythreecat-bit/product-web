@@ -11,7 +11,7 @@ vi.mock('../../src/api/catalog', () => ({ listAgents: vi.fn(async () => []), quo
 vi.mock('../../src/api/conversations', () => ({ getProductVersion: vi.fn(), createProductVersion: vi.fn(), createConversation: vi.fn() }))
 vi.mock('../../src/features/auth/session', () => ({ session: { epoch: ref(1), profile: ref({ user_id: 'result-owner' }), refreshAccount: vi.fn(async () => {}) }, onIdentityChange: () => () => {} }))
 vi.mock('../../src/features/workspace/useTaskStream', () => {
-  const stream = { latestTaskId: ref(''), tasks: ref<Schema<'TaskView'>[]>([]), details: ref<Record<string, Schema<'TaskDetail'>>>({}), fragments: ref({}), connectionState: ref('open'), reconnect: vi.fn(), refreshTask: vi.fn(async () => {}) }
+  const stream = { latestTaskId: ref(''), initialReadComplete: ref(true), tasks: ref<Schema<'TaskView'>[]>([]), details: ref<Record<string, Schema<'TaskDetail'>>>({}), fragments: ref({}), connectionState: ref('open'), reconnect: vi.fn(), refreshTask: vi.fn(async () => {}) }
   return { useTaskStream: () => stream }
 })
 
@@ -41,6 +41,7 @@ function render() {
 }
 beforeEach(() => {
   vi.clearAllMocks()
+  stream.initialReadComplete.value = true
   route.params.conversationId = 'results'; route.path = '/workspace/results'; route.query.task = undefined
   stream.latestTaskId.value = 'newest'; stream.tasks.value = [detail('newest').task, detail('older').task]
   stream.details.value = { newest: detail('newest'), older: detail('older') }; stream.connectionState.value = 'open'
@@ -48,6 +49,18 @@ beforeEach(() => {
   api.replace.mockImplementation(async location => { route.query.task = location.query.task })
 })
 afterEach(() => wrappers.splice(0).forEach(wrapper => wrapper.unmount()))
+
+it('shows a confirmed empty draft without waiting for the event stream to open', async () => {
+  stream.latestTaskId.value = ''; stream.tasks.value = []; stream.details.value = {}
+  stream.connectionState.value = 'connecting'; stream.initialReadComplete.value = false
+  const wrapper = render(); await flushPromises()
+  expect(wrapper.find('.results-skeleton').exists()).toBe(true)
+  stream.initialReadComplete.value = true; await flushPromises()
+  expect(wrapper.find('.creation-empty').exists()).toBe(true)
+  expect(wrapper.find('.results-skeleton').exists()).toBe(false)
+  stream.connectionState.value = 'recovering'; await flushPromises()
+  expect(wrapper.find('.creation-empty').exists()).toBe(true)
+})
 
 it('refreshes credits on settlement changes rather than every task progress update', async () => {
   stream.tasks.value = [{ ...detail('newest').task, state: 'RUNNING', state_version: 3, settlement_state: 'FROZEN' }]

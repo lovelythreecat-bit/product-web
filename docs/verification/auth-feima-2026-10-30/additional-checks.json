@@ -1,0 +1,13 @@
+{
+  "tablet": {
+    "width": 1000,
+    "overflow": false,
+    "form": 370.609375
+  },
+  "focus": "auth-password",
+  "fallback": {
+    "visible": true,
+    "hasForm": true,
+    "brokenImage": false
+  }
+}

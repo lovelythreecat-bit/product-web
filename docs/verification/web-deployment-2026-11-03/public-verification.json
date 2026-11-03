@@ -1,0 +1,32 @@
+{
+  "files_verified": [
+    "/assets/approved-artwork-CtUwbTYa.png",
+    "/assets/CustomerServiceView-BQm5hX9L.css",
+    "/assets/CustomerServiceView-h9hTFytX.js",
+    "/assets/element-table-BrKtYCSz.js",
+    "/assets/element-table-C3pTljLh.css",
+    "/assets/feima-logo-blue-9oZWYVCP.png",
+    "/assets/hero-CfjG-Q_t.png",
+    "/assets/index-BZkJwb7N.js",
+    "/assets/index-DeFa89WU.css",
+    "/assets/lingling-Fvfi6gYZ.png",
+    "/assets/product-stage-dark-DDc7ivPE.webp",
+    "/assets/product-stage-light-DAU8cBY5.webp",
+    "/assets/UsageView-DmevJx5s.css",
+    "/assets/UsageView-yTOthN6X.js",
+    "/assets/vue-D73Prk5k.js",
+    "/homepage/commerce-categories-v3.png",
+    "/homepage/commerce-hero-v3.png",
+    "/index.html"
+  ],
+  "health": {
+    "ready": true,
+    "checks": {
+      "storage": true,
+      "database": true
+    },
+    "mode": "mock",
+    "test_only": true
+  },
+  "domain_final_url": "https://dnspod.qcloud.com/static/webblock.html?d=feimadianshang.online"
+}

@@ -1,0 +1,7 @@
+Use case: precise-object-edit
+Edit target: reference image 1, finished m05 homepage module. Make ONLY one tiny precise addition: add the exact small blue-gray caption “创作示例” to the top-left INSIDE the big right-hand visual composition, above the original sneaker photography or just above the 4-output panel. It must clearly label ALL of the product and generated-result visuals as illustrative examples. Do NOT change any other pixel/layout/text/product/typography/colors. Keep the existing chapter, eyebrow, headline and paragraph verbatim as follows:
+04核心卖点（五大支柱）
+卖点 1 · 文生图
+      传统电商的爆款流水线
+      输入商品，飞马出图。主图、详情页、卖点海报、活动 banner，AI 一次生成多角度方案，传统电商上架不再等设计。
+No other copy additions or deletions. Retain full 1487×1058 composition.

@@ -1,0 +1,239 @@
+{
+  "contentEqual": true,
+  "imagesEqual": true,
+  "layoutEqual": true,
+  "local": {
+    "viewport": {
+      "width": 1440,
+      "height": 1000,
+      "clientWidth": 1430
+    },
+    "content": [
+      "为电商而生，让创意上场\n\n让好商品，\n亮眼登场。\n\n想写文案、做图片，还是来支视频？\n带上商品素材，选你需要的，让 AI 帮你把灵感做成作品，把商品亮点秀出来。\n\n注册体验\n看看能创作什么\n鞋服\n数码\n美妆\n创作示例\n\n电商文案\n\n轻盈设计，\n陪伴日常步伐。\n创作示例\n\n商品图片\n\n创作示例\n\n产品视频\n\n视频封面示意",
+      "文案\n把亮点，写到心动处。\n图片\n给商品，一个亮眼的画面。\n视频\n让商品故事，动起来。",
+      "好商品，不止一种出场方式。\n\n好商品，\n值得更好的表达。\n\n文案创作\n\n把亮点，写到心动处。\n\n创作示例\n轻盈设计，\n陪伴日常步伐。\n\n把寻常的一步，\n走成自己的风格。\n\n从商品信息到创作要求，让你的卖点表达更有意思。\n\n图片创作\n\n给商品，一个亮眼的画面。\n\n创作示例\n\n主图、场景图、海报，换个视角，发现商品的另一面。\n\n视频创作\n\n让商品故事，动起来。\n\n创作示例\n视频封面示意\n\n把商品介绍和图片，变成一支有看点的视频。",
+      "卖什么，都有创意可聊。\n\n一双鞋、一瓶护肤品、一副耳机……不同商品，都值得有自己的精彩。\n\n鞋服\n\n轻盈的日常，也可以很出彩。\n\n创作示例\n鞋服创意展示\n商品素材 · 画面表达\n美妆\n\n细节里的美，值得被看见。\n\n创作示例\n美妆创意展示\n商品素材 · 画面表达\n数码\n\n换个角度，呈现科技的质感。\n\n创作示例\n数码创意展示\n商品素材 · 画面表达",
+      "带上商品素材，让灵感有个着落。\n\n写文案、做图片、创视频，按需选择，分别创作。你定方向，AI 帮你把想法做出来。\n\n商品素材\n\n你提供的基础信息\n\n商品图片\n商品名称\n关键卖点\n其他补充信息\n文案创作\n独立选择，分别创作\n创作示例\n图片创作\n独立选择，分别创作\n创作示例\n视频创作\n独立选择，分别创作\n创作示例\n\n同一份商品素材，\n可以生发不同的创作内容。\n让商品表达更丰富。",
+      "从“有个想法”，到“有份作品”。\n01\n带上商品素材\n\n准备商品图片、名称、卖点等信息。\n\n02\n选个创作方向\n\n按需选择文案、图片或视频，并设置创作规格。\n\n03\n看清费用再开始\n\n提交前，确认本次创作内容与费用。\n\n04\n收下你的新作品\n\n打开作品库，随时查看、下载。\n\n好作品不用翻来翻去，打开作品库，随时查看、下载。",
+      "你的商品，\n下一次怎么出场？\n\n带上一个想法，开启下一份创作。\n\n注册体验",
+      "映作\n\n商品与创作内容仅作示例展示。"
+    ],
+    "images": [
+      {
+        "src": "/homepage/commerce-hero-v3.png",
+        "width": 1536,
+        "height": 1024
+      },
+      {
+        "src": "/homepage/commerce-categories-v3.png",
+        "width": 2172,
+        "height": 724
+      },
+      {
+        "src": "/homepage/commerce-categories-v3.png",
+        "width": 2172,
+        "height": 724
+      },
+      {
+        "src": "/homepage/commerce-categories-v3.png",
+        "width": 2172,
+        "height": 724
+      },
+      {
+        "src": "/homepage/commerce-categories-v3.png",
+        "width": 2172,
+        "height": 724
+      },
+      {
+        "src": "/homepage/commerce-categories-v3.png",
+        "width": 2172,
+        "height": 724
+      },
+      {
+        "src": "/homepage/commerce-categories-v3.png",
+        "width": 2172,
+        "height": 724
+      },
+      {
+        "src": "/homepage/commerce-categories-v3.png",
+        "width": 2172,
+        "height": 724
+      },
+      {
+        "src": "/homepage/commerce-categories-v3.png",
+        "width": 2172,
+        "height": 724
+      },
+      {
+        "src": "/homepage/commerce-categories-v3.png",
+        "width": 2172,
+        "height": 724
+      },
+      {
+        "src": "/homepage/commerce-categories-v3.png",
+        "width": 2172,
+        "height": 724
+      },
+      {
+        "src": "/homepage/commerce-categories-v3.png",
+        "width": 2172,
+        "height": 724
+      }
+    ],
+    "layout": [
+      {
+        "classes": "home-hero",
+        "width": 1430,
+        "height": 650
+      },
+      {
+        "classes": "home-capability-strip",
+        "width": 1430,
+        "height": 98
+      },
+      {
+        "classes": "home-section home-capabilities",
+        "width": 1430,
+        "height": 608
+      },
+      {
+        "classes": "home-section home-scenarios",
+        "width": 1430,
+        "height": 651
+      },
+      {
+        "classes": "home-section home-mechanism",
+        "width": 1430,
+        "height": 449
+      },
+      {
+        "classes": "home-section home-process",
+        "width": 1430,
+        "height": 259
+      },
+      {
+        "classes": "home-final-cta",
+        "width": 1430,
+        "height": 184
+      }
+    ],
+    "overflow": false
+  },
+  "online": {
+    "viewport": {
+      "width": 1440,
+      "height": 1000,
+      "clientWidth": 1430
+    },
+    "content": [
+      "为电商而生，让创意上场\n\n让好商品，\n亮眼登场。\n\n想写文案、做图片，还是来支视频？\n带上商品素材，选你需要的，让 AI 帮你把灵感做成作品，把商品亮点秀出来。\n\n注册体验\n看看能创作什么\n鞋服\n数码\n美妆\n创作示例\n\n电商文案\n\n轻盈设计，\n陪伴日常步伐。\n创作示例\n\n商品图片\n\n创作示例\n\n产品视频\n\n视频封面示意",
+      "文案\n把亮点，写到心动处。\n图片\n给商品，一个亮眼的画面。\n视频\n让商品故事，动起来。",
+      "好商品，不止一种出场方式。\n\n好商品，\n值得更好的表达。\n\n文案创作\n\n把亮点，写到心动处。\n\n创作示例\n轻盈设计，\n陪伴日常步伐。\n\n把寻常的一步，\n走成自己的风格。\n\n从商品信息到创作要求，让你的卖点表达更有意思。\n\n图片创作\n\n给商品，一个亮眼的画面。\n\n创作示例\n\n主图、场景图、海报，换个视角，发现商品的另一面。\n\n视频创作\n\n让商品故事，动起来。\n\n创作示例\n视频封面示意\n\n把商品介绍和图片，变成一支有看点的视频。",
+      "卖什么，都有创意可聊。\n\n一双鞋、一瓶护肤品、一副耳机……不同商品，都值得有自己的精彩。\n\n鞋服\n\n轻盈的日常，也可以很出彩。\n\n创作示例\n鞋服创意展示\n商品素材 · 画面表达\n美妆\n\n细节里的美，值得被看见。\n\n创作示例\n美妆创意展示\n商品素材 · 画面表达\n数码\n\n换个角度，呈现科技的质感。\n\n创作示例\n数码创意展示\n商品素材 · 画面表达",
+      "带上商品素材，让灵感有个着落。\n\n写文案、做图片、创视频，按需选择，分别创作。你定方向，AI 帮你把想法做出来。\n\n商品素材\n\n你提供的基础信息\n\n商品图片\n商品名称\n关键卖点\n其他补充信息\n文案创作\n独立选择，分别创作\n创作示例\n图片创作\n独立选择，分别创作\n创作示例\n视频创作\n独立选择，分别创作\n创作示例\n\n同一份商品素材，\n可以生发不同的创作内容。\n让商品表达更丰富。",
+      "从“有个想法”，到“有份作品”。\n01\n带上商品素材\n\n准备商品图片、名称、卖点等信息。\n\n02\n选个创作方向\n\n按需选择文案、图片或视频，并设置创作规格。\n\n03\n看清费用再开始\n\n提交前，确认本次创作内容与费用。\n\n04\n收下你的新作品\n\n打开作品库，随时查看、下载。\n\n好作品不用翻来翻去，打开作品库，随时查看、下载。",
+      "你的商品，\n下一次怎么出场？\n\n带上一个想法，开启下一份创作。\n\n注册体验",
+      "映作\n\n商品与创作内容仅作示例展示。"
+    ],
+    "images": [
+      {
+        "src": "/homepage/commerce-hero-v3.png",
+        "width": 1536,
+        "height": 1024
+      },
+      {
+        "src": "/homepage/commerce-categories-v3.png",
+        "width": 2172,
+        "height": 724
+      },
+      {
+        "src": "/homepage/commerce-categories-v3.png",
+        "width": 2172,
+        "height": 724
+      },
+      {
+        "src": "/homepage/commerce-categories-v3.png",
+        "width": 2172,
+        "height": 724
+      },
+      {
+        "src": "/homepage/commerce-categories-v3.png",
+        "width": 2172,
+        "height": 724
+      },
+      {
+        "src": "/homepage/commerce-categories-v3.png",
+        "width": 2172,
+        "height": 724
+      },
+      {
+        "src": "/homepage/commerce-categories-v3.png",
+        "width": 2172,
+        "height": 724
+      },
+      {
+        "src": "/homepage/commerce-categories-v3.png",
+        "width": 2172,
+        "height": 724
+      },
+      {
+        "src": "/homepage/commerce-categories-v3.png",
+        "width": 2172,
+        "height": 724
+      },
+      {
+        "src": "/homepage/commerce-categories-v3.png",
+        "width": 2172,
+        "height": 724
+      },
+      {
+        "src": "/homepage/commerce-categories-v3.png",
+        "width": 2172,
+        "height": 724
+      },
+      {
+        "src": "/homepage/commerce-categories-v3.png",
+        "width": 2172,
+        "height": 724
+      }
+    ],
+    "layout": [
+      {
+        "classes": "home-hero",
+        "width": 1430,
+        "height": 650
+      },
+      {
+        "classes": "home-capability-strip",
+        "width": 1430,
+        "height": 98
+      },
+      {
+        "classes": "home-section home-capabilities",
+        "width": 1430,
+        "height": 608
+      },
+      {
+        "classes": "home-section home-scenarios",
+        "width": 1430,
+        "height": 651
+      },
+      {
+        "classes": "home-section home-mechanism",
+        "width": 1430,
+        "height": 449
+      },
+      {
+        "classes": "home-section home-process",
+        "width": 1430,
+        "height": 259
+      },
+      {
+        "classes": "home-final-cta",
+        "width": 1430,
+        "height": 184
+      }
+    ],
+    "overflow": false
+  }
+}

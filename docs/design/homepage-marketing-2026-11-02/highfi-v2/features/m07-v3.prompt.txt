@@ -1,0 +1,12 @@
+Use case: text-localization / precise-object-edit
+Edit target: reference image 1, m07-v2 finished design. Fix ONLY a real missing-character error in the LOWER LEFT body paragraph. The existing image incorrectly has only one 玲 in “AI 数字人客服玲实时指路”. The CORRECT wording has two adjacent identical characters 玲玲. Replace the entire lower-left body paragraph with EXACTLY this text, preserving same font, size, navy-blue-gray color, line spacing, area and readability:
+卡在哪一步，玲玲就在哪一步。AI 数字人客服玲玲实时指路，操作有卡点就开口问，每一步都有人陪你走完，再也不怕「不会用」。
+CRITICAL: after 客服 must be 玲玲 = 玲 + 玲, TWO 玲 characters, then 实时指路. Make both visible! You can wrap line 1 after “AI 数字人”, and line 2 start “客服玲玲实时指路，操作有卡点就开口问，” so no 玲 gets lost at a line break.
+All other module copy must remain unchanged and fully visible, reproduced here verbatim for checking:
+卖点 3 · 双工作台
+      专业与小白，各得其法
+      专业工作台给老手完整控制权；小白工作台把专业能力收进一句对话——选品类、说卖点、挑风格，智能体替你排兵布阵，零基础也能出品专业级素材。
+卖点 4 · 玲玲数字人
+      你的 AI 数字人陪练
+      卡在哪一步，玲玲就在哪一步。AI 数字人客服玲玲实时指路，操作有卡点就开口问，每一步都有人陪你走完，再也不怕「不会用」。
+Keep entire upper row unchanged. Keep two 创作示例 labels. Keep lower character panel, Lingling identity, silver-white/pink long hair, pegasus clip, pink-and-blue jacket, white inner, pleated skirt and white boots unchanged. Keep all photographs, UI, margins, layout, colors and canvas. Do not alter or omit any other text. No real person.

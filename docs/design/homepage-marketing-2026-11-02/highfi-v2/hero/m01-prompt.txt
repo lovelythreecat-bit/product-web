@@ -1,0 +1,15 @@
+Use case: ui-mockup. Generate one polished high-fidelity desktop landing-page HERO section for 飞马电商工作台. This is a single module, not an entire website. Output a wide 1440x1000-style canvas, with superb readable Chinese typography. Input 1 is the approved wireframe: retain its 40% left copy / 60% right product composition, navigation on top and generous breathing room. Input 2 is the existing brand style: inherit cool white, crisp cobalt blue, deep navy type and natural commerce product photography, NOT its old wording or complete-page layout.
+
+Create a beautiful calm commercial AI platform hero. Background #F3F6FB, white surfaces, primary #1559D6, headings #182843, secondary text #586B85. 100px page gutters, content 1240px at reference width, polished Chinese sans-serif, header 72px tall with fine lower border. Small-radius blue buttons 8px; image corners 14px. No purple neon, black theme, giant gradient blobs, clutter, confetti, or a card around every sentence. No wireframe annotations. No people in this hero.
+
+Navigation: left typographic brand 飞马 (do not invent a different mascot logo); center 创作能力  应用场景  工作方式; right 登录 and blue 免费开始创作. Keep it secondary and understated.
+
+Left column vertically centered: small English kicker, brand title 50px bold, generous gap, dominant slogan broken naturally into three lines approx 36px with 十分钟 in blue. Full paragraph 20px line-height 1.8 below, never truncated or summarized. Two actions beneath.
+Required original copy verbatim:
+Pegasus E-commerce Studio
+飞马电商工作台
+一站式电商内容工具，小白十分钟高效出片
+文生图搞定传统电商，文生视频拿下抖店带货；专业与小白双工作台并行，AI 数字人玲玲手把手陪你出片，最后一键发到所有店铺。
+Actions: 免费开始创作 / 看看飞马能做什么
+
+Right column: one dominant luxury editorial product composition on a very pale icy-blue studio background, with a photorealistic ivory technical sneaker, amber serum bottle and graphite wireless headphones on low white pedestals; subtle light and material depth. Refined product-focused artistry, no sci-fi dashboard. Below it a clean row of three miniature output images: a sneaker product poster, a complete skincare detail-image crop, and a vertical headset product-video cover with subtle play icon. Let overlaps and depth appear in the products, not the text. Small neutral labels 主图 / 详情图 / 视频 and 创作示例. Images occupy enough space to carry the story. Precisely align the text and visual blocks. Plenty of empty space above/below, visually striking but usable. Original copy must remain fully readable; no lorem ipsum and no invented claims or numbers.

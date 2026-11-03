@@ -198,8 +198,9 @@ def build_copy_request(
         if key != "max_chars"
     ):
         raise ValueError("Copy requirements must be strings")
-    materials = source.get("material_versions", [])
-    if len(materials) > 4 or materials and not profile.supports_images:
+    # Keep the original task input intact; only send images to vision-capable models.
+    materials = source.get("material_versions", []) if profile.supports_images else []
+    if len(materials) > 4:
         raise ValueError("Text model does not support these materials")
     if validate_only:
         return body

@@ -21,7 +21,7 @@ afterEach(() => { wrappers.forEach(w => w.unmount()); wrappers.length = 0; vi.un
 it('restored homepage session replaces login with a direct workspace shortcut and account trigger', async () => {
   const { default: HomeView } = await import('../../src/features/site/HomeView.vue')
   const wrapper = track(mount(HomeView, { global })); await flushPromises()
-  const header = wrapper.get('.home-header')
+  const header = wrapper.get('header')
   expect(header.find('a[href="/workspace"]').exists()).toBe(true)
   expect(header.get('a[href="/workspace"]').attributes('target')).toBe('_blank')
   expect(header.find('a[href="/login"]').exists()).toBe(false)

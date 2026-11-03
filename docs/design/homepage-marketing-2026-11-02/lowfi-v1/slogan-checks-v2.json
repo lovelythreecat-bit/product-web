@@ -1,0 +1,28 @@
+[
+  {
+    "width": 1440,
+    "overflow": false,
+    "visuals": 6,
+    "audit": {
+      "sourceCount": 49,
+      "placedCount": 49,
+      "missing": [],
+      "duplicated": []
+    },
+    "mismatch": [],
+    "imageValid": true
+  },
+  {
+    "width": 390,
+    "overflow": false,
+    "visuals": 6,
+    "audit": {
+      "sourceCount": 49,
+      "placedCount": 49,
+      "missing": [],
+      "duplicated": []
+    },
+    "mismatch": [],
+    "imageValid": true
+  }
+]

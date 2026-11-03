@@ -51,11 +51,13 @@ it('unwraps durable payload, keeps opaque reset cursor, GETs originals before re
 })
 it('clears old conversation before GET and closes the owned EventSource on disposal', async () => {
   const { stream, conversation } = await setup()
+  expect(stream.initialReadComplete.value).toBe(true)
   expect(stream.latestTaskId.value).toBe('task-a')
   conversation.value = ''
   await vi.waitFor(() => expect(stream.tasks.value).toEqual([]))
   expect(Events.all[0].closed).toBe(true)
   expect(stream.latestTaskId.value).toBe('')
+  expect(stream.initialReadComplete.value).toBe(false)
   scopes[0].stop()
   expect(stream.connectionState.value).toBe('closed')
 })
@@ -119,7 +121,7 @@ it('a protected 401 after opaque EventSource error closes the connection and cle
   expect(Events.all).toHaveLength(1)
 })
 
-it('updates media phases with the same task version through SSE and stays idle without polling', async () => {
+it('updates media phases with the same task version through SSE without re-reading duplicate notifications', async () => {
   const { stream, gets } = await setup()
   vi.useFakeTimers()
   let mediaRevision = 1
@@ -132,8 +134,6 @@ it('updates media phases with the same task version through SSE and stays idle w
   await vi.advanceTimersByTimeAsync(0)
   expect((stream.details.value['task-a'].media as { status: string }).status).toBe('awaiting_confirmation')
   const count = gets.length, previous = stream.details.value['task-a']
-  await vi.advanceTimersByTimeAsync(30000)
-  expect(gets).toHaveLength(count)
   Events.all[0].emit('task.updated', { payload: { task_id: 'task-a', state_version: 3, media_revision: 1 } }, 'user:2')
   await vi.advanceTimersByTimeAsync(0)
   expect(gets).toHaveLength(count)
@@ -142,6 +142,40 @@ it('updates media phases with the same task version through SSE and stays idle w
   Events.all[0].emit('task.updated', { payload: { task_id: 'task-a', state_version: 3, media_revision: 2 } }, 'user:3')
   await vi.advanceTimersByTimeAsync(0)
   expect((stream.details.value['task-a'].media as { revision: number }).revision).toBe(2)
+})
+
+it('refreshes an unfinished task and its durable work without SSE delivery, then stops polling after completion', async () => {
+  vi.useFakeTimers()
+  const { stream, gets } = await setup()
+  const completed = { task: { ...task(4, 'SUCCEEDED'), work_ids: ['work-a'] }, conversation_id: 'conversation-a' }
+  vi.stubGlobal('fetch', async (url: string) => {
+    gets.push(url)
+    return new Response(JSON.stringify(completed))
+  })
+  await vi.advanceTimersByTimeAsync(5000)
+  expect(stream.details.value['task-a'].task).toMatchObject({ state: 'SUCCEEDED', work_ids: ['work-a'] })
+  const count = gets.length
+  await vi.advanceTimersByTimeAsync(30000)
+  expect(gets).toHaveLength(count)
+  expect(gets.every(url => !url.includes('/submit'))).toBe(true)
+})
+
+it('retries a failed fallback read, rejects older snapshots, and stops reads on conversation exit', async () => {
+  vi.useFakeTimers()
+  const { stream, conversation } = await setup()
+  const fetcher = vi.fn()
+    .mockRejectedValueOnce(new Error('offline'))
+    .mockResolvedValueOnce(new Response(JSON.stringify({ task: task(2), conversation_id: 'conversation-a' })))
+    .mockResolvedValue(new Response(JSON.stringify({ task: task(4), conversation_id: 'conversation-a' })))
+  vi.stubGlobal('fetch', fetcher)
+  await vi.advanceTimersByTimeAsync(10000)
+  expect(fetcher).toHaveBeenCalledTimes(2)
+  expect(stream.tasks.value[0].state_version).toBe(3)
+  await vi.advanceTimersByTimeAsync(5000)
+  expect(stream.tasks.value[0].state_version).toBe(4)
+  conversation.value = ''
+  await vi.advanceTimersByTimeAsync(30000)
+  expect(fetcher).toHaveBeenCalledTimes(3)
 })
 
 it('ignores events from other conversations without fetching their private detail', async () => {

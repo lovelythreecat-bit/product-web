@@ -1,0 +1,11 @@
+Use case: ui-mockup. Asset type: one independent desktop homepage section for 飞马, polished high fidelity design, raster PNG. This is a design mockup only.
+Visual system: 1440px wide desktop canvas, natural height; 1240px content area and 100px horizontal margins. White and #F3F6FB cool white background, primary #1559D6, navy #182843 headings, body #586B85, border #DBE3EF. Elegant Chinese sans-serif typography, main headings 40–56px, body 20–22px with 1.7 line-height. Calm spacious editorial composition, refined small blue line icons, 8px controls and 14px panels, delicate borders and restrained shadow. Natural commercial product photography of cream sneaker, amber serum bottle, charcoal headphones. No purple, neon, warm overall theme, fake testimonials, made-up numbers, people or redesigned mascots. Do not render low-fidelity annotations, wireframe labels, IDs, measurements or this instruction text. All supplied marketing text must be visible, with no summary, truncation, scrollbar or accordion. Increase canvas height if needed. Any new product demonstration visual gets a tiny label “创作示例”. Do not add a header/nav or unrelated modules.
+Module m12b only. Exact prototype layout: equal two columns, full community copy on the LEFT, product-sharing art on the RIGHT. No chapter header, no navigation, no footer. Canvas 1440 × 1000. Text vertically centered at left, ample whitespace, blue small title 22px, body 26px with relaxed 1.75 line-height. Do not shrink or shorten the paragraph.
+Right visual: a refined blank social-sharing format holding a three-image product story: cream sneaker photograph, amber serum photograph, dark headphones video thumbnail with a play symbol; white UI panel with fine blue border and subtle shadow on pale cool background, small label “创作示例”. No avatars, no user names, no likes, no comments, no reviews, no shares count, no fake interface testimonials. This is a neutral sharing composition, not a real customer post. No characters or people.
+Text (verbatim, left title):
+“朋友圈 / 社群文案”
+First paragraph:
+“不会 PS、不会剪视频，也能做电商内容了？”
+Second paragraph:
+“飞马电商工作台，小白工作台 + 玲玲数字人陪练，文生图文生视频全包，十分钟出片，一键发多店。这就是我最近在用的出片神器 👉”
+Keep “PS”、plus sign、all punctuation、the pointing emoji and every word. Entire second paragraph printed once on left, no duplicate on right. No additional marketing text.

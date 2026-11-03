@@ -1,6 +1,6 @@
 import { mount, flushPromises } from '@vue/test-utils'
 import { beforeEach, expect, it, vi } from 'vitest'
-import { defineComponent, h, ref } from 'vue'
+import { defineComponent, h, ref, watch } from 'vue'
 import QuickGenerationView from '../../src/features/quick-generation/QuickGenerationView.vue'
 import QuickCopyRequirements from '../../src/features/quick-generation/QuickCopyRequirements.vue'
 import { copyTypeChoices, useQuickGeneration } from '../../src/features/quick-generation/useQuickGeneration'
@@ -535,7 +535,7 @@ it('defaults to every copy type when an old single-type parameter exists without
   } finally { view.unmount() }
 })
 
-it('confirms copy options and the displayed credits in one dialog before submitting once', async () => {
+it('closes copy confirmation when polling confirms admission before the submit response arrives', async () => {
   vi.useFakeTimers()
   const initial: any = fixture(1)
   api.getQuickRun.mockResolvedValueOnce(initial)
@@ -555,6 +555,23 @@ it('confirms copy options and the displayed credits in one dialog before submitt
     await view.findAll('button').find(button => button.text() === '确认生成文案')!.trigger('click'); await flushPromises()
     expect(api.submitQuickBatch).toHaveBeenCalledExactlyOnceWith('run-1', 'copies')
     expect(view.findAll('.quick-charge-total')).toHaveLength(1)
+    const accepted = structuredClone(pending)
+    accepted.version++; accepted.state.step = 2; accepted.state.pending_batch = null; accepted.state.current.copy = 'copies'
+    accepted.state.batches[0].submitted = true
+    for (const [index, item] of accepted.state.batches[0].items.entries()) {
+      item.task_id = 'copy-' + index
+      accepted.tasks[item.task_id] = { task: { task_id: item.task_id, state: 'RUNNING', state_version: 1, settlement_state: 'FROZEN', work_ids: [] } }
+    }
+    api.getQuickRun.mockResolvedValueOnce(accepted)
+    await vi.advanceTimersByTimeAsync(3000); await flushPromises()
+    expect(view.find('.quick-copy-requirements').exists()).toBe(false)
+    expect(view.find('.quick-charge-total').exists()).toBe(false)
+    expect(view.get('.quick-stepper [aria-current="step"]').text()).toContain('营销文案')
+    expect(view.findAll('textarea').every(input => input.attributes('disabled') !== undefined)).toBe(true)
+    const savesBeforeNavigation = api.saveQuickRun.mock.calls.length
+    for (const [guard] of navigation.leave.mock.calls) expect(await guard()).not.toBe(false)
+    expect(api.saveQuickRun).toHaveBeenCalledTimes(savesBeforeNavigation)
+    expect(api.submitQuickBatch).toHaveBeenCalledTimes(1)
   } finally { view.unmount(); vi.useRealTimers() }
 })
 
@@ -708,6 +725,183 @@ function partialCopies() {
   return value
 }
 
+it('keeps hydrated copy visible while other tasks run, reads only new output, then stops polling', async () => {
+  vi.useFakeTimers()
+  const value = partialCopies()
+  value.tasks['copy-2'].task.state = 'RUNNING'
+  api.getQuickRun.mockImplementation(async () => structuredClone(value))
+  vi.mocked(getWork).mockImplementation(async id => ({ items: [{ text: 'result-' + id }] }) as any)
+  vi.mocked(listAgents).mockResolvedValueOnce([{ agent_id: 'copy', kind: 'copy', enabled: true }] as any)
+  const { view, state } = controller(); await flushPromises()
+  const rendered: unknown[] = []
+  const stop = watch(() => state.draft.value.copy_texts['宣传文案'], text => rendered.push(text), { flush: 'sync' })
+  try {
+    await vi.advanceTimersByTimeAsync(300)
+    const quoteCount = vi.mocked(quote).mock.calls.length
+    expect(quoteCount).toBe(3)
+    await vi.advanceTimersByTimeAsync(6000); await flushPromises()
+    expect(api.getQuickRun).toHaveBeenCalledTimes(3)
+    expect(getWork).toHaveBeenCalledTimes(1)
+    expect(vi.mocked(getWork).mock.calls[0]![0]).toBe('work-0')
+    expect(rendered).toEqual([])
+    expect(quote).toHaveBeenCalledTimes(quoteCount)
+    value.tasks['copy-2'].task = { ...value.tasks['copy-2'].task, state: 'SUCCEEDED', settlement_state: 'CONSUMED', work_ids: ['work-2'] }
+    await vi.advanceTimersByTimeAsync(3000); await flushPromises()
+    expect(state.complete.value).toBe(true)
+    expect(state.draft.value.copy_texts['短视频脚本']).toBe('result-work-2')
+    expect(state.dirty.value).toBe(false)
+    expect(getWork).toHaveBeenCalledTimes(2)
+    expect(rendered).toEqual([])
+    const reads = api.getQuickRun.mock.calls.length
+    await vi.advanceTimersByTimeAsync(9000)
+    expect(api.getQuickRun).toHaveBeenCalledTimes(reads)
+    expect(quote).toHaveBeenCalledTimes(quoteCount)
+    expect(api.submitQuickBatch).not.toHaveBeenCalled()
+    expect(api.saveQuickRun).not.toHaveBeenCalled()
+  } finally { stop(); view.unmount(); vi.useRealTimers() }
+})
+
+it('preserves a single hydrated copy on refresh and replaces it when the copy batch changes', async () => {
+  const value = partialCopies()
+  value.state.batches[0].items = [value.state.batches[0].items[0]]
+  value.tasks = { 'copy-0': value.tasks['copy-0'] }
+  api.getQuickRun.mockImplementation(async () => structuredClone(value))
+  vi.mocked(getWork).mockResolvedValue({ items: [{ text: '原始单篇文案' }] } as any)
+  const { view, state } = controller(); await flushPromises()
+  const rendered: string[] = []
+  const stop = watch(() => state.draft.value.copy_text, text => rendered.push(text), { flush: 'sync' })
+  try {
+    await state.refresh()
+    expect(state.draft.value.copy_text).toBe('原始单篇文案')
+    expect(rendered).toEqual([])
+    expect(getWork).toHaveBeenCalledTimes(1)
+    state.draft.value.copy_text = '人工修改'
+    await state.refresh()
+    expect(state.draft.value.copy_text).toBe('人工修改')
+    expect(state.dirty.value).toBe(true)
+    value.version++
+    await state.refresh()
+    expect(state.conflict.value).toBe(true)
+    expect(state.draft.value.copy_text).toBe('人工修改')
+    value.state.current.copy = 'new-batch'; value.state.batches[0].id = 'new-batch'
+    value.tasks['copy-0'].task.work_ids = ['new-work']
+    vi.mocked(getWork).mockResolvedValueOnce({ items: [{ text: '新批次文案' }] } as any)
+    await state.refresh(true)
+    expect(state.draft.value.copy_text).toBe('新批次文案')
+    expect(state.conflict.value).toBe(false)
+  } finally { stop(); view.unmount() }
+})
+
+it.each([
+  ['SUCCEEDED', 'CONSUMED', false], ['FAILED', 'FROZEN', false], ['FAILED', 'RELEASED', false],
+  ['MANUALLY_CLOSED', 'RELEASED', false], ['SUCCEEDED', 'FROZEN', true], ['MANUALLY_CLOSED', 'FROZEN', true],
+  ['QUEUED', 'FROZEN', true], ['SAVING', 'FROZEN', true], ['SAVE_RECOVERY', 'FROZEN', true], ['INVESTIGATING', 'FROZEN', true],
+])('polls %s / %s only when progress or settlement is pending (%s)', async (status, settlement, shouldPoll) => {
+  vi.useFakeTimers()
+  const value: any = fixture(3)
+  value.tasks.task = { task: { task_id: 'task', state: status, settlement_state: settlement, work_ids: [] } }
+  api.getQuickRun.mockResolvedValue(value)
+  const { view } = controller(); await flushPromises()
+  try {
+    await vi.advanceTimersByTimeAsync(9000)
+    expect(api.getQuickRun).toHaveBeenCalledTimes(shouldPoll ? 4 : 1)
+  } finally { view.unmount(); vi.useRealTimers() }
+})
+
+it('does not poll an idle draft and resumes after a new batch is submitted', async () => {
+  vi.useFakeTimers()
+  const initial: any = fixture(1)
+  api.getQuickRun.mockResolvedValue(initial)
+  const { view, state } = controller(); await flushPromises()
+  try {
+    await vi.advanceTimersByTimeAsync(6000)
+    expect(api.getQuickRun).toHaveBeenCalledTimes(1)
+    const pending = structuredClone(initial)
+    pending.version = 2; pending.state.pending_batch = 'new-copy'
+    pending.state.batches = [{ id: 'new-copy', kind: 'copy', submitted: false, items: [{ label: '宣传文案', task_id: null, request: { input: { parameters: {} }, confirmed_quote: { credits: 10 } } }] }]
+    api.prepareQuickRun.mockResolvedValueOnce(pending)
+    await state.prepare('copy')
+    const accepted = structuredClone(pending)
+    accepted.version = 3; accepted.state.step = 2; accepted.state.pending_batch = null; accepted.state.current.copy = 'new-copy'
+    accepted.state.batches[0].submitted = true; accepted.state.batches[0].items[0].task_id = 'new-task'
+    accepted.tasks['new-task'] = { task: { task_id: 'new-task', state: 'RUNNING', settlement_state: 'FROZEN', work_ids: [] } }
+    api.submitQuickBatch.mockResolvedValueOnce(accepted)
+    api.getQuickRun.mockResolvedValue(accepted)
+    await state.submit()
+    await vi.advanceTimersByTimeAsync(3000)
+    expect(api.getQuickRun).toHaveBeenCalledTimes(2)
+    expect(api.submitQuickBatch).toHaveBeenCalledTimes(1)
+  } finally { view.unmount(); vi.useRealTimers() }
+})
+
+it('resumes polling after a failed task retry notification, even when its first refresh fails', async () => {
+  vi.useFakeTimers()
+  const value = partialCopies()
+  api.getQuickRun.mockResolvedValue(value)
+  const view = mount(QuickGenerationView, { global: { stubs } }); await flushPromises()
+  try {
+    await vi.advanceTimersByTimeAsync(6000)
+    expect(api.getQuickRun).toHaveBeenCalledTimes(1)
+    await view.findAll('button').find(button => button.text() === '查看原始任务')!.trigger('click')
+    api.getQuickRun.mockRejectedValueOnce(new Error('重试后的进度暂时无法读取'))
+    view.findAllComponents({ name: 'TaskCard' })[2]!.vm.$emit('mediaChanged', 'retry-task')
+    await flushPromises()
+    const retried = structuredClone(value)
+    retried.tasks['copy-2'].task = { ...retried.tasks['copy-2'].task, task_id: 'retry-task', state: 'RUNNING' }
+    api.getQuickRun.mockResolvedValue(retried)
+    await vi.advanceTimersByTimeAsync(6000)
+    expect(api.getQuickRun).toHaveBeenCalledTimes(4)
+  } finally { view.unmount(); vi.useRealTimers() }
+})
+
+it('continues polling tasks in another stage while viewing earlier copy', async () => {
+  vi.useFakeTimers()
+  const value: any = fixture(3)
+  value.tasks.image = { task: { task_id: 'image', state: 'RUNNING', settlement_state: 'FROZEN', work_ids: [] } }
+  api.getQuickRun.mockResolvedValue(value)
+  const { view, state } = controller(); await flushPromises()
+  try {
+    await state.goToStep(2)
+    await vi.advanceTimersByTimeAsync(3000)
+    expect(api.getQuickRun).toHaveBeenCalledTimes(2)
+    expect(state.step.value).toBe(2)
+  } finally { view.unmount(); vi.useRealTimers() }
+})
+
+it('recovers a failed copy read after tasks settle without losing the other loaded copies', async () => {
+  vi.useFakeTimers()
+  const value = partialCopies()
+  api.getQuickRun.mockResolvedValue(value)
+  vi.mocked(getWork).mockRejectedValueOnce(new Error('作品暂时无法读取')).mockResolvedValue({ items: [{ text: '恢复的原始文案' }] } as any)
+  const { view, state } = controller(); await flushPromises()
+  try {
+    expect(state.error.value).toBe('作品暂时无法读取')
+    await vi.advanceTimersByTimeAsync(3000)
+    expect(state.draft.value.copy_texts['宣传文案']).toBe('恢复的原始文案')
+    expect(state.error.value).toBe('')
+    await vi.advanceTimersByTimeAsync(6000)
+    expect(api.getQuickRun).toHaveBeenCalledTimes(2)
+    expect(getWork).toHaveBeenCalledTimes(2)
+  } finally { view.unmount(); vi.useRealTimers() }
+})
+
+it('retries the balance read after settlement without continuing task polling', async () => {
+  vi.useFakeTimers()
+  const value: any = fixture(3)
+  value.tasks.image = { task: { task_id: 'image', state: 'RUNNING', settlement_state: 'FROZEN', work_ids: [] } }
+  api.getQuickRun.mockResolvedValueOnce(value)
+  const { view } = controller(); await flushPromises()
+  const settled = structuredClone(value)
+  settled.tasks.image.task = { ...settled.tasks.image.task, state: 'SUCCEEDED', settlement_state: 'CONSUMED' }
+  api.getQuickRun.mockResolvedValue(settled)
+  vi.mocked(session.refreshAccount).mockRejectedValueOnce(new Error('余额读取失败')).mockResolvedValueOnce({} as any)
+  try {
+    await vi.advanceTimersByTimeAsync(9000)
+    expect(api.getQuickRun).toHaveBeenCalledTimes(2)
+    expect(session.refreshAccount).toHaveBeenCalledTimes(2)
+  } finally { view.unmount(); vi.useRealTimers() }
+})
+
 it('restores successful copies independently and fills a retried copy without overwriting saved edits', async () => {
   const value = partialCopies()
   api.getQuickRun.mockResolvedValueOnce(value)
@@ -722,7 +916,7 @@ it('restores successful copies independently and fills a retried copy without ov
     await state.refresh()
     expect(state.draft.value.copy_texts).toEqual({ 商品标题: '人工保留标题', 宣传文案: '已成功宣传文案', 短视频脚本: '重试成功脚本' })
     expect(getWork).not.toHaveBeenCalledWith('work-1')
-    expect(state.dirty.value).toBe(true)
+    expect(state.dirty.value).toBe(false)
     api.advanceQuickRun.mockResolvedValueOnce(fixture(3))
     await state.advance('confirm_copy')
     expect(api.saveQuickRun).toHaveBeenCalledWith('run-1', 1, expect.objectContaining({ copy_texts: { 商品标题: '人工保留标题', 宣传文案: '已成功宣传文案', 短视频脚本: '重试成功脚本' } }))
@@ -740,6 +934,26 @@ it('allows leaving a partially successful stage without saving a task-locked dra
     expect(state.step.value).toBe(1)
     expect(await navigation.leave.mock.calls.at(-1)![0]()).not.toBe(false)
     expect(api.saveQuickRun).not.toHaveBeenCalled()
+  } finally { view.unmount() }
+})
+
+it.each(['RUNNING', 'SUCCEEDED'])('switches menus after reading %s copy progress without a draft write', async status => {
+  const value = partialCopies()
+  value.tasks['copy-2'].task = { ...value.tasks['copy-2'].task, state: status, settlement_state: status === 'SUCCEEDED' ? 'CONSUMED' : 'FROZEN', work_ids: status === 'SUCCEEDED' ? ['work-2'] : [] }
+  api.getQuickRun.mockResolvedValue(value)
+  api.saveQuickRun.mockRejectedValueOnce(new Error('任务处理中，请等待完成或处置失败任务后修改。'))
+  const { view, state } = controller(); await flushPromises()
+  try {
+    expect(state.draft.value.copy_texts['宣传文案']).toBeTruthy()
+    expect(await navigation.leave.mock.calls.at(-1)![0]()).not.toBe(false)
+    expect(await navigation.update.mock.calls.at(-1)![0]()).not.toBe(false)
+    expect(api.saveQuickRun).not.toHaveBeenCalled()
+    expect(api.submitQuickBatch).not.toHaveBeenCalled()
+    // Reopening reads the existing run and its original output; it never resubmits.
+    await state.initialize()
+    expect(state.draft.value.copy_texts['宣传文案']).toBeTruthy()
+    expect(state.run.value?.run_id).toBe('run-1')
+    expect(api.submitQuickBatch).not.toHaveBeenCalled()
   } finally { view.unmount() }
 })
 

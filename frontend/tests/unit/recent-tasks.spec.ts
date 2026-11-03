@@ -20,7 +20,7 @@ beforeEach(() => {
   api.getTask.mockImplementation(async id => ({ conversation_id: 'shared', task: id === 'task-new' ? first : second, input: { product: { name: '陶瓷马克杯' } } }))
   api.listConversations.mockResolvedValue({ items: [{conversation_id:'shared', title:'原会话', created_at:'2026-10-17'}], next_cursor: null })
 })
-afterEach(() => wrappers.splice(0).forEach(wrapper => wrapper.unmount()))
+afterEach(() => { wrappers.splice(0).forEach(wrapper => wrapper.unmount()); vi.useRealTimers() })
 async function setup(path = '/workspace/shared?task=task-old') {
   const router = createRouter({ history: createMemoryHistory(), routes: [{ path: '/workspace/quick/:runId?', component: { template: '<div />' } }, { path: '/:pathMatch(.*)*', component: { template: '<div />' } }] })
   await router.push(path); await router.isReady()
@@ -216,4 +216,52 @@ it('offers deletion of the selected task on mobile and cancellation leaves histo
   await flushPromises()
   expect(api.deleteTask).not.toHaveBeenCalled()
   expect(wrapper.findAll('.task-history-item')).toHaveLength(2)
+})
+
+it('automatically updates unfinished history tasks without navigation and stops when they complete', async () => {
+  vi.useFakeTimers()
+  const { wrapper } = await setup()
+  api.getTask.mockResolvedValue({ conversation_id: 'shared', task: { ...first, state: 'SUCCEEDED', state_version: 3 }, input: { product: { name: '陶瓷马克杯' } } })
+  api.getTask.mockClear()
+  await vi.advanceTimersByTimeAsync(5000)
+  expect(wrapper.findAll('.task-history-item')[0].text()).toContain('生成成功')
+  expect(api.getTask).toHaveBeenCalledTimes(1)
+  expect(api.getTask).toHaveBeenCalledWith('task-new', expect.any(AbortSignal))
+  await vi.advanceTimersByTimeAsync(30000)
+  expect(api.getTask).toHaveBeenCalledTimes(1)
+})
+
+it('refreshes unfinished tasks on loaded history pages and preserves their status against an older list response', async () => {
+  vi.useFakeTimers()
+  api.listTasks.mockResolvedValueOnce({ items: [second], next_cursor: 'older' })
+    .mockResolvedValueOnce({ items: [first], next_cursor: null })
+    .mockResolvedValue({ items: [first, second], next_cursor: null })
+  const { wrapper } = await setup()
+  await wrapper.findAll('button').find(button => button.text() === '更多任务')!.trigger('click'); await flushPromises()
+  api.getTask.mockResolvedValue({ conversation_id: 'shared', task: { ...first, state: 'SUCCEEDED', state_version: 3 }, input: { product: { name: '陶瓷马克杯' } } })
+  await vi.advanceTimersByTimeAsync(5000)
+  expect(wrapper.findAll('.task-history-item')[1].text()).toContain('生成成功')
+  ;(session.account as unknown as { value: unknown }).value = { available: 24 }
+  await flushPromises()
+  expect(wrapper.findAll('.task-history-item').every(link => link.text().includes('生成成功'))).toBe(true)
+})
+
+it('keeps history visible on a failed refresh and cancels stale reads when switching to quick mode', async () => {
+  vi.useFakeTimers()
+  const { wrapper, router } = await setup()
+  api.getTask.mockRejectedValueOnce(new Error('offline'))
+  await vi.advanceTimersByTimeAsync(5000)
+  expect(wrapper.findAll('.task-history-item')[0].text()).toContain('生成中')
+  let resolve!: (value: unknown) => void
+  api.getTask.mockImplementationOnce(() => new Promise(done => { resolve = done }))
+  await vi.advanceTimersByTimeAsync(5000)
+  const signal = api.getTask.mock.calls.at(-1)![1] as AbortSignal
+  await router.push('/workspace/quick'); await flushPromises()
+  expect(signal.aborted).toBe(true)
+  resolve({ conversation_id: 'shared', task: { ...first, state: 'SUCCEEDED', state_version: 3 }, input: { product: { name: '旧任务' } } })
+  await flushPromises()
+  const count = api.getTask.mock.calls.length
+  await vi.advanceTimersByTimeAsync(30000)
+  expect(api.getTask).toHaveBeenCalledTimes(count)
+  expect(wrapper.text()).not.toContain('旧任务')
 })

@@ -2,12 +2,15 @@
 import UiInput from '../../components/ui/UiInput.vue'
 import UiButton from '../../components/ui/UiButton.vue'
 import AuthShowcase from './AuthShowcase.vue'
-import { onBeforeUnmount, ref } from 'vue'
+import { h, onBeforeUnmount, ref } from 'vue'
+import AppIcon from '../../components/AppIcon.vue'
 import { useRouter } from 'vue-router'
 import { session } from './session'
 import { ApiError } from '../../api/client'
 import type { Schema } from '../../types/api'
 const props = defineProps<{ register?: boolean }>()
+const AccountGlyph = () => h(AppIcon, { name: 'account' })
+const LockGlyph = () => h('svg', { viewBox:'0 0 24 24', fill:'none', stroke:'currentColor', 'stroke-width':1.6, 'stroke-linecap':'round', 'aria-hidden':'true' }, [h('rect', { x:5, y:10, width:14, height:11, rx:2 }), h('path', { d:'M8 10V7a4 4 0 0 1 8 0v3m-4 5v2' })])
 const router = useRouter()
 const account = ref(''), password = ref(''), confirmation = ref(''), error = ref('')
 const accountError = ref(''), passwordError = ref(''), confirmationError = ref('')
@@ -43,9 +46,9 @@ async function submit() {
     <nav class="auth-tabs" aria-label="登录或注册"><RouterLink to="/login" :aria-current="!register ? 'page' : undefined" :class="{ active: !register }">登录</RouterLink><RouterLink to="/register" :aria-current="register ? 'page' : undefined" :class="{ active: register }">注册</RouterLink></nav>
     <slot name="notice" />
     <form class="form-stack" :aria-busy="session.busy.value" @submit.prevent="submit" novalidate>
-      <div><div class="auth-field-label"><label for="auth-account">账号</label><small id="account-help">3–64 个字符</small></div><UiInput id="auth-account" v-model="account" :disabled="session.busy.value" autocomplete="username" placeholder="请输入账号" :aria-invalid="!!accountError" aria-describedby="account-help account-error" @input="edited" /><p id="account-error" class="field-error" role="alert">{{ accountError }}</p></div>
-      <div><div class="auth-field-label"><label for="auth-password">密码</label><small id="password-help">10–128 个字符</small></div><UiInput id="auth-password" v-model="password" :disabled="session.busy.value" type="password" placeholder="请输入密码" :aria-invalid="!!passwordError" :autocomplete="register ? 'new-password' : 'current-password'" aria-describedby="password-help password-error" @input="edited" /><p id="password-error" class="field-error" role="alert">{{ passwordError }}</p></div>
-      <div v-if="register"><label for="auth-confirmation">确认密码</label><UiInput id="auth-confirmation" v-model="confirmation" :disabled="session.busy.value" type="password" autocomplete="new-password" aria-describedby="confirmation-error" :aria-invalid="!!confirmationError" @input="confirmationError = ''; error = ''" /><p id="confirmation-error" class="field-error" role="alert">{{ confirmationError }}</p></div>
+      <div><div class="auth-field-label"><label for="auth-account">账号</label><small id="account-help">3–64 个字符</small></div><UiInput :prefix-icon="AccountGlyph" id="auth-account" v-model="account" :disabled="session.busy.value" autocomplete="username" placeholder="请输入账号" :aria-invalid="!!accountError" aria-describedby="account-help account-error" @input="edited" /><p id="account-error" class="field-error" role="alert">{{ accountError }}</p></div>
+      <div><div class="auth-field-label"><label for="auth-password">密码</label><small id="password-help">10–128 个字符</small></div><UiInput :prefix-icon="LockGlyph" id="auth-password" v-model="password" :disabled="session.busy.value" type="password" placeholder="请输入密码" :aria-invalid="!!passwordError" :autocomplete="register ? 'new-password' : 'current-password'" aria-describedby="password-help password-error" @input="edited" /><p id="password-error" class="field-error" role="alert">{{ passwordError }}</p></div>
+      <div v-if="register"><label for="auth-confirmation">确认密码</label><UiInput :prefix-icon="LockGlyph" id="auth-confirmation" v-model="confirmation" :disabled="session.busy.value" type="password" autocomplete="new-password" aria-describedby="confirmation-error" :aria-invalid="!!confirmationError" @input="confirmationError = ''; error = ''" /><p id="confirmation-error" class="field-error" role="alert">{{ confirmationError }}</p></div>
       <p v-if="error || session.error.value" class="field-error" role="alert">{{ error || session.error.value }}</p>
       <UiButton type="submit" class="button primary" :disabled="session.busy.value" :loading="session.busy.value">{{ session.busy.value ? '正在提交…' : register ? '创建账号' : '登录' }}</UiButton>
     </form>
@@ -55,16 +58,17 @@ async function submit() {
   </section>
 </template>
 <style scoped>
-.auth-layout { display:grid; grid-template-columns:minmax(0,1.1fr) minmax(0,.9fr); width:100%; max-width:1180px; margin:0 auto; min-height:650px; border:1px solid var(--color-border); border-radius:var(--radius-panel); overflow:hidden; background:var(--color-panel); }
-.auth-form-panel { display:flex; align-items:center; justify-content:center; min-width:0; padding:48px; }
-.auth-card { width:100%; max-width:400px; }
+.auth-layout { display:grid; grid-template-columns:minmax(0,1.1fr) minmax(0,.9fr); width:100%; margin:0; padding:16px; min-height:650px; background:var(--color-panel); }
+.auth-form-panel { display:flex; align-items:center; justify-content:center; min-width:0; padding:40px 44px; }
+.auth-card { width:100%; max-width:380px; margin:0; }
 .auth-card h1 { font-size:32px; line-height:1.35; margin:0 0 12px; letter-spacing:-.02em; }
 .auth-intro { margin:0; font-size:14px; line-height:1.8; }
-.auth-tabs { display:flex; gap:28px; border-bottom:1px solid var(--color-border); margin:28px 0; }
+.auth-tabs { display:flex; gap:28px; border-bottom:1px solid var(--color-border); margin:26px 0 28px; }
 .auth-tabs a { display:flex; align-items:center; justify-content:center; min-width:64px; min-height:48px; padding:10px 8px; text-decoration:none; color:var(--color-muted); border-bottom:2px solid transparent; }
 .auth-tabs a:hover { color:var(--color-primary); }
 .auth-tabs .active { color:var(--color-primary); border-bottom-color:var(--color-primary); font-weight:600; }
 .auth-card .form-stack { gap:22px; }
+.auth-card :deep(.el-input__wrapper) { background:var(--color-panel); }
 .auth-card label { font-size:14px; font-weight:500; }
 .auth-field-label { display:flex; align-items:baseline; justify-content:space-between; flex-wrap:wrap; column-gap:12px; margin-bottom:8px; }
 .auth-field-label label { margin:0; }
@@ -75,10 +79,12 @@ async function submit() {
 .auth-card .field-error:empty { display:none; }
 .auth-card .field-error { margin:6px 0 0; font-size:13px; }
 .auth-card .form-stack>.primary { width:100%; min-height:48px; margin-top:6px; font-size:15px; font-weight:600; }
-.auth-footer { text-align:center; margin-top:28px; font-size:14px; }
+.auth-footer { text-align:center; margin-top:24px; font-size:14px; color:var(--color-muted); }
 .auth-footer p { margin:0; }
-.auth-footer a { display:inline-flex; align-items:center; min-height:44px; color:var(--color-primary); font-weight:600; text-underline-offset:4px; }
-@media(max-width:1000px) { .auth-form-panel { padding:36px 28px; } }
-@media(max-width:800px) { .auth-layout { display:block; max-width:480px; min-height:0; } .auth-form-panel { padding:36px 28px; } .auth-card h1 { font-size:28px; } }
-@media(max-width:420px) { .auth-layout { border:0; border-radius:0; background:transparent; } .auth-form-panel { padding:20px 8px; } .auth-tabs { margin-block:24px; } }
+.auth-footer a { display:inline-flex; align-items:center; min-height:44px; color:var(--color-primary); font-weight:600; text-decoration:none; text-underline-offset:4px; }
+.auth-footer a:hover { text-decoration:underline; }
+@media(min-height:880px) and (min-width:801px) { .auth-layout { min-height:680px; } }
+@media(max-width:1100px) { .auth-form-panel { padding-inline:30px; } }
+@media(max-width:800px) { .auth-layout { display:block; max-width:464px; min-height:0; padding:0; margin:0 auto; background:transparent; } .auth-form-panel { padding:54px 32px 40px; } .auth-card { max-width:400px; } .auth-card h1 { font-size:30px; } .auth-tabs { margin-block:30px; } }
+@media(max-width:360px) { .auth-form-panel { padding-inline:20px; } }
 </style>

@@ -1,0 +1,139 @@
+[
+  {
+    "module": "m05",
+    "copy_ids": [
+      "C04-01",
+      "C04-02"
+    ],
+    "prompt": "m05.prompt.txt",
+    "image": "m05-v2.png",
+    "notes": [
+      "已实际 view_image 核对初稿与修订稿；C04-01、C04-02 章节、标签、标题、段落均可见，未观察到删句或错字。",
+      "初稿漏“创作示例”，已内置 image_gen 定向修复，最终为 m05-v2.png；m05.png 保留追溯。",
+      "右侧商品到主图/详情/海报/banner 的结构保留；样例图额外出现“轻盈舒适、透气不闷、缓震支撑、新品上架”等示例创意字，不属于源营销文案或真实商品属性。"
+    ],
+    "copy_sidecar": "m05.copy.json",
+    "tool": "built-in image_gen",
+    "actual_model": "not exposed by built-in tool; not independently verifiable",
+    "references": [
+      "../../lowfi-v1/screenshots/m05-desktop.png",
+      "F:/Work/电商/web/docs/design/feima-ui-2026-10-29/home-light-desktop.png"
+    ],
+    "original_image": "m05.png",
+    "repair_prompt": "m05-v2.prompt.txt"
+  },
+  {
+    "module": "m06",
+    "copy_ids": [
+      "C04-03"
+    ],
+    "prompt": "m06.prompt.txt",
+    "image": "m06.png",
+    "notes": [
+      "已实际 view_image 核对；C04-03 标签、标题和完整段落可见，未观察到删句或错字。",
+      "保留标题/正文在上、单幅宽画面及下方三点节奏线的原型结构；实际画面约2.4:1，比提示词16:9更宽，与线框区域相近，属于已记录比例差异。",
+      "静态示例有播放图形，无真实视频文件、任务进度或自动播放；图下已有“创作示例”。"
+    ],
+    "copy_sidecar": "m06.copy.json",
+    "tool": "built-in image_gen",
+    "actual_model": "not exposed by built-in tool; not independently verifiable",
+    "references": [
+      "../../lowfi-v1/screenshots/m06-desktop.png",
+      "../hero/m01.png"
+    ]
+  },
+  {
+    "module": "m07",
+    "copy_ids": [
+      "C04-04",
+      "C04-05"
+    ],
+    "prompt": "m07.prompt.txt",
+    "image": "m07-v3.png",
+    "notes": [
+      "已实际 view_image 核对初稿及两次修订。主调度复核发现 v2 下半段“客服玲玲实时指路”漏一个“玲”，已定向修复为 v3，两个“玲”现同处第二行清晰可见；其余标签、标题与原句已重新目视比对。",
+      "初稿两幅画面缺“创作示例”，v2 已补标签；v3 进一步修复漏字。最终 m07-v3.png；m07.png 与 m07-v2.png 保留追溯。",
+      "实际引用原玲玲绝对路径，银白粉长发、飞马发饰、粉蓝夹克、白内搭、百褶裙、白靴及卡通身份保留；重生成像素不是原图直接粘贴，存在细微面部和服装纹理差异。",
+      "上下两行左文右图与分隔线保留。示例 UI 和“有问题随时问我哦！”为新增画面内示意，不代表实时客服。"
+    ],
+    "copy_sidecar": "m07.copy.json",
+    "tool": "built-in image_gen",
+    "actual_model": "not exposed by built-in tool; not independently verifiable",
+    "references": [
+      "../../lowfi-v1/screenshots/m07-desktop.png",
+      "../hero/m01.png",
+      "F:/Work/电商/web/output/figma-assets-20261102/01-character-front.png"
+    ],
+    "original_image": "m07.png",
+    "repair_prompt": "m07-v3.prompt.txt",
+    "repair_prompts": [
+      "m07-v2.prompt.txt",
+      "m07-v3.prompt.txt"
+    ]
+  },
+  {
+    "module": "m08",
+    "copy_ids": [
+      "C04-06"
+    ],
+    "prompt": "m08.prompt.txt",
+    "image": "m08.png",
+    "notes": [
+      "已实际 view_image 核对；C04-06 标签、标题、完整段落可见，未观察到删句或错字。",
+      "一套素材经蓝色连线分发到三个匿名店铺窗口，保留原型单幅关系图；无真实平台标志、成功勾选或发布反馈，已有“创作示例”。",
+      "视频缩略图出现0:00/0:15播放器示意时码，属于生成的创作示例，非真实视频产物/时长证据。"
+    ],
+    "copy_sidecar": "m08.copy.json",
+    "tool": "built-in image_gen",
+    "actual_model": "not exposed by built-in tool; not independently verifiable",
+    "references": [
+      "../../lowfi-v1/screenshots/m08-desktop.png",
+      "../hero/m01.png"
+    ]
+  },
+  {
+    "module": "m09a",
+    "copy_ids": [
+      "C05-01",
+      "C05-02"
+    ],
+    "prompt": "m09a.prompt.txt",
+    "image": "m09a.png",
+    "notes": [
+      "已实际 view_image 核对；C05-01、C05-02 章节、🐣 场景标题、四句完整正文均可见，未观察到删句或错字。",
+      "保留左文右侧需求对话→步骤与商品成果的原型，未重复玲玲；保温杯摄影匹配原文需求，已有“创作示例”。",
+      "需求句及四步流程在画面中按原型重复展示；非真实用户会话或发布成果。"
+    ],
+    "copy_sidecar": "m09a.copy.json",
+    "tool": "built-in image_gen",
+    "actual_model": "not exposed by built-in tool; not independently verifiable",
+    "references": [
+      "../../lowfi-v1/screenshots/m09a-desktop.png",
+      "../hero/m01.png"
+    ]
+  },
+  {
+    "module": "m09b",
+    "copy_ids": [
+      "C05-03",
+      "C05-04"
+    ],
+    "prompt": "m09b.prompt.txt",
+    "image": "m09b-v2.png",
+    "notes": [
+      "已实际 view_image 核对初稿与修订稿；C05-03、C05-04 两场景标题、完整正文、箭头顺序均可见，未观察到删句或错字。",
+      "上半工作台初稿缺单独示例标识，已定向补“创作示例”，最终为 m09b-v2.png；m09b.png 保留追溯。",
+      "上下两行左文右图、横向专业编辑画面及视频方案画面保留；🛠 被渲染为交叉工具图形、🎬 为场记板图形，语义一致但不是确定性字形。",
+      "UI 中参数+10/+18/+6、方案一（推荐）、0:00/0:15及一键发店均是标注示例的画面内容，不是新业务流程或能力已上线证据。"
+    ],
+    "copy_sidecar": "m09b.copy.json",
+    "tool": "built-in image_gen",
+    "actual_model": "not exposed by built-in tool; not independently verifiable",
+    "references": [
+      "../../lowfi-v1/screenshots/m09b-desktop.png",
+      "../hero/m01.png"
+    ],
+    "original_image": "m09b.png",
+    "repair_prompt": "m09b-v2.prompt.txt"
+  }
+]

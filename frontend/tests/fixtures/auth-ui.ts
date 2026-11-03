@@ -7,6 +7,7 @@ import RegisterView from '../../src/features/auth/RegisterView.vue'
 import '../../src/styles/element-components'
 import '../../src/styles/tokens.css'
 import '../../src/styles/element-theme.css'
+import '../../src/styles/themes.css'
 
 window.fetch = async () => {
   await new Promise(resolve => setTimeout(resolve, 1200))

@@ -42,7 +42,10 @@ async function load(more = false) {
   try {
     const page = await listTasks(undefined, more ? cursor.value : undefined, undefined, 'ordinary')
     if (!current()) return
-    page.items = page.items.filter(item => !deletedIds.value.has(item.task_id))
+    page.items = page.items.filter(item => !deletedIds.value.has(item.task_id)).map(item => {
+      const known = items.value.find(task => task.task_id === item.task_id)
+      return known && known.state_version > item.state_version ? known : item
+    })
     const nextDetails = { ...details.value }
     const knownTasks = new Map([...items.value, ...page.items].map(item => [item.task_id, item]))
     const missing = [...knownTasks.values()].filter(item => !nextDetails[item.task_id])
@@ -122,6 +125,36 @@ watch(session.epoch, () => {
 }, { flush: 'sync' })
 watch(quickMode, () => { creationError.value = ''; revision++; loading.value = false })
 watch([() => route.fullPath, () => session.account.value, () => session.epoch.value], () => { if (!route.meta.public && !quickMode.value) void load() }, { immediate: true })
+const unfinished = computed(() => items.value.filter(item => !['SUCCEEDED', 'FAILED', 'MANUALLY_CLOSED'].includes(item.state)))
+watch([() => unfinished.value.map(item => item.task_id).join(','), quickMode, () => session.epoch.value], ([ids, quick], _, onCleanup) => {
+  if (!ids || quick) return
+  let stopped = false
+  let timer: ReturnType<typeof setTimeout>
+  const controllers = new Set<AbortController>()
+  const poll = async () => {
+    const pending = [...unfinished.value]
+    let index = 0
+    await Promise.allSettled(Array.from({ length: Math.min(4, pending.length) }, async () => {
+      while (!stopped && index < pending.length) {
+        const id = pending[index++].task_id, controller = new AbortController()
+        controllers.add(controller)
+        const timeout = setTimeout(() => controller.abort(), 15000)
+        try {
+          const detail = await getTask(id, controller.signal)
+          if (stopped || deletedIds.value.has(id)) continue
+          const known = items.value.find(item => item.task_id === id)
+          if (!known || known.state_version > detail.task.state_version) continue
+          details.value = { ...details.value, [id]: detail }
+          items.value = items.value.map(item => item.task_id === id ? detail.task : item)
+        } catch { /* A missed refresh leaves the last known state visible until the next read. */ }
+        finally { clearTimeout(timeout); controllers.delete(controller) }
+      }
+    }))
+    if (!stopped) timer = setTimeout(() => { void poll() }, 5000)
+  }
+  timer = setTimeout(() => { void poll() }, 5000)
+  onCleanup(() => { stopped = true; clearTimeout(timer); for (const controller of controllers) controller.abort() })
+}, { flush: 'sync' })
 let quickRevision = 0
 const quickLoading = ref(false), quickError = ref('')
 async function loadQuick() {

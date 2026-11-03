@@ -714,3 +714,36 @@ def test_complete_detail_set_delivers_despite_set_audit_warning(profile, snapsho
     outcome = obj.query('task-1')
     assert outcome.state == 'RESULT_READY' and len(outcome.result.items) == 3
     assert outcome.result.warnings
+
+
+@pytest.mark.parametrize(
+    "mutation", [None, "less_than_three", "legacy", "uncertain", "no_failed_asset"],
+)
+def test_generation_retry_exhaustion_is_terminal_only_with_matching_evidence(
+    profile, snapshot, mutation,
+):
+    service = Service()
+    service.task["core_status"] = "failed"
+    error = {"code": "generation_attempts_exhausted", "stage": "generate", "retryable": False}
+    service.result.update(status="failed", usage={"image_calls": 3}, error_info=error,
+                          assets=[{"status": "failed", "error_info": deepcopy(error)}])
+    if mutation == "less_than_three":
+        service.result["usage"]["image_calls"] = 2
+    elif mutation == "legacy":
+        service.result["error_info"]["code"] = "provider_http"
+    elif mutation == "uncertain":
+        service.result["assets"].append({"status": "generation_uncertain"})
+    elif mutation == "no_failed_asset":
+        service.result["assets"] = [Service.asset()]
+    obj, state = adapter(profile, snapshot, service)
+    obj.submit(snapshot, "external-1")
+    for _ in range(2):
+        outcome = obj.query("task-1")
+        if mutation is None:
+            assert (outcome.status, outcome.state) == ("FOUND", "FAILED")
+            assert state["failure"]["code"] == "generation_attempts_exhausted"
+            assert state["failure"]["retryable"] is False
+        else:
+            assert outcome.status == "UNAVAILABLE"
+    assert sum(call[0] == "POST" for call in service.calls) == 1
+    assert not any(call[0] == "DOWNLOAD" for call in service.calls)

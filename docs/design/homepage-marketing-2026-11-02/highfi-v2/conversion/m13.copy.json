@@ -1,0 +1,72 @@
+{
+  "module": "m13",
+  "source": "../../lowfi-v1/copy-data.json",
+  "copy_ids": [
+    "C08-01",
+    "C08-02",
+    "C08-03",
+    "C08-04",
+    "C08-05",
+    "C08-06",
+    "C08-07",
+    "C09-01"
+  ],
+  "blocks": [
+    {
+      "id": "C08-01",
+      "group": "C08",
+      "tag": "h2",
+      "text": "08CTA 按钮文案库",
+      "html": "<h2><span class=\"source-num\">08</span>CTA 按钮文案库</h2>"
+    },
+    {
+      "id": "C08-02",
+      "group": "C08",
+      "tag": "span",
+      "text": "免费开始创作",
+      "html": "<span class=\"source-cta\">免费开始创作</span>"
+    },
+    {
+      "id": "C08-03",
+      "group": "C08",
+      "tag": "span",
+      "text": "立即出片",
+      "html": "<span class=\"source-cta source-alt\">立即出片</span>"
+    },
+    {
+      "id": "C08-04",
+      "group": "C08",
+      "tag": "span",
+      "text": "看玲玲怎么带你玩",
+      "html": "<span class=\"source-cta\">看玲玲怎么带你玩</span>"
+    },
+    {
+      "id": "C08-05",
+      "group": "C08",
+      "tag": "span",
+      "text": "一键发布到我的店铺",
+      "html": "<span class=\"source-cta source-alt\">一键发布到我的店铺</span>"
+    },
+    {
+      "id": "C08-06",
+      "group": "C08",
+      "tag": "span",
+      "text": "十分钟做第一条带货视频",
+      "html": "<span class=\"source-cta\">十分钟做第一条带货视频</span>"
+    },
+    {
+      "id": "C08-07",
+      "group": "C08",
+      "tag": "span",
+      "text": "小白也能用，试试看",
+      "html": "<span class=\"source-cta source-alt\">小白也能用，试试看</span>"
+    },
+    {
+      "id": "C09-01",
+      "group": "C09",
+      "tag": "div",
+      "text": "飞马电商工作台 · 营销文案手册（v1）｜ 主 Slogan 已锁定；数据类文案为占位，上线后按真实指标替换。\n    使用建议：落地页与商店描述保持「主 Slogan + 五大卖点」口径统一；短视频与社群侧重「小白 + 玲玲陪练」的陪伴感。",
+      "html": "<div class=\"source-foot\">\n    飞马电商工作台 · 营销文案手册（v1）｜ 主 Slogan 已锁定；数据类文案为占位，上线后按真实指标替换。<br>\n    使用建议：落地页与商店描述保持「主 Slogan + 五大卖点」口径统一；短视频与社群侧重「小白 + 玲玲陪练」的陪伴感。\n  </div>"
+    }
+  ]
+}

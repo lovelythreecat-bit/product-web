@@ -1,0 +1,38 @@
+[
+  {
+    "file": "hero-dark.png",
+    "sha256": "2abe91c75be26ec5d569073e9a38cf2bc92289a2c7b06e9b14cd5ee345005ff2",
+    "origin": "built-in imagegen; prompt in ../prompts",
+    "model_verified": false
+  },
+  {
+    "file": "gallery-light.png",
+    "sha256": "19f18ed2dd8e1562dc8004bba585b4811f1a8a929f5295bd1977fd1c7bc9874a",
+    "origin": "built-in imagegen; prompt in ../prompts",
+    "model_verified": false
+  },
+  {
+    "file": "cinema.png",
+    "sha256": "bc9a98a13508eb3b6797b815446a4398d2bbeb34cb48d935ce53b74653f57167",
+    "origin": "built-in imagegen; prompt in ../prompts",
+    "model_verified": false
+  },
+  {
+    "file": "shoe.png",
+    "sha256": "a280fbbf8f9c6fddc5dad9a4074286077f477c3d950f8a4c9efb843905726fa1",
+    "origin": "built-in imagegen; prompt in ../prompts",
+    "model_verified": false
+  },
+  {
+    "file": "lingling.png",
+    "sha256": "6ccfa515c0eb65ee705d86a00c14d3306283bb4142b2b929112b1c6415313df1",
+    "origin": "output/figma-assets-20261102/01-character-front.png",
+    "model_verified": false
+  },
+  {
+    "file": "feima-logo-blue.png",
+    "sha256": "e99fb6072c6b3b4d94b1d96674cbdd47d77e9f0c17e7743b511ae77fb0bdaa94",
+    "origin": "frontend/src/assets/feima-logo-blue.png",
+    "model_verified": false
+  }
+]

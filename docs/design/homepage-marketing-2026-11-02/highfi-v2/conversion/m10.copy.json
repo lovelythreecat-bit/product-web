@@ -1,0 +1,64 @@
+{
+  "module": "m10",
+  "source": "../../lowfi-v1/copy-data.json",
+  "copy_ids": [
+    "C06-01",
+    "C06-02",
+    "C06-03",
+    "C06-04",
+    "C06-05",
+    "C06-06",
+    "C06-07"
+  ],
+  "blocks": [
+    {
+      "id": "C06-01",
+      "group": "C06",
+      "tag": "h2",
+      "text": "06落地页 / 官网分区文案",
+      "html": "<h2><span class=\"source-num\">06</span>落地页 / 官网分区文案</h2>"
+    },
+    {
+      "id": "C06-02",
+      "group": "C06",
+      "tag": "div",
+      "text": "Hero 区\n      飞马电商工作台\n      副标题：一站式电商内容工具，小白十分钟高效出片\n      支撑点：文生图 ｜ 文生视频 ｜ 小白工作台 ｜ 玲玲陪练 ｜ 一键多发\n      主 CTA：免费开始创作　次 CTA：看 1 分钟演示",
+      "html": "<div class=\"source-card\">\n      <span class=\"source-tag\">Hero 区</span>\n      <h3>飞马电商工作台</h3>\n      <p><b>副标题：</b>一站式电商内容工具，小白十分钟高效出片<br>\n      <b>支撑点：</b>文生图 ｜ 文生视频 ｜ 小白工作台 ｜ 玲玲陪练 ｜ 一键多发<br>\n      <b>主 CTA：</b>免费开始创作　<b>次 CTA：</b>看 1 分钟演示</p>\n    </div>"
+    },
+    {
+      "id": "C06-03",
+      "group": "C06",
+      "tag": "h3",
+      "text": "功能卡片区",
+      "html": "<h3>功能卡片区</h3>"
+    },
+    {
+      "id": "C06-04",
+      "group": "C06",
+      "tag": "div",
+      "text": "文生图传统电商，看图说话出爆款主图、详情、海报，输入即出。",
+      "html": "<div class=\"source-card\"><span class=\"source-tag\">文生图</span><h3>传统电商，看图说话出爆款</h3><p>主图、详情、海报，输入即出。</p></div>"
+    },
+    {
+      "id": "C06-05",
+      "group": "C06",
+      "tag": "div",
+      "text": "文生视频抖店带货，十分钟一条种草片卖点进，视频出，节奏跟上投放。",
+      "html": "<div class=\"source-card\"><span class=\"source-tag\">文生视频</span><h3>抖店带货，十分钟一条种草片</h3><p>卖点进，视频出，节奏跟上投放。</p></div>"
+    },
+    {
+      "id": "C06-06",
+      "group": "C06",
+      "tag": "div",
+      "text": "小白工作台零基础，对话即出片智能体帮你把专业流程走完。",
+      "html": "<div class=\"source-card\"><span class=\"source-tag\">小白工作台</span><h3>零基础，对话即出片</h3><p>智能体帮你把专业流程走完。</p></div>"
+    },
+    {
+      "id": "C06-07",
+      "group": "C06",
+      "tag": "div",
+      "text": "玲玲数字人每一步都有人陪卡哪步教哪步，操作零卡点。",
+      "html": "<div class=\"source-card\"><span class=\"source-tag\">玲玲数字人</span><h3>每一步都有人陪</h3><p>卡哪步教哪步，操作零卡点。</p></div>"
+    }
+  ]
+}

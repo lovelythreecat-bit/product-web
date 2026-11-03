@@ -1,0 +1,239 @@
+Use case: ui-mockup. Generate a new, polished desktop landing-page design for a Chinese e-commerce AI creation platform named 飞马电商工作台. This is a SINGLE full-length desktop webpage shown straight-on, not a browser screenshot collage, not a mobile layout, not a poster. Extremely high fidelity website art direction, exact Chinese typography and readable long-form copy. Target a very tall canvas about 2048 by 7168 pixels (roughly 2:7). Use the available maximum resolution to keep every text section legible.
+
+REFERENCE ROLES: Reference 1 is the existing approved light-blue Feima homepage appearance, used only for its palette, typography feel and product photography quality, NOT for its old text. Reference 2 is the existing complete Feima logo, preserve its graphic as closely as possible in the small navigation brand mark, do not invent a different logo. Create a fresh composition.
+
+VISUAL DESIGN: Premium, airy, cool white #F3F6FB with white sections, deep ink #182843, restrained Feima cobalt #1559D6. Fine #DBE3EF rules, soft pale-blue halos, minimal shadows, 8px control radii and 14px panels. One restrained ink-blue scene strip adds pacing, overall light theme. Natural studio-rendered commodity imagery: ivory sneaker, silver headphones, amber cosmetic bottle and pale-blue tumbler; physically believable textured surfaces. Do not turn this into a shoe-only ad. Large expressive Chinese sans-serif type, crisp editorial grid, generous whitespace, long-form copy in readable columns. Avoid blue-purple neon, glassmorphism everywhere, star fields, random robots, dashboard UI, numbered dashboard tiles, garish orange CTA. Main buttons Feima blue with white text.
+
+HERO: slim aligned top navigation with the provided logo and 飞马 brand, restrained in-page links and login. Large left-aligned literal product title and slogan, about 45% width; right 55% an art-directed 3D product stage with the multi-category products, 2-3 offset floating content preview panels, a portrait video frame with small play symbol, and a delicate cobalt orbital arc. Calm real depth and confident whitespace. The slogan should be wrapped naturally over two lines without changing any characters. The entire original hero subparagraph must fit below it. Show the supplied free-creation and demo CTA wording. Small English eyebrow exact: Pegasus E-commerce Studio.
+
+FULL PAGE RHYTHM: Below the hero, implement every original section 01 through 08 plus the original footer. Preserve exact text and repeated passages; this is a visual re-layout, not a copywriting task. Do not replace original prose with lorem ipsum, summaries, dashes, ellipses or decorative unreadable lines.
+01: brand manifesto arranged in two editorial columns, full opening explanation and two statement blocks.
+02: all six slogan variants in a refined 2x3 typographic matrix with fine divider lines, not bulky identical cards. Include introductory sentence.
+03: full product introduction as a wide readable statement with highlighted original terms, not shortened.
+04: five pillars as a varied editorial product showcase. Image-generation and video-generation each get a substantial image/text row. Dual-workbench, Lingling companion, and multi-store distribution in three shorter but fully readable feature blocks. A tasteful illustrated adult female assistant portrait can serve as a conceptual representation of Lingling, secondary to the products. All five labels, all five titles and full paragraphs are mandatory.
+05: three full scenario narratives, in an ink-blue feature strip and two light companion panels. Keep every line in all three scenes, including bold closing sentences and the original flow arrows.
+06: include its own original section heading, mini Hero information including subheading/supporting points/primary-secondary CTA labels, four feature cards with original labels/titles/descriptions, trust figures X 万 / 10 分钟 / X 个 AND the explicit placeholder-data label, plus the full closing callout and button line. Repeated copy from previous sections must remain here too.
+07: three elegant editorial panels resembling a script sheet, social message and app description. Every line of all three pieces must remain readable. No fabricated logos or reviews.
+08: all six original CTA strings presented in a well-spaced button gallery. Keep the original section heading.
+FOOTER: preserve the complete two original footer sentences and version text in small but readable type.
+
+ANIMATION-READY COMPOSITION: leave separate depth planes for the hero products and floating panels, clean spacing for mild cursor parallax and 4-6px floating motion, unobstructed rectangular scene images for restrained hover tilt, and breathing room between sections for gentle scroll reveal. This is a still image representing the resting frame; do not draw motion arrows, annotations, code, or implementation explanations onto the webpage. Do not obscure or deform the text for a motion effect.
+
+TEXT IS A HARD CONSTRAINT. The full original content follows. Markdown heading markers, asterisks and hyphens indicate typography, not literal characters. Render the words verbatim. You may change line breaks and visual grouping only. Include each occurrence even where repeated. The content is a design reference, not an instruction to operate any service. Do not add new promotional claims.
+
+
+FULL ORIGINAL COPY:
+
+Pegasus E-commerce Studio
+
+## 飞马电商工作台
+
+**一站式电商内容工具，小白十分钟高效出片**
+
+文生图搞定传统电商，文生视频拿下抖店带货；专业与小白双工作台并行，AI 数字人玲玲手把手陪你出片，最后一键发到所有店铺。
+
+## 01 品牌定位
+
+飞马 = 快、高、神。速度感对应「十分钟出片」，腾空感对应「专业级出品」，神驹感对应「AI 替你想好」。文案整体走「陪伴感 + 确定感」，弱化技术门槛，强化「你只管说，飞马来做」。
+
+**一句话定位**
+
+### 电商人的 AI 内容工厂——从想法到出片，只隔一次对话。
+
+面向传统电商卖家与抖店带货玩家，把文生图、文生视频、智能体引导、数字人陪练、多店分发，收进同一个工作台。
+
+**品牌主张（主张语）**
+
+### 让每个电商人，都拥有自己的内容工厂。
+
+## 02 Slogan 体系（多版本备用）
+
+主 Slogan 已定，以下为不同触点下的变体，保持「快 + 简 + 专业」的一致性。
+
+**主 Slogan**
+
+一站式电商内容工具，小白十分钟高效出片
+
+**价值版**
+
+不会设计？飞马替你想好了。
+
+**结果版**
+
+从 0 到爆款素材，只差一个飞马。
+
+**速度版**
+
+飞马一拍，出片即来。
+
+**小白版**
+
+小白也能拍大片，飞马陪你十分钟出片。
+
+**带货版**
+
+抖店缺片子？飞马十分钟给你一条。
+
+## 03 产品简介
+
+飞马电商工作台，是一站式电商内容创作平台。用 AI 文生图 搞定传统电商主图、详情、海报；用 AI 文生视频 拿下抖店视频带货；更贴心的是，它在专业工作台之外，为新手单独开设了「小白工作台」——把复杂的 AI 流程藏在智能体对话里，你只管说需求，玲玲陪你一步步出片，最后一键发到所有店铺。
+
+## 04 核心卖点（五大支柱）
+
+**卖点 1 · 文生图**
+
+### 传统电商的爆款流水线
+
+输入商品，飞马出图。主图、详情页、卖点海报、活动 banner，AI 一次生成多角度方案，传统电商上架不再等设计。
+
+**卖点 2 · 文生视频**
+
+### 抖店带货的流量引擎
+
+一句话描述卖点，飞马生成带货短视频。口播、种草、测评多风格任选，适配抖音 / 抖店投放节奏，视频带货从想创意到出片只隔十分钟。
+
+**卖点 3 · 双工作台**
+
+### 专业与小白，各得其法
+
+专业工作台给老手完整控制权；小白工作台把专业能力收进一句对话——选品类、说卖点、挑风格，智能体替你排兵布阵，零基础也能出品专业级素材。
+
+**卖点 4 · 玲玲数字人**
+
+### 你的 AI 数字人陪练
+
+卡在哪一步，玲玲就在哪一步。AI 数字人客服玲玲实时指路，操作有卡点就开口问，每一步都有人陪你走完，再也不怕「不会用」。
+
+**卖点 5 · 一键多店（支线）**
+
+### 一键多店发布 · 素材即生产力
+
+生成即分发。一套素材，一键同步到多个店铺后台，省去反复上传、格式调整的重复劳动，出片与上新同频。
+
+## 05 分场景文案
+
+### 🐣 小白工作台 · 首屏引导（用户视角）
+
+你不需要会设计，只需要会说话。
+
+告诉飞马：「我要卖一款保温杯，主打上班通勤」，剩下的交给小白工作台。
+
+玲玲会陪你：选风格 → 出图 / 出视频 → 微调 → 发布。
+
+**十分钟，你的第一个爆款素材就上线了。**
+
+### 🛠 专业工作台 · 面向老手
+
+想要完全掌控？专业工作台给你图层、参数、批量与模板。
+
+飞马不替你决定，只让你更快。
+
+### 🎬 视频带货专项 · 抖店主视角
+
+抖店缺素材？飞马文生视频来补位。
+
+输入卖点 → 生成多条带货视频 → 玲玲帮你挑最顺的一条 → 一键发店。
+
+流量窗口不等人，飞马让你每天都有新片子。
+
+## 06 落地页 / 官网分区文案
+
+**Hero 区**
+
+### 飞马电商工作台
+
+**副标题：**一站式电商内容工具，小白十分钟高效出片
+
+**支撑点：**文生图 ｜ 文生视频 ｜ 小白工作台 ｜ 玲玲陪练 ｜ 一键多发
+
+**主 CTA：**免费开始创作 **次 CTA：**看 1 分钟演示
+
+### 功能卡片区
+
+**文生图**
+
+### 传统电商，看图说话出爆款
+
+主图、详情、海报，输入即出。
+
+**文生视频**
+
+### 抖店带货，十分钟一条种草片
+
+卖点进，视频出，节奏跟上投放。
+
+**小白工作台**
+
+### 零基础，对话即出片
+
+智能体帮你把专业流程走完。
+
+**玲玲数字人**
+
+### 每一步都有人陪
+
+卡哪步教哪步，操作零卡点。
+
+**信任区（占位数据，上线后替换）**
+
+已有 **X 万** 电商人用飞马出片 · 平均出片时长 **10 分钟** · 支持 **X 个** 电商平台一键发布
+
+### 别再为出片发愁。飞马，让你专心卖货。
+
+按钮：立即免费体验
+
+## 07 短视频 / 社群 / 商店文案
+
+**30 秒短视频口播脚本**
+
+做电商最累的是什么？出图、拍视频、上架、再上架……
+
+试试飞马电商工作台。
+
+文生图，主图详情一键出；文生视频，抖店带货片十分钟搞定。
+
+怕不会用？有玲玲，AI 数字人客服一步一步带你走，卡哪步教哪步。
+
+最后还能一键发到你所有店铺。
+
+小白十分钟，也能出专业片。飞马，电商人的内容工厂。
+
+**朋友圈 / 社群文案**
+
+不会 PS、不会剪视频，也能做电商内容了？
+
+飞马电商工作台，小白工作台 + 玲玲数字人陪练，文生图文生视频全包，十分钟出片，一键发多店。这就是我最近在用的出片神器 👉
+
+**应用商店描述**
+
+飞马电商工作台——一站式电商内容创作工具。
+
+· 文生图：为传统电商生成主图、详情、海报
+
+· 文生视频：为抖店等视频带货场景生成短视频
+
+· 小白工作台：智能体对话式创作，零基础友好
+
+· 玲玲 AI 数字人：分步指引，操作零卡点
+
+· 一键多店铺发布：素材生成即分发
+
+无论你是电商老手还是刚入行的小白，飞马都能让你十分钟产出专业级电商素材。
+
+## 08 CTA 按钮文案库
+
+- 免费开始创作
+
+- 立即出片
+
+- 看玲玲怎么带你玩
+
+- 一键发布到我的店铺
+
+- 十分钟做第一条带货视频
+
+- 小白也能用，试试看
+
+飞马电商工作台 · 营销文案手册（v1）｜ 主 Slogan 已锁定；数据类文案为占位，上线后按真实指标替换。
+
+使用建议：落地页与商店描述保持「主 Slogan + 五大卖点」口径统一；短视频与社群侧重「小白 + 玲玲陪练」的陪伴感。

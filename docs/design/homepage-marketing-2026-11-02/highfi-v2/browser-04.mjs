@@ -1,0 +1,16 @@
+const task=await taskSpace(13);
+const page=task.page('p1');
+await page.cdp('Emulation.setDeviceMetricsOverride',{width:1440,height:1000,deviceScaleFactor:1,mobile:false});
+await page.click('@25');
+await page.waitForFunction(()=>location.hash==='#m03'&&Math.abs(document.querySelector('#m03').getBoundingClientRect().top-24)<4,undefined,{timeout:5000});
+const fs=await import('node:fs/promises');
+const base='F:/Work/电商/web/docs/design/homepage-marketing-2026-11-02/highfi-v2/';
+const desktop=await page.evaluate(()=>({width:innerWidth,scrollWidth:document.documentElement.scrollWidth,modules:document.querySelectorAll('section.module').length,m07:document.querySelector('#m07 img.design').getAttribute('src'),imagesLoaded:[...document.images].every(x=>x.complete&&x.naturalWidth>0),hash:location.hash,copy:[...document.querySelectorAll('[data-copy]')].map(x=>({id:x.dataset.copy,text:x.textContent}))}));
+const source=JSON.parse(await fs.readFile(base+'all-source-copy.json','utf8'));
+const norm=s=>s.replace(/\s+/g,'');
+desktop.copyDifferences=source.filter(b=>norm(b.text)!==norm(desktop.copy.find(x=>x.id===b.id)?.text||'')).map(x=>x.id);
+delete desktop.copy;
+await fs.writeFile(base+'browser-checks-desktop.json',JSON.stringify(desktop,null,2),'utf8');
+await page.screenshot({path:base+'gallery-slogans.png'});
+console.log(desktop);
+await task.finish({keep:['p1']});

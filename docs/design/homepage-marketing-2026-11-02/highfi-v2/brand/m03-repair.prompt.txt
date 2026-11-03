@@ -1,0 +1,13 @@
+Use case: precise-object-edit
+Edit reference image 1, the generated m03 section. Change ONLY the picture window in ROW 1 RIGHT (immediately left of blue "价值版" label). Currently it is one large white sneaker on pale background. Replace that single picture with an obvious before-after product design comparison WITHIN THE SAME WINDOW: left half a small original ivory sneaker on plain white, a blue right-pointing arrow in middle, right half a designed natural-light sneaker photo on pale stone pedestal. Use a split diptych so two visibly separate stages appear. Keep the small "创作示例" badge inside that window. Do not change the window size or its location.
+Keep EVERYTHING ELSE exactly unchanged: entire two-column three-row layout, every existing text character, labels, colors, title/subtitle, other five pictures, every slogan, Lingling full body and wardrobe. Reference image 2 is the original Lingling identity source, only to ensure she stays unchanged. No other changes.
+All text in image 1 must remain exactly:
+"02" "Slogan 体系（多版本备用）"
+"主 Slogan 已定，以下为不同触点下的变体，保持「快 + 简 + 专业」的一致性。"
+"主 Slogan" "一站式电商内容工具，小白十分钟高效出片"
+"价值版" "不会设计？飞马替你想好了。"
+"结果版" "从 0 到爆款素材，只差一个飞马。"
+"速度版" "飞马一拍，出片即来。"
+"小白版" "小白也能拍大片，飞马陪你十分钟出片。"
+"带货版" "抖店缺片子？飞马十分钟给你一条。"
+"创作示例" on each of five product windows. Preserve original light cool blue Feima visual.

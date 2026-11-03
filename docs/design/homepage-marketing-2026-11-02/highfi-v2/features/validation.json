@@ -1,0 +1,94 @@
+{
+  "modules": 6,
+  "copy_blocks": 10,
+  "results": [
+    {
+      "module": "m05",
+      "image": "m05-v2.png",
+      "size": [
+        1487,
+        1058
+      ],
+      "copy_ids": [
+        "C04-01",
+        "C04-02"
+      ],
+      "sidecar_exact_source": true,
+      "prompt_full_source": true,
+      "view_image_reviewed": true
+    },
+    {
+      "module": "m06",
+      "image": "m06.png",
+      "size": [
+        1487,
+        1058
+      ],
+      "copy_ids": [
+        "C04-03"
+      ],
+      "sidecar_exact_source": true,
+      "prompt_full_source": true,
+      "view_image_reviewed": true
+    },
+    {
+      "module": "m07",
+      "image": "m07-v3.png",
+      "size": [
+        1487,
+        1058
+      ],
+      "copy_ids": [
+        "C04-04",
+        "C04-05"
+      ],
+      "sidecar_exact_source": true,
+      "prompt_full_source": true,
+      "view_image_reviewed": true
+    },
+    {
+      "module": "m08",
+      "image": "m08.png",
+      "size": [
+        1487,
+        1058
+      ],
+      "copy_ids": [
+        "C04-06"
+      ],
+      "sidecar_exact_source": true,
+      "prompt_full_source": true,
+      "view_image_reviewed": true
+    },
+    {
+      "module": "m09a",
+      "image": "m09a.png",
+      "size": [
+        1487,
+        1058
+      ],
+      "copy_ids": [
+        "C05-01",
+        "C05-02"
+      ],
+      "sidecar_exact_source": true,
+      "prompt_full_source": true,
+      "view_image_reviewed": true
+    },
+    {
+      "module": "m09b",
+      "image": "m09b-v2.png",
+      "size": [
+        1487,
+        1058
+      ],
+      "copy_ids": [
+        "C05-03",
+        "C05-04"
+      ],
+      "sidecar_exact_source": true,
+      "prompt_full_source": true,
+      "view_image_reviewed": true
+    }
+  ]
+}

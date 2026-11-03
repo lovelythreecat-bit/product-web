@@ -1,0 +1,30 @@
+[
+  {
+    "id": "C00-01",
+    "group": "C00",
+    "tag": "div",
+    "text": "Pegasus E-commerce Studio",
+    "html": "<div class=\"source-kicker\">Pegasus E-commerce Studio</div>"
+  },
+  {
+    "id": "C00-02",
+    "group": "C00",
+    "tag": "h1",
+    "text": "飞马电商工作台",
+    "html": "<h1>飞马电商工作台</h1>"
+  },
+  {
+    "id": "C00-03",
+    "group": "C00",
+    "tag": "div",
+    "text": "一站式电商内容工具，小白十分钟高效出片",
+    "html": "<div class=\"source-master-slogan\">一站式电商内容工具，小白十分钟高效出片</div>"
+  },
+  {
+    "id": "C00-04",
+    "group": "C00",
+    "tag": "p",
+    "text": "文生图搞定传统电商，文生视频拿下抖店带货；专业与小白双工作台并行，AI 数字人玲玲手把手陪你出片，最后一键发到所有店铺。",
+    "html": "<p class=\"source-hero-sub\">文生图搞定传统电商，文生视频拿下抖店带货；专业与小白双工作台并行，AI 数字人玲玲手把手陪你出片，最后一键发到所有店铺。</p>"
+  }
+]

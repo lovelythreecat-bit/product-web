@@ -1,0 +1,22 @@
+{
+  "frontend/dist/assets/approved-artwork-CtUwbTYa.png": "aed45daa9761e4a41177c766ee02ef2ddcc17815cf43e4a1524eb27b1eba726b",
+  "frontend/dist/assets/CustomerServiceView-BQm5hX9L.css": "a6c4db041025fde37cb5928f6edb1dec348f6c8d5febb1ab04b8859c550900cd",
+  "frontend/dist/assets/CustomerServiceView-h9hTFytX.js": "1900d323afe01f7347d5f0356a1d2ea5582299377357e3083fb5a5196ae1845a",
+  "frontend/dist/assets/element-table-BrKtYCSz.js": "a11778fa12fbb68677b8f2de1e7ddb68211069165d2cdd4ea6a5da3db7deb4cc",
+  "frontend/dist/assets/element-table-C3pTljLh.css": "27be2319078ac677ecc6d0d2bae57a7c55470e174b20559de047adb2b3710367",
+  "frontend/dist/assets/feima-logo-blue-9oZWYVCP.png": "e99fb6072c6b3b4d94b1d96674cbdd47d77e9f0c17e7743b511ae77fb0bdaa94",
+  "frontend/dist/assets/hero-CfjG-Q_t.png": "4f37d52b232199415f24862e920bf3692f4fba50e5f705cd3c2886bbbf060da0",
+  "frontend/dist/assets/index-BZkJwb7N.js": "521417757e4213af34e024aab02ecc01b1ee4336b6085565e9924b2c4e6e7ec7",
+  "frontend/dist/assets/index-DeFa89WU.css": "adb265fcc6756fc8454a1570c23807dcd3b91a89603ea5a37d1c419cf7f6df7a",
+  "frontend/dist/assets/lingling-Fvfi6gYZ.png": "6ccfa515c0eb65ee705d86a00c14d3306283bb4142b2b929112b1c6415313df1",
+  "frontend/dist/assets/product-stage-dark-DDc7ivPE.webp": "5a2958ee2f0162dac5fde6a1626e10cfb4af9627b6742ddbb8b9ea676af888c3",
+  "frontend/dist/assets/product-stage-light-DAU8cBY5.webp": "c1cb565cee2d4292182cc2e003b45ab7cafa6a783dcc273358280f76ff57822c",
+  "frontend/dist/assets/UsageView-DmevJx5s.css": "ff7166b5db728bdef7168dfcefdee1fe3a6db4b955e8a1a535f9a42c07c6ebef",
+  "frontend/dist/assets/UsageView-yTOthN6X.js": "9c959234763e0abd6f09fff40c964f77699d1f1565f669f686a10d5a89836609",
+  "frontend/dist/assets/vue-D73Prk5k.js": "41f1585d10fa567159a8a09ef6b58b11cafedc1cc1912b13a37eca84c3826723",
+  "frontend/dist/homepage/commerce-categories-v3.png": "92af08a60c02119487ace4e62aa792fb10caaa488f4607ff6b0f0c60d600de0f",
+  "frontend/dist/homepage/commerce-hero-v3.png": "919ad090017db2dde871b25988a8ae4fdf8334bbe141850c6fd356a368444346",
+  "frontend/dist/index.html": "99e61356fd24465d42fe708ac1c4fd3817cb0ea7e215faf8f96c34583c3cd74b",
+  "backend/app/agents/text.py": "fd6cdc60aec8f680e33a7ecc077c17986623c742771d2aecb6e1b511a703c119",
+  "backend/app/tasks/admission.py": "c64cbe29640146ab282dda7bd50e2d68578635aac530dbeb66065b7771fcdc82"
+}

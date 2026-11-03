@@ -1,0 +1,240 @@
+{
+  "motion": {
+    "before": {
+      "renderer": "WebGL",
+      "scene": 0,
+      "progress": 0.008,
+      "time": 0.966,
+      "camera": [
+        0.003257192497354852,
+        0.5052778987193518,
+        11.609047826376033
+      ],
+      "productRotation": [
+        0.05,
+        0.035294750085194906,
+        -0.21773804340599207
+      ],
+      "drawCalls": 27,
+      "triangles": 27036,
+      "mode": "beginner",
+      "paused": false,
+      "reduced": false,
+      "texturesPending": 0
+    },
+    "after": {
+      "renderer": "WebGL",
+      "scene": 0,
+      "progress": 0.003,
+      "time": 1.066,
+      "camera": [
+        0.017439878179062895,
+        0.5021458334864722,
+        11.603678571691097
+      ],
+      "productRotation": [
+        0.05,
+        0.04647913817328722,
+        -0.2190803570772262
+      ],
+      "drawCalls": 27,
+      "triangles": 27036,
+      "mode": "beginner",
+      "paused": false,
+      "reduced": false,
+      "texturesPending": 0
+    }
+  },
+  "copy": [
+    {
+      "text": "Pegasus E-commerce Studio",
+      "matches": true
+    },
+    {
+      "text": "飞马电商工作台",
+      "matches": true
+    },
+    {
+      "text": "一站式电商内容工具，小白十分钟高效出片",
+      "matches": true
+    },
+    {
+      "text": "文生图搞定传统电商，文生视频拿下抖店带货；专业与小白双工作台并行，AI 数字人玲玲手把手陪你出片，最后一键发到所有店铺。",
+      "matches": true
+    },
+    {
+      "text": "免费开始创作",
+      "matches": true
+    },
+    {
+      "text": "文生图 ｜ 文生视频 ｜ 小白工作台 ｜ 玲玲陪练 ｜ 一键多发",
+      "matches": true
+    },
+    {
+      "text": "不会设计？飞马替你想好了。",
+      "matches": true
+    },
+    {
+      "text": "传统电商，看图说话出爆款",
+      "matches": true
+    },
+    {
+      "text": "主图、详情、海报，输入即出。",
+      "matches": true
+    },
+    {
+      "text": "输入商品，飞马出图。主图、详情页、卖点海报、活动 banner，AI 一次生成多角度方案，传统电商上架不再等设计。",
+      "matches": true
+    },
+    {
+      "text": "抖店带货，十分钟一条种草片",
+      "matches": true
+    },
+    {
+      "text": "卖点进，视频出，节奏跟上投放。",
+      "matches": true
+    },
+    {
+      "text": "流量窗口不等人，飞马让你每天都有新片子。",
+      "matches": true
+    },
+    {
+      "text": "你不需要会设计，只需要会说话。",
+      "matches": true
+    },
+    {
+      "text": "告诉飞马：「我要卖一款保温杯，主打上班通勤」，剩下的交给小白工作台。",
+      "matches": true
+    },
+    {
+      "text": "玲玲会陪你：选风格 → 出图 / 出视频 → 微调 → 发布。",
+      "matches": true
+    },
+    {
+      "text": "想要完全掌控？专业工作台给你图层、参数、批量与模板。",
+      "matches": true
+    },
+    {
+      "text": "飞马不替你决定，只让你更快。",
+      "matches": true
+    },
+    {
+      "text": "你的 AI 数字人陪练",
+      "matches": true
+    },
+    {
+      "text": "卡在哪一步，玲玲就在哪一步。",
+      "matches": true
+    },
+    {
+      "text": "一键多店发布· 素材即生产力",
+      "matches": true
+    },
+    {
+      "text": "生成即分发。",
+      "matches": true
+    },
+    {
+      "text": "一套素材，一键同步到多个店铺后台，省去反复上传、格式调整的重复劳动，出片与上新同频。",
+      "matches": true
+    },
+    {
+      "text": "别再为出片发愁。飞马，让你专心卖货。",
+      "matches": true
+    },
+    {
+      "text": "让每个电商人，都拥有自己的内容工厂。",
+      "matches": true
+    },
+    {
+      "text": "立即免费体验",
+      "matches": true
+    }
+  ],
+  "views": [
+    {
+      "theme": "dark",
+      "width": 1440,
+      "overflow": false,
+      "scene": 0,
+      "renderer": "webgl"
+    },
+    {
+      "theme": "dark",
+      "width": 1440,
+      "overflow": false,
+      "scene": 1,
+      "renderer": "webgl"
+    },
+    {
+      "theme": "dark",
+      "width": 1440,
+      "overflow": false,
+      "scene": 2,
+      "renderer": "webgl"
+    },
+    {
+      "theme": "dark",
+      "width": 1440,
+      "overflow": false,
+      "scene": 3,
+      "renderer": "webgl"
+    },
+    {
+      "theme": "dark",
+      "width": 1440,
+      "overflow": false,
+      "scene": 4,
+      "renderer": "webgl"
+    },
+    {
+      "theme": "dark",
+      "width": 1440,
+      "overflow": false,
+      "scene": 5,
+      "renderer": "webgl"
+    },
+    {
+      "theme": "light",
+      "width": 1440,
+      "overflow": false,
+      "scene": 0,
+      "renderer": "webgl"
+    },
+    {
+      "theme": "light",
+      "width": 1440,
+      "overflow": false,
+      "scene": 1,
+      "renderer": "webgl"
+    },
+    {
+      "theme": "light",
+      "width": 1440,
+      "overflow": false,
+      "scene": 2,
+      "renderer": "webgl"
+    },
+    {
+      "theme": "light",
+      "width": 1440,
+      "overflow": false,
+      "scene": 3,
+      "renderer": "webgl"
+    },
+    {
+      "theme": "light",
+      "width": 1440,
+      "overflow": false,
+      "scene": 4,
+      "renderer": "webgl"
+    },
+    {
+      "theme": "light",
+      "width": 1440,
+      "overflow": false,
+      "scene": 5,
+      "renderer": "webgl"
+    }
+  ]
+}

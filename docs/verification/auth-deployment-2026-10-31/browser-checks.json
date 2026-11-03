@@ -1,0 +1,158 @@
+{
+  "originalTheme": "light",
+  "readyStatus": 200,
+  "checks": [
+    {
+      "viewport": "desktop",
+      "url": "http://43.142.150.158/login",
+      "width": 1440,
+      "theme": "light",
+      "overflow": false,
+      "images": [
+        {
+          "src": "http://43.142.150.158/assets/feima-logo-blue-9oZWYVCP.png",
+          "loaded": true
+        },
+        {
+          "src": "http://43.142.150.158/assets/product-stage-light-DAU8cBY5.webp",
+          "loaded": true
+        }
+      ],
+      "fields": 2,
+      "brand": "飞马工作台"
+    },
+    {
+      "viewport": "desktop",
+      "url": "http://43.142.150.158/register",
+      "width": 1440,
+      "theme": "light",
+      "overflow": false,
+      "images": [
+        {
+          "src": "http://43.142.150.158/assets/feima-logo-blue-9oZWYVCP.png",
+          "loaded": true
+        },
+        {
+          "src": "http://43.142.150.158/assets/product-stage-light-DAU8cBY5.webp",
+          "loaded": true
+        }
+      ],
+      "fields": 3,
+      "brand": "飞马工作台"
+    },
+    {
+      "viewport": "desktop",
+      "url": "http://43.142.150.158/login",
+      "width": 1440,
+      "theme": "dark",
+      "overflow": false,
+      "images": [
+        {
+          "src": "http://43.142.150.158/assets/feima-logo-blue-9oZWYVCP.png",
+          "loaded": true
+        },
+        {
+          "src": "http://43.142.150.158/assets/product-stage-dark-DDc7ivPE.webp",
+          "loaded": true
+        }
+      ],
+      "fields": 2,
+      "brand": "飞马工作台"
+    },
+    {
+      "viewport": "desktop",
+      "url": "http://43.142.150.158/register",
+      "width": 1440,
+      "theme": "dark",
+      "overflow": false,
+      "images": [
+        {
+          "src": "http://43.142.150.158/assets/feima-logo-blue-9oZWYVCP.png",
+          "loaded": true
+        },
+        {
+          "src": "http://43.142.150.158/assets/product-stage-dark-DDc7ivPE.webp",
+          "loaded": true
+        }
+      ],
+      "fields": 3,
+      "brand": "飞马工作台"
+    },
+    {
+      "viewport": "mobile",
+      "url": "http://43.142.150.158/login",
+      "width": 390,
+      "theme": "light",
+      "overflow": false,
+      "images": [
+        {
+          "src": "http://43.142.150.158/assets/feima-logo-blue-9oZWYVCP.png",
+          "loaded": true
+        },
+        {
+          "src": "http://43.142.150.158/assets/product-stage-light-DAU8cBY5.webp",
+          "loaded": true
+        }
+      ],
+      "fields": 2,
+      "brand": "飞马工作台"
+    },
+    {
+      "viewport": "mobile",
+      "url": "http://43.142.150.158/register",
+      "width": 390,
+      "theme": "light",
+      "overflow": false,
+      "images": [
+        {
+          "src": "http://43.142.150.158/assets/feima-logo-blue-9oZWYVCP.png",
+          "loaded": true
+        },
+        {
+          "src": "http://43.142.150.158/assets/product-stage-light-DAU8cBY5.webp",
+          "loaded": true
+        }
+      ],
+      "fields": 3,
+      "brand": "飞马工作台"
+    },
+    {
+      "viewport": "mobile",
+      "url": "http://43.142.150.158/login",
+      "width": 390,
+      "theme": "dark",
+      "overflow": false,
+      "images": [
+        {
+          "src": "http://43.142.150.158/assets/feima-logo-blue-9oZWYVCP.png",
+          "loaded": true
+        },
+        {
+          "src": "http://43.142.150.158/assets/product-stage-dark-DDc7ivPE.webp",
+          "loaded": true
+        }
+      ],
+      "fields": 2,
+      "brand": "飞马工作台"
+    },
+    {
+      "viewport": "mobile",
+      "url": "http://43.142.150.158/register",
+      "width": 390,
+      "theme": "dark",
+      "overflow": false,
+      "images": [
+        {
+          "src": "http://43.142.150.158/assets/feima-logo-blue-9oZWYVCP.png",
+          "loaded": true
+        },
+        {
+          "src": "http://43.142.150.158/assets/product-stage-dark-DDc7ivPE.webp",
+          "loaded": true
+        }
+      ],
+      "fields": 3,
+      "brand": "飞马工作台"
+    }
+  ]
+}

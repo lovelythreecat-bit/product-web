@@ -128,7 +128,7 @@ it('restores only media choices and requires a new first frame when the original
   expect(draftFor('media-source').agents['video-agent'].parameters).toEqual({ platform: 'taobao', output_type: 'main_image' })
 })
 
-it('SSE updates media phases without task version changes and never polls while idle', async () => {
+it('SSE updates media phases, fallback reads unfinished tasks and polling stops at completion', async () => {
   vi.useFakeTimers()
   let source!: Events
   class Events {
@@ -154,7 +154,8 @@ it('SSE updates media phases without task version changes and never polls while 
   await flushPromises()
   const initialCount = requests.length
   await vi.advanceTimersByTimeAsync(15000)
-  expect(requests).toHaveLength(initialCount)
+  expect(requests).toHaveLength(initialCount + 3)
+  expect(requests.slice(initialCount).every(request => request.url === '/api/v1/tasks/media-poll')).toBe(true)
   phase = 'awaiting_confirmation'
   source.update(2)
   await flushPromises()

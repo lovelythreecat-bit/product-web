@@ -604,6 +604,26 @@ class ImageAgentAdapter:
                 return QueryOutcome(status="UNAVAILABLE", **fallback)
             if task.get("core_status") == "failed":
                 usage, error = result.get("usage") or {}, result.get("error_info") or {}
+                # The image service has completed its bounded generation retry policy.
+                # Interrupted/lost journal state and legacy failures stay uncertain below.
+                assets = result.get("assets")
+                if (result.get("status") == "failed"
+                        and error.get("code") == "generation_attempts_exhausted"
+                        and error.get("retryable") is False
+                        and type(usage.get("image_calls")) is int and usage["image_calls"] >= 3
+                        and isinstance(assets, list) and assets
+                        and any(a.get("status") == "failed"
+                                and (a.get("error_info") or {}).get("code")
+                                == "generation_attempts_exhausted" for a in assets)
+                        and not any(a.get("status") == "generation_uncertain"
+                                    or (a.get("error_info") or {}).get("code")
+                                    == "generation_uncertain" for a in assets)):
+                    self.save_state({"failure": {
+                        "code": "generation_attempts_exhausted", "stage": "generate",
+                        "retryable": False,
+                        "message": "生图 API 连续尝试 3 次均失败，任务已结束；可手动创建新任务重试",
+                    }})
+                    return QueryOutcome(status="FOUND", state="FAILED", **fallback)
                 # A failed analysis with zero image requests is definite failure.
                 # Generated/partial/uncertain results still require investigation.
                 if (result.get("status") == "failed" and result.get("assets") == []

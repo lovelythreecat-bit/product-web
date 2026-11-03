@@ -60,8 +60,13 @@ watch(copyRequirementsOpen, open => {
   if (open) previousCopyRequirements = { types: [...draft.value.copy_types], parameters: { ...draft.value.copy_parameters } }
 }, { flush: 'sync' })
 watch(() => run.value?.run_id, () => { copyRequirementsOpen.value = false; originalsOpen.value = false })
+// Polling can confirm admission before the original submit request returns.
+// Close this local dialog as soon as the accepted copy batch becomes current.
+watch(() => run.value?.state.current.copy, batchId => {
+  if (batchId) copyRequirementsOpen.value = false
+})
 function changeRequirements(types: string[], parameters: Record<string, string | number | boolean>) {
-  if (readOnly.value || chargeOpen.value) return
+  if (blocked.value || chargeOpen.value) return
   if (JSON.stringify(draft.value.copy_types) !== JSON.stringify(types)) draft.value.copy_types = types
   if (JSON.stringify(draft.value.copy_parameters) !== JSON.stringify(parameters)) draft.value.copy_parameters = parameters
 }
@@ -95,7 +100,7 @@ async function closeRequirements(target: 'copy' | 'image', open: boolean) {
   const prepared = chargeOpen.value
   if (!open && chargeOpen.value) await closeCharge(false)
   if (target === 'copy') {
-    if (!open && !prepared && !uncertain.value && previousCopyRequirements) {
+    if (!open && !prepared && !locked.value && !uncertain.value && previousCopyRequirements) {
       draft.value.copy_types = previousCopyRequirements.types
       draft.value.copy_parameters = previousCopyRequirements.parameters
     }

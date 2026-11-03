@@ -1,0 +1,12 @@
+const task=await taskSpace(11);
+const page=task.page('p1');
+await page.goto('file:///F:/Work/电商/web/docs/design/feima-home-2026-10-30/index.html?theme=dark');
+await page.waitForFunction(()=>Array.from(document.images).every(i=>i.complete&&i.naturalWidth>0));
+console.log(await page.screenshot({path:'F:/Work/电商/web/docs/design/feima-home-2026-10-30/home-dark-hero.png'}));
+console.log(await page.screenshot({path:'F:/Work/电商/web/docs/design/feima-home-2026-10-30/home-dark-full.png',fullPage:true}));
+await page.cdp('Emulation.setDeviceMetricsOverride',{width:390,height:844,deviceScaleFactor:1,mobile:true});
+await page.goto('file:///F:/Work/电商/web/docs/design/feima-home-2026-10-30/index.html');
+await page.waitForFunction(()=>Array.from(document.images).every(i=>i.complete&&i.naturalWidth>0));
+console.log(await page.evaluate(()=>({width:innerWidth,height:document.documentElement.scrollHeight,overflow:document.documentElement.scrollWidth>innerWidth})));
+console.log(await page.screenshot({path:'F:/Work/电商/web/docs/design/feima-home-2026-10-30/home-light-mobile.png',fullPage:true}));
+console.log(await page.snapshot());

@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="zh-CN">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>飞马 · 首页设计提案 V1</title><link rel="stylesheet" href="design.css"><script>if(new URLSearchParams(location.search).get('theme')==='dark')document.documentElement.dataset.theme='dark';</script></head>
+<body>
+<svg class="symbols" xmlns="http://www.w3.org/2000/svg"><defs>
+<symbol id="arrow" viewBox="0 0 24 24"><path d="M5 12h14m-6-6 6 6-6 6"/></symbol><symbol id="diagonal" viewBox="0 0 24 24"><path d="M6 18 18 6M6 6h12v12"/></symbol>
+<symbol id="sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v2m0 16v2M2 12h2m16 0h2M5 5l1.5 1.5m11 11L19 19M5 19l1.5-1.5m11-11L19 5"/></symbol>
+<symbol id="image" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="8" cy="8" r="1.5"/><path d="m3 17 6-6 4 4 3-3 5 5"/></symbol>
+<symbol id="text" viewBox="0 0 24 24"><path d="M4 6V4h16v2M12 4v16m-4 0h8"/></symbol>
+<symbol id="video" viewBox="0 0 24 24"><rect x="3" y="5" width="14" height="14" rx="3"/><path d="m17 9 4-2v10l-4-2M8 9l5 3-5 3Z"/></symbol>
+<symbol id="play" viewBox="0 0 24 24"><path d="m9 5 11 7-11 7Z"/></symbol>
+</defs></svg>
+<header class="header wrap"><a class="brand" href="#"><img src="../../../frontend/src/assets/feima-logo-blue.png" alt="飞马标志"><span>飞马<small>电商 AI 创作平台</small></span></a><nav aria-label="主导航"><a href="#abilities">创作能力</a><a href="#scenes">应用场景</a><a href="#process">使用流程</a></nav><div class="header-actions"><button class="theme" aria-label="切换浅色或深色"><svg><use href="#sun"/></svg></button><a class="login" href="http://127.0.0.1:15173/login">登录</a><a class="button compact" href="http://127.0.0.1:15173/register">注册体验<svg><use href="#arrow"/></svg></a></div></header>
+<main>
+<section class="hero wrap">
+<div class="eyebrow"><span class="tiny-line"></span> 为电商创作而生</div>
+<h1>让好商品，<em>亮眼登场。</em></h1>
+<p class="hero-lead">从打动人心的文案，到吸睛的图片与视频。<br>把商品的好，变成看得见的精彩。</p>
+<div class="hero-actions"><a class="button" href="http://127.0.0.1:15173/register">开始你的创作<svg><use href="#arrow"/></svg></a><a class="secondary" href="#abilities">看看能做什么<svg><use href="#diagonal"/></svg></a></div>
+<div class="showcase">
+<div class="showcase-top"><span><span class="blue-dot"></span> 商品的另一种打开方式</span><span>文案 / 图片 / 视频</span></div>
+<div class="showcase-grid">
+<article class="copy-card"><div class="medium-label"><svg><use href="#text"/></svg>文案创作</div><div class="copy-body"><span class="overline">把卖点，写成心动点</span><h2>轻一点，<br>走远一点。</h2><p>把轻盈穿进日常，<br>让每一步都自在。</p></div><div class="copy-bottom"><span>轻盈运动鞋 · 商品文案</span><span class="sample">创作示例</span></div></article>
+<article class="image-card"><img src="../../../frontend/public/homepage/commerce-hero-v3.png" alt="鞋服、美妆和耳机的商品创作展示"><div class="image-card-top"><span class="white-label"><svg><use href="#image"/></svg>图片创作</span><span class="white-label small">创作示例</span></div><div class="image-card-bottom"><span>好商品，自带主角感。</span><span class="round-arrow"><svg><use href="#diagonal"/></svg></span></div></article>
+<article class="video-card"><div class="category-photo digital"><img src="../../../frontend/public/homepage/commerce-categories-v3.png" alt="耳机商品视频分镜示意"></div><div class="video-overlay"></div><span class="video-label"><svg><use href="#video"/></svg>视频创作</span><span class="play" aria-hidden="true"><svg><use href="#play"/></svg></span><div class="video-bottom"><h3>让细节，<br>有自己的镜头。</h3><div class="timeline"><span></span><span></span><span></span></div><span>视频分镜示意 · 非播放内容</span></div></article>
+</div></div>
+<div class="hero-foot"><span>围绕你的商品，展开每一种表达</span><div><span>鞋服</span><i></i><span>美妆</span><i></i><span>数码</span><i></i><span>更多商品品类</span></div></div>
+</section>
+<section class="abilities wrap section" id="abilities"><div class="section-head"><div><span class="overline">01 / 创作能力</span><h2>一个商品，<br>不止一种精彩。</h2></div><p>你来决定创作方向，<br>飞马陪你把想法展开。</p></div>
+<div class="ability-list"><article><span class="ability-index">01</span><span class="ability-icon"><svg><use href="#text"/></svg></span><div><h3>文案，说到心动处。</h3><p>从商品资料与卖点出发，让介绍更生动，让表达更有画面。</p><div class="keywords"><span>商品介绍</span><span>卖点表达</span><span>创作指令辅助</span></div></div><a href="http://127.0.0.1:15173/workspace" class="ability-link" aria-label="前往工作台探索文案创作"><svg><use href="#diagonal"/></svg></a></article>
+<article><span class="ability-index">02</span><span class="ability-icon"><svg><use href="#image"/></svg></span><div><h3>图片，让亮点先被看见。</h3><p>结合商品图片和创作要求，探索适合商品的视觉表达。</p><div class="keywords"><span>商品主图</span><span>详情图</span><span>商品长图</span></div></div><a href="http://127.0.0.1:15173/workspace" class="ability-link" aria-label="前往工作台探索图片创作"><svg><use href="#diagonal"/></svg></a></article>
+<article><span class="ability-index">03</span><span class="ability-icon"><svg><use href="#video"/></svg></span><div><h3>视频，让商品故事动起来。</h3><p>从商品介绍与图片开始，确认创作方案，再展开动态表达。</p><div class="keywords"><span>商品展示</span><span>方案确认</span><span>视频成果</span></div></div><a href="http://127.0.0.1:15173/workspace" class="ability-link" aria-label="前往工作台探索视频创作"><svg><use href="#diagonal"/></svg></a></article></div>
+</section>
+<section class="scenes" id="scenes"><div class="wrap section"><div class="section-head"><div><span class="overline">02 / 应用场景</span><h2>不同品类，同样出彩。</h2></div><p>让风格、细节与质感，<br>都有合适的表达。</p></div><div class="scene-grid"><article><div class="category-photo fashion"><img src="../../../frontend/public/homepage/commerce-categories-v3.png" alt="运动鞋与卫衣创作示例"><span class="photo-label">鞋服</span></div><div class="scene-copy"><h3>把日常，穿出新意。</h3><span>风格与穿着场景</span></div></article><article><div class="category-photo beauty"><img src="../../../frontend/public/homepage/commerce-categories-v3.png" alt="美妆瓶罐创作示例"><span class="photo-label">美妆</span></div><div class="scene-copy"><h3>让细节，自带吸引力。</h3><span>质地与商品细节</span></div></article><article><div class="category-photo digital"><img src="../../../frontend/public/homepage/commerce-categories-v3.png" alt="耳机创作示例"><span class="photo-label">数码</span></div><div class="scene-copy"><h3>换个角度，看见质感。</h3><span>外观与使用体验</span></div></article></div><p class="sample-note">以上为创作示例，非真实客户案例。</p></div></section>
+<section class="process wrap section" id="process"><div class="section-head"><div><span class="overline">03 / 使用流程</span><h2>有灵感，也有章法。</h2></div><p>从准备资料到收下作品，<br>每一步都清楚。</p></div><ol><li><span class="step-number">01</span><h3>带上商品素材</h3><p>准备图片、名称与卖点，<br>让创作围绕商品展开。</p></li><li><span class="step-number">02</span><h3>选个创作方向</h3><p>选择文案、图片或视频，<br>写下你的创作要求。</p></li><li><span class="step-number">03</span><h3>看清费用再开始</h3><p>提交前确认内容与费用；<br>视频按流程确认方案。</p></li><li><span class="step-number">04</span><h3>收下你的新作品</h3><p>在我的作品中查看成果，<br>按类型复制、预览或下载。</p></li></ol></section>
+<section class="final-cta wrap"><div><span class="overline">下一份精彩，从这里开始</span><h2>好商品，<br>值得一个好开场。</h2></div><div class="final-action"><p>带上你的商品，让创意登场。</p><a class="button" href="http://127.0.0.1:15173/register">注册体验<svg><use href="#arrow"/></svg></a></div><span class="cta-orbit" aria-hidden="true"></span></section>
+</main>
+<footer class="wrap"><a class="brand" href="#"><img src="../../../frontend/src/assets/feima-logo-blue.png" alt=""><span>飞马<small>电商 AI 创作平台</small></span></a><span>让每一次创作，都围绕你的商品。</span><a href="#">回到顶部 ↑</a></footer>
+<script>document.querySelector('.theme').onclick=()=>{const dark=document.documentElement.dataset.theme!=='dark';document.documentElement.dataset.theme=dark?'dark':'light';document.querySelector('.theme').setAttribute('aria-pressed',String(dark));};</script>
+</body></html>

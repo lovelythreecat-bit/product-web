@@ -1,0 +1,30 @@
+Use case: ui-mockup
+Asset type: Feima ecommerce AI creation platform marketing homepage, individual high-fidelity desktop section, NOT an entire website.
+Primary request: Render an actual finished premium Chinese website design image from the confirmed low-fidelity layout, with realistic product photography, meticulous Chinese typography and generous whitespace.
+Reference image 1 is ONLY the approved lowfi layout. Inherit its composition, never render its gray placeholder labels, crossed boxes, review notes or wireframe appearance. Reference image 2 is the newly generated Feima hero style anchor ONLY, do not inherit its page structure or extra copy. Additional character reference (when present) is the exact Lingling identity to preserve.
+Palette and visual system: cool off-white #F3F6FB and white, brand blue #1559D6, dark navy headings #182843, body blue-gray #586B85, thin border #DBE3EF. 1440px desktop design, 1240px content, ~100px side margins. Chinese sans-serif, headings 40–56px, body 18–22px, line-height 1.7. Controls 8px radius, panels 14px, very restrained soft shadow. Natural material product photography, warm product reflections allowed but never a warm primary UI.
+Constraints: One module only. No browser chrome, no site navigation, no footer, no review tags, no giant fake logo, no purple gradients, no cyber neon, no robots, no real human models, no omitted/rewritten/shortened copy. Do not use generic English lorem ipsum. Do not print copy IDs or HTML tags. Every source string below must be visibly typeset verbatim, including headings, badges, emoji, punctuation, numbers and labels. Preserve full body text; increase canvas height if necessary instead of shrinking or deleting. Text blocks can wrap freely while exact wording remains. Any additional visual sample is subtly labeled 创作示例.
+
+Composition:
+1440 × 1220 desktop module. Follow m07 wireframe EXACTLY: TWO vertically stacked editorial rows with a thin horizontal divider, both rows left text / right illustration. Top row: complete Sell Point 3 text left, right a refined side-by-side miniature comparison of a professional editing workbench and simple conversational workbench, with cream sneaker thumbnails, blue controls, mostly wordless geometry and only labels 专业工作台 and 小白工作台. Bottom row: complete Sell Point 4 text left, right FULL BODY Lingling character from the provided character reference, precisely preserve silver-white/pink long hair, small white pegasus hairclip with gold mane, big anime eyes, pink-and-pale-blue jacket, white inner shirt, iridescent pleated skirt and white boots. The exact same stylized 3D anime character, NOT a real woman, not a redesign or clothing change. White/cool pale blue clean backdrop, no black rectangle copied from source background. She gently accompanies an understated single blue dialogue cue, no fabricated live chat or customer status. Full character within image, no cropped feet. Rows generously separated; 18–22px body text and 40–46px headings, allow more height to fit.
+
+Text (verbatim; source HTML encodes hierarchy only, print all text and NO tags):
+[C04-04]
+卖点 3 · 双工作台
+      专业与小白，各得其法
+      专业工作台给老手完整控制权；小白工作台把专业能力收进一句对话——选品类、说卖点、挑风格，智能体替你排兵布阵，零基础也能出品专业级素材。
+Hierarchy: <div class="source-card">
+      <span class="source-tag">卖点 3 · 双工作台</span>
+      <h3>专业与小白，各得其法</h3>
+      <p>专业工作台给老手完整控制权；小白工作台把专业能力收进一句对话——选品类、说卖点、挑风格，智能体替你排兵布阵，零基础也能出品专业级素材。</p>
+    </div>
+
+[C04-05]
+卖点 4 · 玲玲数字人
+      你的 AI 数字人陪练
+      卡在哪一步，玲玲就在哪一步。AI 数字人客服玲玲实时指路，操作有卡点就开口问，每一步都有人陪你走完，再也不怕「不会用」。
+Hierarchy: <div class="source-card">
+      <span class="source-tag">卖点 4 · 玲玲数字人</span>
+      <h3>你的 AI 数字人陪练</h3>
+      <p>卡在哪一步，玲玲就在哪一步。AI 数字人客服玲玲实时指路，操作有卡点就开口问，每一步都有人陪你走完，再也不怕「不会用」。</p>
+    </div>

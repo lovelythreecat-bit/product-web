@@ -1,0 +1,129 @@
+{
+  "mode": "Real public code and responses. Test-page fetch uses credentials omit for GET/HEAD; writes blocked. No cookies or server responses modified. Cache bypassed to load new release.",
+  "results": [
+    {
+      "route": "login",
+      "device": "desktop",
+      "brand": "飞马工作台",
+      "theme": "light",
+      "overflow": false,
+      "fields": 2,
+      "showcase": "flex",
+      "paused": "false",
+      "imageWidth": 1199,
+      "hasMotion": true
+    },
+    {
+      "route": "login",
+      "device": "desktop",
+      "brand": "飞马工作台",
+      "theme": "dark",
+      "overflow": false,
+      "fields": 2,
+      "showcase": "flex",
+      "paused": "false",
+      "imageWidth": 1199,
+      "hasMotion": true
+    },
+    {
+      "route": "login",
+      "device": "mobile",
+      "brand": "飞马工作台",
+      "theme": "light",
+      "overflow": false,
+      "fields": 2,
+      "showcase": "none",
+      "paused": "true",
+      "imageWidth": 1199,
+      "hasMotion": true
+    },
+    {
+      "route": "login",
+      "device": "mobile",
+      "brand": "飞马工作台",
+      "theme": "dark",
+      "overflow": false,
+      "fields": 2,
+      "showcase": "none",
+      "paused": "true",
+      "imageWidth": 1199,
+      "hasMotion": true
+    },
+    {
+      "route": "register",
+      "device": "desktop",
+      "brand": "飞马工作台",
+      "theme": "light",
+      "overflow": false,
+      "fields": 3,
+      "showcase": "flex",
+      "paused": "false",
+      "imageWidth": 1199,
+      "hasMotion": true
+    },
+    {
+      "route": "register",
+      "device": "desktop",
+      "brand": "飞马工作台",
+      "theme": "dark",
+      "overflow": false,
+      "fields": 3,
+      "showcase": "flex",
+      "paused": "false",
+      "imageWidth": 1199,
+      "hasMotion": true
+    },
+    {
+      "route": "register",
+      "device": "mobile",
+      "brand": "飞马工作台",
+      "theme": "light",
+      "overflow": false,
+      "fields": 3,
+      "showcase": "none",
+      "paused": "true",
+      "imageWidth": 1199,
+      "hasMotion": true
+    },
+    {
+      "route": "register",
+      "device": "mobile",
+      "brand": "飞马工作台",
+      "theme": "dark",
+      "overflow": false,
+      "fields": 3,
+      "showcase": "none",
+      "paused": "true",
+      "imageWidth": 1199,
+      "hasMotion": true
+    }
+  ],
+  "motion": {
+    "before": "matrix(0.997564, -0.0697565, 0.0697565, 0.997564, 0, 4)",
+    "after": "matrix(0.997673, -0.0681829, 0.0681829, 0.997673, 0, 3.36739)",
+    "tilt": "--tilt-x: 0.50deg; --tilt-y: 1.40deg;"
+  },
+  "pause": {
+    "paused": "true",
+    "states": [
+      "paused",
+      "paused",
+      "paused",
+      "paused",
+      "paused",
+      "paused",
+      "paused",
+      "paused",
+      "paused",
+      "paused",
+      "paused",
+      "paused"
+    ]
+  },
+  "reduced": {
+    "animations": 0,
+    "text": "inset(0px)"
+  },
+  "themeRestored": "light",
+  "note": "Initial pause assertion included a finite reset transition; final check targets looping CSS animations and all 12 are paused."
+}

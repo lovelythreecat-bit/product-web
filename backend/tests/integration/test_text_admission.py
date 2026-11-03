@@ -19,6 +19,7 @@ from tests.integration.test_task_admission import (
     admission,
     catalog,
     counts,
+    material_body,
     request_body,
     submit,
 )
@@ -152,21 +153,24 @@ def test_http_admission_pins_model_configuration(text_catalog):
         assert "service_key" not in routing
 
 
-def test_text_only_default_rejects_images_before_any_freeze(text_catalog):
+@pytest.mark.parametrize("supports_images", [False, True])
+def test_text_admission_accepts_images_and_pins_capability(
+    text_catalog, text_server, supports_images,
+):
     c = text_catalog
-    body = request_body(c)
-    body["input"]["material_versions"] = [{"file_id": str(uuid4()), "version": "TEST_ONLY_v1"}]
-    quote = c.client.post(
-        "/api/v1/quotes",
-        json={
-            "agent_id": c.agent_id,
-            "input": body["input"],
-        },
-    )
-    assert quote.status_code == 200, quote.text
-    body["confirmed_quote"] = quote.json()
+    text_server[2]["supports_images"] = supports_images
+    body = material_body(c)
+    key = uuid4().hex
+    response = submit(c, body, key)
+    assert response.status_code == 201, response.text
+    with Session(c.engine) as session:
+        snapshot = session.get(TaskSnapshot, response.json()["task"]["task_id"])
+        assert snapshot.routing_snapshot["supports_images"] is supports_images
+        assert snapshot.input_snapshot == body["input"]
+        assert snapshot.quote == body["confirmed_quote"]
     before = counts(c)
-    response = submit(c, body)
-    assert response.status_code == 422
-    assert "不支持图片" in response.json()["error"]["message"]
+    text_server[2]["supports_images"] = not supports_images
+    replay = submit(c, body, key)
+    assert replay.status_code == 200, replay.text
+    assert replay.json()["task"]["task_id"] == response.json()["task"]["task_id"]
     assert counts(c) == before

@@ -1,0 +1,10 @@
+const task=await taskSpace(11);
+const desktop=task.page('p1');
+await desktop.goto('file:///F:/Work/%E7%94%B5%E5%95%86/web/docs/design/homepage-marketing-2026-11-02/lowfi-v1/index.html?module=m07&shot=1');
+console.log(await desktop.screenshot({path:'F:/Work/电商/web/docs/design/homepage-marketing-2026-11-02/lowfi-v1/screenshots/desktop-character-initial.png',fullPage:true}));
+const mobile=await task.newPage();
+await mobile.cdp('Emulation.setDeviceMetricsOverride',{width:390,height:844,deviceScaleFactor:1,mobile:true});
+await mobile.goto('file:///F:/Work/%E7%94%B5%E5%95%86/web/docs/design/homepage-marketing-2026-11-02/lowfi-v1/index.html');
+console.log({mobile:mobile.label});
+console.log(await mobile.evaluate(()=>({audit:window.COPY_AUDIT,overflow:document.documentElement.scrollWidth>innerWidth,overflowing:[...document.querySelectorAll('main *')].filter(n=>n.getBoundingClientRect().right>innerWidth+1).slice(0,10).map(n=>({tag:n.tagName,cls:n.className}))})));
+console.log(await mobile.screenshot({path:'F:/Work/电商/web/docs/design/homepage-marketing-2026-11-02/lowfi-v1/screenshots/mobile-initial.png'}));

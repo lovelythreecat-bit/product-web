@@ -1,0 +1,36 @@
+const task=await taskSpace(15);const page=task.page('p1');const fs=await import('node:fs/promises');
+const base='F:/Work/电商/web/docs/design/homepage-marketing-2026-11-02/highfi-v4/';
+await page.cdp('Emulation.setDeviceMetricsOverride',{width:1440,height:1000,deviceScaleFactor:1,mobile:false});
+await page.goto('http://127.0.0.1:18114/highfi-v4/');
+await page.waitForFunction(()=>window.exhibitionDiagnostics?.texturesPending===0);
+await page.evaluate(()=>{document.documentElement.style.scrollBehavior='auto';scrollTo(0,0);});
+await page.screenshot({path:base+'screenshots/home-dark.png'});
+const capture=await page.evaluate(async()=>{
+ const live=document.querySelector('#scene canvas');
+ const canvas=document.createElement('canvas');canvas.width=1280;canvas.height=720;const c=canvas.getContext('2d');
+ const stream=canvas.captureStream(24);const type=MediaRecorder.isTypeSupported('video/webm;codecs=vp9')?'video/webm;codecs=vp9':'video/webm';
+ const recorder=new MediaRecorder(stream,{mimeType:type,videoBitsPerSecond:3500000});const chunks=[];
+ const data=new Promise(resolve=>{recorder.ondataavailable=e=>{if(e.data.size)chunks.push(e.data);};recorder.onstop=async()=>{const blob=new Blob(chunks,{type});const reader=new FileReader();reader.onload=()=>resolve({data:reader.result.split(',')[1],bytes:blob.size,type});reader.readAsDataURL(blob);};});
+ const sections=[...document.querySelectorAll('.chapter')];const started=performance.now();let animation;
+ const titles=['飞马电商工作台','不会设计？','抖店带货，','你不需要会设计，','一键多店发布','别再为出片发愁。'];
+ const second=['小白十分钟高效出片','飞马替你想好了。','十分钟一条种草片','只需要会说话。','素材即生产力','飞马，让你专心卖货。'];
+ function draw(now){const elapsed=now-started;const step=Math.min(5,Math.floor(elapsed/2400));const local=(elapsed%2400)/2400;const start=sections[step].offsetTop,end=sections[Math.min(step+1,5)].offsetTop;const change=Math.max(0,(local-.58)/.42);scrollTo(0,start+(end-start)*change*change*(3-2*change));
+ c.fillStyle='#060c19';c.fillRect(0,0,1280,720);c.drawImage(live,430,0,790,720);c.fillStyle='#a2b6d4';c.font='16px sans-serif';c.fillText('PEGASUS E-COMMERCE STUDIO',45,120);c.fillStyle='#eff5ff';c.font='bold 35px sans-serif';c.fillText(titles[step],45,260);c.fillStyle='#88b6ff';c.font='bold 29px sans-serif';c.fillText(second[step],45,312);c.fillStyle='#879fbe';c.font='13px sans-serif';c.fillText('V4 · 浏览器实时 WebGL 场景录制',45,610);c.fillText('创作示例 · 设计评审稿',45,637);
+ if(elapsed<14400)animation=requestAnimationFrame(draw);else{recorder.stop();stream.getTracks().forEach(t=>t.stop());}}
+ recorder.start();animation=requestAnimationFrame(draw);return await data;
+});
+await fs.writeFile(base+'motion-preview.webm',Buffer.from(capture.data,'base64'));
+console.log({recorded:true,bytes:capture.bytes,type:capture.type});
+await page.evaluate(()=>scrollTo(0,document.querySelector('#guide').offsetTop));
+await page.waitForFunction(()=>Math.abs(window.exhibitionDiagnostics.progress-3)<.01);
+await page.click('button[data-mode="pro"]');await page.waitForFunction(()=>window.exhibitionDiagnostics.mode==='pro');
+console.log({pro:await page.evaluate(()=>window.exhibitionDiagnostics)});
+await page.click('button[data-mode="beginner"]');await page.waitForFunction(()=>window.exhibitionDiagnostics.mode==='beginner');
+await page.screenshot({path:base+'screenshots/guide-dark.png'});
+await page.evaluate(()=>scrollTo(0,document.querySelector('#film').offsetTop));
+await page.waitForFunction(()=>Math.abs(window.exhibitionDiagnostics.progress-2)<.01);
+await page.click('#replay');console.log({replay:await page.evaluate(()=>window.exhibition.replay)});
+await page.click('#motion');await page.waitForFunction(()=>window.exhibitionDiagnostics.paused);
+const before=await page.evaluate(()=>window.exhibitionDiagnostics);await page.screenshot();const after=await page.evaluate(()=>window.exhibitionDiagnostics);
+console.log({pausedStable:JSON.stringify(before)===JSON.stringify(after)});
+await page.click('#motion');

@@ -1,0 +1,13 @@
+Use case: ui-mockup
+Asset type: high fidelity desktop marketing website single section, module m02 brand positioning.
+Generate a polished finished flat website design image, 1440×1000 desktop composition. Reference image 1 is the EXACT approved low fidelity layout: preserve its structure and columns, not its grayscale visual styling. Reference image 2 is style reference ONLY: inherit cool white #F3F6FB and white background, Feima royal blue #1559D6 accents, deep navy #182843 titles, blue gray #586B85 text, delicate #DBE3EF dividers, refined spacious Chinese sans serif. Do not reproduce any other section from reference 2.
+THIS MODULE IS A TEXT MANIFESTO, no pictures, no characters, no products, no navigation, no CTA buttons. A confident editorial composition with generous whitespace, aligned 1240px content and 100px margins. Top heading with small blue section number 01 and 48px title. Main two-column layout: left 480px explanatory paragraph centered vertically; right 700px positioning statement above a thin rule and brand claim below. Intro body 21px with airy 1.75 line spacing. Right labels 18px in blue, right headline 36px and final claim 36px. Keep every sentence visibly readable; use wrapping instead of shrinking text. Very subtle cool pale blue background field is allowed; avoid enclosing text in cards.
+Text (verbatim), ALL required, do not abbreviate, add, or delete:
+Heading: "01" "品牌定位"
+Left paragraph: "飞马 = 快、高、神。速度感对应「十分钟出片」，腾空感对应「专业级出品」，神驹感对应「AI 替你想好」。文案整体走「陪伴感 + 确定感」，弱化技术门槛，强化「你只管说，飞马来做」。"
+Right upper label: "一句话定位"
+Right upper large headline: "电商人的 AI 内容工厂——从想法到出片，只隔一次对话。"
+Right upper body: "面向传统电商卖家与抖店带货玩家，把文生图、文生视频、智能体引导、数字人陪练、多店分发，收进同一个工作台。"
+Right lower label: "品牌主张（主张语）"
+Right lower large statement: "让每个电商人，都拥有自己的内容工厂。"
+Avoid any prototype annotations, grayscale placeholder labels, fake data, logos, footer, watermarks, purple gradients, warm UI, neon. This is one standalone section image, NOT an entire webpage.

@@ -1,0 +1,12 @@
+Use case: ui-mockup. Asset type: one independent desktop homepage closing section for 飞马, polished high fidelity raster PNG. Exact structure: chapter heading at upper left; below a two-column, three-row CTA text library; beneath ample whitespace and a fine horizontal separator, the full footer in two paragraphs. Canvas 1440 × 1000, content max 1240px. Cool white #F3F6FB/white, primary #1559D6, navy headings #182843, muted blue-gray #586B85, fine border #DBE3EF. Chinese sans serif, heading 46px, six buttons 22px, footer 22px with generous 1.7 line-height. Small controls 8px radius, precise alignment, abundant whitespace.
+THIS IS ONLY TEXT AND BUTTONS. No photographs, no products, no extra navigation, no logo redesign, no graphics or people. No decorative containers around each library cell, only buttons. Do not add editorial annotations or invented marketing. Every word below must appear verbatim, no deletion or summary. Footer is source content and must be displayed, not removed as annotation.
+Heading: “08CTA 按钮文案库”
+Buttons in 2 columns x 3 rows, reading order:
+Row 1 LEFT solid blue white-text “免费开始创作”; RIGHT white outlined blue-text “立即出片”.
+Row 2 LEFT solid blue white-text “看玲玲怎么带你玩”; RIGHT outlined “一键发布到我的店铺”.
+Row 3 LEFT solid blue white-text “十分钟做第一条带货视频”; RIGHT outlined “小白也能用，试试看”.
+Below separator, exact full footer first paragraph:
+“飞马电商工作台 · 营销文案手册（v1）｜ 主 Slogan 已锁定；数据类文案为占位，上线后按真实指标替换。”
+Second paragraph:
+“使用建议：落地页与商店描述保持「主 Slogan + 五大卖点」口径统一；短视频与社群侧重「小白 + 玲玲陪练」的陪伴感。”
+Footer text can wrap naturally at right edge; print all text, not abbreviated.

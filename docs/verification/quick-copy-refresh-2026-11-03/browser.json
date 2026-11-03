@@ -1,0 +1,34 @@
+{
+  "running": {
+    "reads": 3,
+    "works": [
+      "/api/v1/works/TEST_ONLY-copy-0-work",
+      "/api/v1/works/TEST_ONLY-copy-1-work",
+      "/api/v1/works/TEST_ONLY-copy-2-work",
+      "/api/v1/works/TEST_ONLY-copy-3-work",
+      "/api/v1/works/TEST_ONLY-copy-4-work",
+      "/api/v1/works/TEST_ONLY-copy-5-work"
+    ],
+    "quotes": 0,
+    "writes": [],
+    "values": [],
+    "complete": false
+  },
+  "settled": {
+    "reads": 4,
+    "works": [
+      "/api/v1/works/TEST_ONLY-copy-0-work",
+      "/api/v1/works/TEST_ONLY-copy-1-work",
+      "/api/v1/works/TEST_ONLY-copy-2-work",
+      "/api/v1/works/TEST_ONLY-copy-3-work",
+      "/api/v1/works/TEST_ONLY-copy-4-work",
+      "/api/v1/works/TEST_ONLY-copy-5-work",
+      "/api/v1/works/TEST_ONLY-copy-6-work"
+    ],
+    "quotes": 0,
+    "writes": [],
+    "values": [],
+    "complete": true,
+    "nonemptyCopies": 7
+  }
+}

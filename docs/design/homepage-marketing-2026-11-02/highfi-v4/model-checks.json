@@ -1,0 +1,12 @@
+{
+  "model": "Shopify MaterialsVariantsShoe",
+  "modelLoaded": true,
+  "motionChanged": true,
+  "pausedStable": true,
+  "mobile": {
+    "width": 390,
+    "overflow": false,
+    "model": "Shopify MaterialsVariantsShoe"
+  },
+  "recordingBytes": 1947882
+}

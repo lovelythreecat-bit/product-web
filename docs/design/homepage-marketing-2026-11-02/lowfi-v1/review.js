@@ -1,0 +1,10 @@
+const blocks=new Map(window.SOURCE_BLOCKS.map(b=>[b.id,b]));
+const seen=new Map();
+document.querySelectorAll('[data-copy]').forEach(slot=>{const id=slot.dataset.copy,b=blocks.get(id);seen.set(id,(seen.get(id)||0)+1);if(b)slot.innerHTML=b.html;else{slot.classList.add('copy-error');slot.textContent='未找到原文 '+id;}});
+const index=document.querySelector('.module-index');
+document.querySelectorAll('.module').forEach((module,i)=>{const frame=document.createElement('div');frame.className='module-frame';module.before(frame);frame.append(module);const label=document.createElement('div');label.className='frame-label';label.innerHTML='<span>'+String(i+1).padStart(2,'0')+' / '+module.dataset.title+'</span><small>后续动效：'+(module.dataset.motion||'静态展示')+'</small>';frame.prepend(label);const link=document.createElement('a');link.href='#'+module.id;link.textContent=module.dataset.title;index.append(link);});
+const missing=[...blocks.keys()].filter(id=>!seen.has(id));const duplicated=[...seen].filter(([id,n])=>n!==1);window.COPY_AUDIT={sourceCount:blocks.size,placedCount:seen.size,missing,duplicated};
+document.querySelector('#copy-status').textContent=missing.length||duplicated.length?'原文检查发现缺项，请复核':'原文区块 '+blocks.size+' / '+blocks.size+'，全部保留';
+document.querySelector('#toggle-notes').onclick=()=>{document.body.classList.toggle('review-hide');document.querySelector('#toggle-notes').setAttribute('aria-pressed',String(document.body.classList.contains('review-hide')));};
+document.querySelector('#toggle-overview').onclick=()=>{document.body.classList.toggle('overview');document.querySelector('#toggle-overview').setAttribute('aria-pressed',String(document.body.classList.contains('overview')));};
+const params=new URLSearchParams(location.search);if(params.has('module')){document.body.classList.add('solo');const node=document.getElementById(params.get('module'));if(node)node.closest('.module-frame').classList.add('selected');}if(params.has('shot'))document.body.classList.add('module-shot');

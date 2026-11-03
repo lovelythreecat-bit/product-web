@@ -1,0 +1,15 @@
+Use case: ui-mockup
+Asset type: high fidelity desktop marketing website single section module m03, six Slogan stories.
+Primary request: Generate a premium, finished flat webpage section image about 1440×1100, using the EXACT two-column three-row structure of reference image 1. Do NOT turn this into 6 columns or six huge cards. Each story has its illustration/photo on LEFT and original label and complete sentence on RIGHT. Reference image 2 is the sole identity/wardrobe source for Lingling in bottom-left story: faithfully composite her existing full-body 3D cartoon identity, silver-white pink long hair, flying pegasus hair ornament, pink-and-blue jacket, white inner top, pleated skirt and white boots. Never replace her with real human or redesign her clothes. Reference image 3 is visual style only, not layout.
+Visual: cold white #F3F6FB / white, navy #182843, blue gray #586B85, Feima blue #1559D6 labels, #DBE3EF thin separators. Elegant legible Chinese sans serif, title 46px, subtitle 20px, slogan 24–28px. 1240px content width, ~100px left/right. Plenty of air, restrained fine separators across each story, modest 14px rounded image windows. No card surrounding each story. Use natural product photography: ivory sneakers, amber serum bottle, dark headphones and natural texture, cool blue UI. No warm colored overall UI, no purple gradient, no neon.
+Top heading and subtitle, verbatim:
+"02" "Slogan 体系（多版本备用）"
+"主 Slogan 已定，以下为不同触点下的变体，保持「快 + 简 + 专业」的一致性。"
+Then SIX STORIES exactly in reading order:
+ROW 1 LEFT: Left image shows multi-category creative results with ivory sneaker, amber skincare, black headphones composed as elegant photographs; subtle small text "创作示例". To image right, label "主 Slogan", text "一站式电商内容工具，小白十分钟高效出片"
+ROW 1 RIGHT: Left image shows original ivory sneaker on plain white -> polished natural photographic sneaker design output, small text "创作示例". To image right, label "价值版", text "不会设计？飞马替你想好了。"
+ROW 2 LEFT: Left image shows two overlapping polished product main-image posters for amber skincare and headphones, small text "创作示例". To image right, label "结果版", text "从 0 到爆款素材，只差一个飞马。"
+ROW 2 RIGHT: Left image shows three miniature storyboard frames with small arrows, product input to blue creative workspace to polished product image, small text "创作示例". To image right, label "速度版", text "飞马一拍，出片即来。"
+ROW 3 LEFT: Left image shows the exact full body Lingling from reference 2 on a pale cool background, retaining entire character and shoes, no other person. To image right, label "小白版", text "小白也能拍大片，飞马陪你十分钟出片。"
+ROW 3 RIGHT: Left image shows a vertical smartphone video cover with amber serum in natural photography and small play icon, small text "创作示例". To image right, label "带货版", text "抖店缺片子？飞马十分钟给你一条。"
+All quoted text must be actual rendered pixels and legible, preserve every word and punctuation; wrap as needed. Do NOT include prototype notes, grayscale placeholders, extra slogans, navigation or footer. The prototype's grey image captions are direction notes; replace those with actual relevant visuals, no placeholder captions.

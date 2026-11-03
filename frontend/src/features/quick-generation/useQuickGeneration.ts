@@ -28,7 +28,8 @@ export function useQuickGeneration() {
   const productOpen = ref(false), requirementsOpen = ref(false), chargeOpen = ref(false), uncertain = ref(false)
   const estimated = ref<number | null>(null), estimateBusy = ref(false), imageQuotes = ref<Record<string, number>>({})
   const uploadControl = ref<HTMLInputElement>(), uploading = ref(false)
-  let alive = true, stamp = 0, polling = false, baseline = '', mutationRevision = 0, exiting = false, timer: ReturnType<typeof setTimeout> | undefined
+  const baseline = ref('')
+  let alive = true, stamp = 0, polling = false, mutationRevision = 0, exiting = false, timer: ReturnType<typeof setTimeout> | undefined
   let localValidation = ''
   let progressReadError = ''
   let creationId = ''
@@ -51,7 +52,7 @@ export function useQuickGeneration() {
   const progressStep = computed(() => run.value?.state.step || 1)
   const readOnly = computed(() => progressStep.value === 5)
   const step = computed(() => viewedStep.value ?? progressStep.value)
-  const dirty = computed(() => !!run.value && !readOnly.value && JSON.stringify(draft.value) !== baseline)
+  const dirty = computed(() => !!run.value && !readOnly.value && JSON.stringify(draft.value) !== baseline.value)
   const batches = computed(() => run.value?.state.batches || [])
   const currentBatch = (kind: api.QuickKind) => batches.value.find(batch => batch.id === run.value?.state.current[kind])
   const currentItems = (kind: api.QuickKind) => (currentBatch(kind)?.items || []).map(item => ({ ...item, detail: item.task_id ? run.value?.tasks[item.task_id] : undefined }))
@@ -121,7 +122,7 @@ export function useQuickGeneration() {
     const changed = run.value?.run_id !== value.run_id || run.value?.version !== value.version
     run.value = value
     if (changed) quickGenerationRevision.value++
-    if (replaceDraft) { draft.value = { ...emptyDraft(), ...clone(value.state.draft) }; baseline = JSON.stringify(draft.value) }
+    if (replaceDraft) { draft.value = { ...emptyDraft(), ...clone(value.state.draft) }; baseline.value = JSON.stringify(draft.value) }
   }
   async function readProduct() {
     const version = draft.value.product_version
@@ -141,7 +142,11 @@ export function useQuickGeneration() {
       if (progressReadError && error.value === progressReadError) error.value = ''
       progressReadError = ''
       accountNeedsRefresh ||= taskStates(value) !== taskStates(run.value)
-      apply(value, replaceDraft || !dirty.value)
+      // Task progress changes independently of the saved draft. Keep locally
+      // hydrated copy when polling returns the same draft and copy batch.
+      const draftChanged = value.state.current.copy !== run.value.state.current.copy
+        || JSON.stringify(value.state.draft) !== JSON.stringify(run.value.state.draft)
+      apply(value, replaceDraft || !dirty.value && draftChanged)
       if (submissionPending && acceptedBatch(value, submittingBatchId)) finishSubmission(value, submittingBatchId)
       if (!value.state.pending_batch) { uncertain.value = false; chargeOpen.value = false }
       if (replaceDraft) { conflict.value = false; error.value = '' }
@@ -161,9 +166,9 @@ export function useQuickGeneration() {
         if (!active() || run.value?.run_id !== runId || run.value.state.current.copy !== batchId || Object.hasOwn(draft.value.copy_texts, key)) return
         const wasDirty = dirty.value
         updateCopy(key, works.flatMap(work => work.items.map(item => item.text || '')).join('\n\n'))
-        // Generated results can be read while tasks lock the server draft.
-        // They must not force a forbidden save when navigating away.
-        if (!wasDirty && locked.value) baseline = JSON.stringify(draft.value)
+        // Reading persisted output is not a user edit. Navigation must not
+        // depend on saving these results back into a task-locked draft.
+        if (!wasDirty) baseline.value = JSON.stringify(draft.value)
       }))
     } else {
       const item = items[0]?.detail
@@ -172,14 +177,17 @@ export function useQuickGeneration() {
       if (!active() || run.value?.run_id !== runId || run.value.state.current.copy !== batchId || draft.value.copy_text) return
       const wasDirty = dirty.value
       draft.value.copy_text = works.flatMap(work => work.items.map(item => item.text || '')).join('\n\n')
-      if (!wasDirty && locked.value) baseline = JSON.stringify(draft.value)
+      if (!wasDirty) baseline.value = JSON.stringify(draft.value)
     }
   }
   function message(cause: unknown) { return cause instanceof Error ? cause.message : '操作暂时无法完成，请重试。' }
   async function save() {
     if (readOnly.value) return
     if (!run.value || conflict.value) throw new Error('请重新读取最新进度后继续。')
-    if (dirty.value) {
+    // Explicit progression still persists hydrated output before confirming it.
+    // While tasks run, only real user edits require a save.
+    const hydrated = JSON.stringify(draft.value) !== JSON.stringify({ ...emptyDraft(), ...run.value.state.draft })
+    if (dirty.value || !locked.value && hydrated) {
       mutationRevision++
       const value = await api.saveQuickRun(run.value.run_id, run.value.version, clone(draft.value))
       if (!active()) return
@@ -196,9 +204,10 @@ export function useQuickGeneration() {
   }
   async function initialize() {
     const revision = ++stamp
-    loading.value = true; run.value = null; error.value = ''; baseline = ''; draft.value = emptyDraft(); product.value = null
+    loading.value = true; run.value = null; error.value = ''; baseline.value = ''; draft.value = emptyDraft(); product.value = null
     submissionRevision++; submissionPending = false; submittingBatchId = ''; busy.value = false
     uncertain.value = false; conflict.value = false; productOpen.value = false; chargeOpen.value = false; requirementsOpen.value = false; viewedStep.value = null
+    progressReadError = ''; accountNeedsRefresh = false
     try {
       const runId = String(route.params.runId || '')
       if (!runId) {
@@ -219,7 +228,7 @@ export function useQuickGeneration() {
       apply(values[0]); agents.value = values[1]
       uncertain.value = !!pendingBatch.value
       await readProduct(); await fillCopy()
-    } catch (cause) { if (active() && revision === stamp) error.value = message(cause) }
+    } catch (cause) { if (active() && revision === stamp) error.value = progressReadError = message(cause) }
     finally { if (active() && revision === stamp) loading.value = false }
   }
   const validation = (target: api.QuickKind) => {
@@ -270,7 +279,7 @@ export function useQuickGeneration() {
     viewedStep.value = null; apply(value); uncertain.value = false; chargeOpen.value = false; requirementsOpen.value = false; busy.value = false
     feedback.value = '任务已受理，生成进度会自动更新。'
     accountNeedsRefresh = true; refreshBalance()
-    void fillCopy().catch(cause => { if (active() && run.value?.run_id === value.run_id) error.value = message(cause) })
+    void fillCopy().catch(cause => { if (active() && run.value?.run_id === value.run_id) error.value = progressReadError = message(cause) })
   }
   async function submit() {
     if (readOnly.value || busy.value || conflict.value || !active()) return
@@ -390,9 +399,34 @@ export function useQuickGeneration() {
     catch { /* The confirmation action surfaces exact server validation. */ }
     finally { if (active() && revision === quoteRevision) estimateBusy.value = false }
   }
-  watch(() => JSON.stringify([draft.value, kind.value, requirementsOpen.value, product.value?.version, agents.value.length, videoMaterials.value]), () => { if (localValidation && error.value === localValidation) { error.value = ''; localValidation = '' }; quoteRevision++; estimated.value = null; imageQuotes.value = {}; estimateBusy.value = false; clearTimeout(timer); timer = setTimeout(() => { void estimate() }, 250) }, { flush: 'sync' })
+  watch(() => {
+    // Copy results are output, not copy quote inputs. Only the confirmed detail
+    // copy participates in image quotes; hydration must not re-quote every copy.
+    const { copy_text: _copy, copy_texts: _copies, ...settings } = draft.value
+    const target = requirementsOpen.value ? 'image' : kind.value
+    return JSON.stringify([settings, target, product.value?.version, agents.value.length, videoMaterials.value,
+      target !== 'copy' ? run.value?.state.confirmed_copy : null,
+      target === 'image' ? [copyEntries.value.map(entry => entry.key), draft.value.copy_texts['详情介绍']] : null])
+  }, () => { if (localValidation && error.value === localValidation) { error.value = ''; localValidation = '' }; quoteRevision++; estimated.value = null; imageQuotes.value = {}; estimateBusy.value = false; clearTimeout(timer); timer = setTimeout(() => { void estimate() }, 250) }, { flush: 'sync' })
   watch(() => route.params.runId, () => { void initialize() }, { immediate: true })
-  const interval = setInterval(() => { if (run.value && !document.hidden && !conflict.value) void refresh() }, 3000)
+  function needsProgressPoll() {
+    if (submissionPending || uncertain.value || progressReadError) return true
+    if (!run.value || readOnly.value) return false
+    // Inspect the whole run, not the stage currently being viewed.
+    if ((['copy', 'image', 'video'] as const).some(kind => currentItems(kind).some(item => item.task_id && !item.detail))) return true
+    return Object.values(run.value.tasks).some(({ task }) => {
+      if (task.state === 'FAILED') return false // Waiting for an explicit retry/release.
+      if (task.state === 'SUCCEEDED') return task.settlement_state !== 'CONSUMED'
+      if (task.state === 'MANUALLY_CLOSED') return task.settlement_state === 'FROZEN'
+      return true
+    })
+  }
+  const interval = setInterval(() => {
+    if (!active() || !run.value || loading.value || document.hidden || conflict.value) return
+    if (needsProgressPoll()) void refresh()
+    // A failed balance read must recover even after task polling has stopped.
+    else refreshBalance()
+  }, 3000)
   function beforeUnload(event: BeforeUnloadEvent) { if (dirty.value) event.preventDefault() }
   window.addEventListener('beforeunload', beforeUnload)
   async function saveBeforeNavigation() {

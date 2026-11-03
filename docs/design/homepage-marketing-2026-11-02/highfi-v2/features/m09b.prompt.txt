@@ -1,0 +1,32 @@
+Use case: ui-mockup
+Asset type: Feima ecommerce AI creation platform marketing homepage, individual high-fidelity desktop section, NOT an entire website.
+Primary request: Render an actual finished premium Chinese website design image from the confirmed low-fidelity layout, with realistic product photography, meticulous Chinese typography and generous whitespace.
+Reference image 1 is ONLY the approved lowfi layout. Inherit its composition, never render its gray placeholder labels, crossed boxes, review notes or wireframe appearance. Reference image 2 is the newly generated Feima hero style anchor ONLY, do not inherit its page structure or extra copy. Additional character reference (when present) is the exact Lingling identity to preserve.
+Palette and visual system: cool off-white #F3F6FB and white, brand blue #1559D6, dark navy headings #182843, body blue-gray #586B85, thin border #DBE3EF. 1440px desktop design, 1240px content, ~100px side margins. Chinese sans-serif, headings 40–56px, body 18–22px, line-height 1.7. Controls 8px radius, panels 14px, very restrained soft shadow. Natural material product photography, warm product reflections allowed but never a warm primary UI.
+Constraints: One module only. No browser chrome, no site navigation, no footer, no review tags, no giant fake logo, no purple gradients, no cyber neon, no robots, no real human models, no omitted/rewritten/shortened copy. Do not use generic English lorem ipsum. Do not print copy IDs or HTML tags. Every source string below must be visibly typeset verbatim, including headings, badges, emoji, punctuation, numbers and labels. Preserve full body text; increase canvas height if necessary instead of shrinking or deleting. Text blocks can wrap freely while exact wording remains. Any additional visual sample is subtly labeled 创作示例.
+
+Composition:
+1440 × 1200 desktop module. Follow m09b wireframe EXACTLY: TWO vertically stacked spacious editorial rows, thin horizontal rule separating, each row left complete source text / right visual. Top: professional workbench scene complete title with 🛠, two sentences; right a horizontal premium editing interface mockup with one cream sneaker photo, small layers list, restrained sliders and template thumbnails. It is illustrative UI, no real account or fabricated status. Bottom: video-commerce scene complete title with 🎬 and three full sentences; right a wide video planning composition with dark headphones and amber serum product stills, three large shot frames and subtle selection framing, then one tiny generic storefront cue. No real person, no new Lingling character because reference not provided for this module, no marketplace logos or success feedback. All source text remains in readable 20px size. Good whitespace, typography, elegant quiet blue-white design.
+
+Text (verbatim; source HTML encodes hierarchy only, print all text and NO tags):
+[C05-03]
+🛠 专业工作台 · 面向老手
+      想要完全掌控？专业工作台给你图层、参数、批量与模板。
+      飞马不替你决定，只让你更快。
+Hierarchy: <div class="source-quote-scene">
+      <h3>🛠 专业工作台 · 面向老手</h3>
+      <p>想要完全掌控？专业工作台给你图层、参数、批量与模板。<br>
+      飞马不替你决定，只让你更快。</p>
+    </div>
+
+[C05-04]
+🎬 视频带货专项 · 抖店主视角
+      抖店缺素材？飞马文生视频来补位。
+      输入卖点 → 生成多条带货视频 → 玲玲帮你挑最顺的一条 → 一键发店。
+      流量窗口不等人，飞马让你每天都有新片子。
+Hierarchy: <div class="source-quote-scene">
+      <h3>🎬 视频带货专项 · 抖店主视角</h3>
+      <p>抖店缺素材？飞马文生视频来补位。<br>
+      输入卖点 → 生成多条带货视频 → 玲玲帮你挑最顺的一条 → 一键发店。<br>
+      流量窗口不等人，飞马让你每天都有新片子。</p>
+    </div>

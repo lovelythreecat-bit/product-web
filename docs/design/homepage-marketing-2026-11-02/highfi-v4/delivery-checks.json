@@ -1,0 +1,57 @@
+{
+  "video": {
+    "width": 1280,
+    "height": 720,
+    "time": 0.2345,
+    "error": null
+  },
+  "links": [
+    {
+      "href": "index.html",
+      "status": 200
+    },
+    {
+      "href": "index.html?theme=light",
+      "status": 200
+    },
+    {
+      "href": "../highfi-v3/gallery.html",
+      "status": 200
+    },
+    {
+      "href": "../highfi-v2/gallery.html",
+      "status": 200
+    },
+    {
+      "href": "vendor/THREE-LICENSE.txt",
+      "status": 200
+    }
+  ],
+  "fallback": {
+    "renderer": "fallback",
+    "visible": true,
+    "loaded": true
+  },
+  "final": {
+    "renderer": "WebGL",
+    "scene": 0,
+    "progress": 0,
+    "time": 0.383,
+    "camera": [
+      0,
+      0.5,
+      11.600000000000001
+    ],
+    "productRotation": [
+      0.05,
+      -0.059826780374219186,
+      -0.22
+    ],
+    "drawCalls": 21,
+    "triangles": 26994,
+    "mode": "beginner",
+    "paused": false,
+    "reduced": false,
+    "texturesPending": 0
+  }
+}

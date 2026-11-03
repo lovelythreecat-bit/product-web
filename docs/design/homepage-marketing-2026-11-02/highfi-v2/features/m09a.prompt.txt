@@ -1,0 +1,28 @@
+Use case: ui-mockup
+Asset type: Feima ecommerce AI creation platform marketing homepage, individual high-fidelity desktop section, NOT an entire website.
+Primary request: Render an actual finished premium Chinese website design image from the confirmed low-fidelity layout, with realistic product photography, meticulous Chinese typography and generous whitespace.
+Reference image 1 is ONLY the approved lowfi layout. Inherit its composition, never render its gray placeholder labels, crossed boxes, review notes or wireframe appearance. Reference image 2 is the newly generated Feima hero style anchor ONLY, do not inherit its page structure or extra copy. Additional character reference (when present) is the exact Lingling identity to preserve.
+Palette and visual system: cool off-white #F3F6FB and white, brand blue #1559D6, dark navy headings #182843, body blue-gray #586B85, thin border #DBE3EF. 1440px desktop design, 1240px content, ~100px side margins. Chinese sans-serif, headings 40–56px, body 18–22px, line-height 1.7. Controls 8px radius, panels 14px, very restrained soft shadow. Natural material product photography, warm product reflections allowed but never a warm primary UI.
+Constraints: One module only. No browser chrome, no site navigation, no footer, no review tags, no giant fake logo, no purple gradients, no cyber neon, no robots, no real human models, no omitted/rewritten/shortened copy. Do not use generic English lorem ipsum. Do not print copy IDs or HTML tags. Every source string below must be visibly typeset verbatim, including headings, badges, emoji, punctuation, numbers and labels. Preserve full body text; increase canvas height if necessary instead of shrinking or deleting. Text blocks can wrap freely while exact wording remains. Any additional visual sample is subtly labeled 创作示例.
+
+Composition:
+1440 × 1120 desktop module. Follow m09a wireframe EXACTLY: section heading 05 分场景文案 at top left; beneath TWO columns, left complete source scene title including 🐣 and all four paragraphs, right a tall composition with requirement dialogue above, a discreet down arrow, then step-by-step creation sequence and photographic result below. NO Lingling character here. Use a plain ivory insulated commuting tumbler with metal lid as the product required by the original text, in bright architectural commuting/product studio set; provide a product photo result. The source quote 我要卖一款保温杯，主打上班通勤 may repeat in the dialogue. Four small sequence labels 选风格 → 出图 / 出视频 → 微调 → 发布. Ensure source last sentence bold blue, all text full. Refined cool white/blue scene, not warm primary UI.
+
+Text (verbatim; source HTML encodes hierarchy only, print all text and NO tags):
+[C05-01]
+05分场景文案
+Hierarchy: <h2><span class="source-num">05</span>分场景文案</h2>
+
+[C05-02]
+🐣 小白工作台 · 首屏引导（用户视角）
+      你不需要会设计，只需要会说话。
+      告诉飞马：「我要卖一款保温杯，主打上班通勤」，剩下的交给小白工作台。
+      玲玲会陪你：选风格 → 出图 / 出视频 → 微调 → 发布。
+      十分钟，你的第一个爆款素材就上线了。
+Hierarchy: <div class="source-quote-scene">
+      <h3>🐣 小白工作台 · 首屏引导（用户视角）</h3>
+      <p>你不需要会设计，只需要会说话。<br>
+      告诉飞马：「我要卖一款保温杯，主打上班通勤」，剩下的交给小白工作台。<br>
+      玲玲会陪你：选风格 → 出图 / 出视频 → 微调 → 发布。<br>
+      <b>十分钟，你的第一个爆款素材就上线了。</b></p>
+    </div>
