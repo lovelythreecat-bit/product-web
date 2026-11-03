@@ -126,7 +126,7 @@ onMounted(load)
 <div class="screen-top"><span><i></i> {{ brandName }}</span><span>创作示例</span>
 </div>
 <div class="scene scene-input" :inert="stage !== 0" :aria-hidden="stage !== 0">
-<div class="source-product product shoe" role="img" aria-label="鞋服商品示例">
+<div class="source-product product tumbler" role="img" aria-label="浅蓝通勤保温杯白底商品示例">
 </div>
 <div class="source-caption"><span>文生图</span>
 <h3>输入商品，飞马出图。</h3>
@@ -135,11 +135,11 @@ onMounted(load)
 </div>
 </div>
 <div class="scene scene-images" :inert="stage !== 1" :aria-hidden="stage !== 1">
-<div class="output-photo back-photo product shoe">
+<div class="output-photo back-photo product tumbler" role="img" aria-label="同款保温杯主图示例">
 </div>
-<div class="output-photo mid-photo product beauty">
+<div class="output-photo mid-photo product tumbler-detail" role="img" aria-label="同款保温杯杯盖与材质细节示例">
 </div>
-<div class="output-photo front-photo product audio">
+<div class="output-photo front-photo product commute" role="img" aria-label="同款保温杯通勤办公场景海报示例">
 </div>
 <div class="output-caption">
 <h3>传统电商，看图说话出爆款</h3>
@@ -148,7 +148,7 @@ onMounted(load)
 </div>
 <div class="scene scene-video" :inert="stage !== 2" :aria-hidden="stage !== 2">
 <div class="video-frame">
-<div class="product beauty">
+<div class="product creator" role="img" aria-label="人物讲解同款保温杯的带货视频分镜示例">
 </div>
 <div class="video-title">抖店带货，<br>十分钟一条种草片</div>
 <div class="video-label">动态分镜示意</div>
@@ -193,7 +193,7 @@ onMounted(load)
 <a class="text-button" href="#creation">十分钟做第一条带货视频 <span aria-hidden="true">↗</span></a>
 </div>
 <div class="reel" aria-label="视频带货动态分镜示意">
-<div class="reel-picture product audio">
+<div class="reel-picture product creator" role="img" aria-label="人物口播讲解保温杯的种草视频分镜示例">
 </div>
 <div class="reel-caption"><span>动态分镜示意</span>
 <h3>流量窗口不等人，<br>飞马让你每天都有新片子。</h3>
@@ -241,6 +241,10 @@ onMounted(load)
 <div class="workspace-visual" id="workspace-visual" :class="{ 'is-pro': pro }">
 <div class="mini-conversation"><span>小白工作台</span>
 <p>我要卖一款保温杯，主打上班通勤</p>
+<section class="workspace-result" aria-label="保温杯创作示例">
+<figure><div class="product tumbler" role="img" aria-label="保温杯白底商品图"></div><figcaption>商品主图 · 创作示例</figcaption></figure>
+<figure><div class="product commute" role="img" aria-label="保温杯通勤办公场景图"></div><figcaption>通勤场景 · 创作示例</figcaption></figure>
+</section>
 <div>选风格 <span>→</span> 出图 / 出视频 <span>→</span> 微调 <span>→</span> 发布</div>
 </div>
 <div class="mini-pro"><span>专业工作台</span>

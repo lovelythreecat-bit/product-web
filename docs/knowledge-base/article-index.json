@@ -1,0 +1,1527 @@
+{
+  "status": "draft",
+  "formal_import_allowed": false,
+  "articles": [
+    {
+      "id": "quick-start",
+      "title": "开始或继续快速生成",
+      "status": "draft",
+      "implementation_status": "implemented",
+      "applicable_routes": [
+        "/workspace/quick/:runId?"
+      ],
+      "source_refs": [
+        {
+          "path": "frontend/src/router.ts",
+          "line_start": 22,
+          "line_end": 29
+        },
+        {
+          "path": "frontend/src/features/workspace/ConversationList.vue",
+          "line_start": 176,
+          "line_end": 192
+        },
+        {
+          "path": "frontend/src/features/quick-generation/useQuickGeneration.ts",
+          "line_start": 205,
+          "line_end": 230
+        },
+        {
+          "path": "frontend/src/features/quick-generation/QuickGenerationView.vue",
+          "line_start": 195,
+          "line_end": 203
+        },
+        {
+          "path": "backend/app/quick_generation/service.py",
+          "line_start": 477,
+          "line_end": 515
+        }
+      ],
+      "deployment_status": "not_verified",
+      "review_required": true,
+      "path": "articles/quick-start.md"
+    },
+    {
+      "id": "quick-product",
+      "title": "填写并保存商品资料",
+      "status": "draft",
+      "implementation_status": "implemented",
+      "applicable_routes": [
+        "/workspace/quick/:runId?"
+      ],
+      "source_refs": [
+        {
+          "path": "frontend/src/features/quick-generation/QuickProductEditor.vue",
+          "line_start": 20,
+          "line_end": 67
+        },
+        {
+          "path": "frontend/src/features/quick-generation/useQuickGeneration.ts",
+          "line_start": 91,
+          "line_end": 91
+        },
+        {
+          "path": "frontend/src/features/workspace/productTypes.ts",
+          "line_start": 1,
+          "line_end": 34
+        },
+        {
+          "path": "frontend/src/features/workspace/display.ts",
+          "line_start": 2,
+          "line_end": 13
+        },
+        {
+          "path": "backend/app/catalog/service.py",
+          "line_start": 475,
+          "line_end": 485
+        },
+        {
+          "path": "frontend/src/features/quick-generation/QuickGenerationView.vue",
+          "line_start": 195,
+          "line_end": 203
+        },
+        {
+          "path": "backend/app/quick_generation/service.py",
+          "line_start": 477,
+          "line_end": 515
+        }
+      ],
+      "deployment_status": "not_verified",
+      "review_required": true,
+      "path": "articles/quick-product.md"
+    },
+    {
+      "id": "quick-upload",
+      "title": "上传商品参考图",
+      "status": "draft",
+      "implementation_status": "implemented",
+      "applicable_routes": [
+        "/workspace/quick/:runId?"
+      ],
+      "source_refs": [
+        {
+          "path": "frontend/src/features/workspace/materialLimits.ts",
+          "line_start": 1,
+          "line_end": 2
+        },
+        {
+          "path": "backend/app/common/types.py",
+          "line_start": 12,
+          "line_end": 12
+        },
+        {
+          "path": "frontend/src/features/quick-generation/QuickGenerationView.vue",
+          "line_start": 111,
+          "line_end": 121
+        },
+        {
+          "path": "frontend/src/features/quick-generation/useQuickGeneration.ts",
+          "line_start": 351,
+          "line_end": 365
+        },
+        {
+          "path": "backend/app/quick_generation/service.py",
+          "line_start": 38,
+          "line_end": 40
+        },
+        {
+          "path": "backend/app/storage/service.py",
+          "line_start": 28,
+          "line_end": 57
+        },
+        {
+          "path": "backend/app/quick_generation/schemas.py",
+          "line_start": 15,
+          "line_end": 18
+        }
+      ],
+      "deployment_status": "not_verified",
+      "review_required": true,
+      "path": "articles/quick-upload.md"
+    },
+    {
+      "id": "quick-copy-options",
+      "title": "选择文案类型和创作要求",
+      "status": "draft",
+      "implementation_status": "implemented",
+      "applicable_routes": [
+        "/workspace/quick/:runId?"
+      ],
+      "source_refs": [
+        {
+          "path": "frontend/src/features/quick-generation/QuickCopyRequirements.vue",
+          "line_start": 15,
+          "line_end": 45
+        },
+        {
+          "path": "frontend/src/features/workspace/TextChoices.vue",
+          "line_start": 24,
+          "line_end": 51
+        },
+        {
+          "path": "frontend/src/features/quick-generation/useQuickGeneration.ts",
+          "line_start": 20,
+          "line_end": 21
+        },
+        {
+          "path": "backend/app/quick_generation/schemas.py",
+          "line_start": 11,
+          "line_end": 31
+        },
+        {
+          "path": "backend/app/quick_generation/service.py",
+          "line_start": 342,
+          "line_end": 386
+        },
+        {
+          "path": "frontend/src/features/quick-generation/QuickGenerationView.vue",
+          "line_start": 195,
+          "line_end": 203
+        },
+        {
+          "path": "backend/app/quick_generation/service.py",
+          "line_start": 477,
+          "line_end": 515
+        }
+      ],
+      "deployment_status": "not_verified",
+      "review_required": true,
+      "path": "articles/quick-copy-options.md"
+    },
+    {
+      "id": "quick-copy-confirm",
+      "title": "确认营销文案后进入图片阶段",
+      "status": "draft",
+      "implementation_status": "implemented",
+      "applicable_routes": [
+        "/workspace/quick/:runId?"
+      ],
+      "source_refs": [
+        {
+          "path": "frontend/src/features/quick-generation/QuickGenerationView.vue",
+          "line_start": 147,
+          "line_end": 158
+        },
+        {
+          "path": "frontend/src/features/quick-generation/QuickGenerationView.vue",
+          "line_start": 198,
+          "line_end": 198
+        },
+        {
+          "path": "frontend/src/features/quick-generation/useQuickGeneration.ts",
+          "line_start": 61,
+          "line_end": 85
+        },
+        {
+          "path": "backend/app/quick_generation/service.py",
+          "line_start": 483,
+          "line_end": 504
+        },
+        {
+          "path": "frontend/src/features/quick-generation/QuickGenerationView.vue",
+          "line_start": 160,
+          "line_end": 165
+        },
+        {
+          "path": "frontend/src/features/quick-generation/QuickGenerationView.vue",
+          "line_start": 211,
+          "line_end": 217
+        },
+        {
+          "path": "frontend/src/features/quick-generation/useQuickGeneration.ts",
+          "line_start": 14,
+          "line_end": 19
+        },
+        {
+          "path": "frontend/src/features/quick-generation/useQuickGeneration.ts",
+          "line_start": 239,
+          "line_end": 250
+        },
+        {
+          "path": "backend/app/quick_generation/service.py",
+          "line_start": 340,
+          "line_end": 347
+        },
+        {
+          "path": "backend/app/quick_generation/service.py",
+          "line_start": 505,
+          "line_end": 510
+        }
+      ],
+      "deployment_status": "not_verified",
+      "review_required": true,
+      "path": "articles/quick-copy-confirm.md"
+    },
+    {
+      "id": "quick-images",
+      "title": "选择图片内容并确认图片成果",
+      "status": "draft",
+      "implementation_status": "implemented",
+      "applicable_routes": [
+        "/workspace/quick/:runId?"
+      ],
+      "source_refs": [
+        {
+          "path": "frontend/src/features/quick-generation/QuickGenerationView.vue",
+          "line_start": 160,
+          "line_end": 165
+        },
+        {
+          "path": "frontend/src/features/quick-generation/QuickGenerationView.vue",
+          "line_start": 211,
+          "line_end": 217
+        },
+        {
+          "path": "frontend/src/features/quick-generation/useQuickGeneration.ts",
+          "line_start": 14,
+          "line_end": 19
+        },
+        {
+          "path": "frontend/src/features/quick-generation/useQuickGeneration.ts",
+          "line_start": 239,
+          "line_end": 250
+        },
+        {
+          "path": "backend/app/quick_generation/service.py",
+          "line_start": 340,
+          "line_end": 347
+        },
+        {
+          "path": "backend/app/quick_generation/service.py",
+          "line_start": 505,
+          "line_end": 510
+        },
+        {
+          "path": "backend/app/catalog/service.py",
+          "line_start": 464,
+          "line_end": 542
+        },
+        {
+          "path": "backend/app/tasks/admission.py",
+          "line_start": 106,
+          "line_end": 126
+        },
+        {
+          "path": "backend/app/tasks/admission.py",
+          "line_start": 250,
+          "line_end": 251
+        },
+        {
+          "path": "backend/app/quick_generation/service.py",
+          "line_start": 406,
+          "line_end": 438
+        },
+        {
+          "path": "frontend/src/features/quick-generation/useQuickGeneration.ts",
+          "line_start": 87,
+          "line_end": 89
+        },
+        {
+          "path": "frontend/src/features/quick-generation/QuickGenerationView.vue",
+          "line_start": 195,
+          "line_end": 203
+        },
+        {
+          "path": "backend/app/quick_generation/service.py",
+          "line_start": 477,
+          "line_end": 515
+        }
+      ],
+      "deployment_status": "not_verified",
+      "review_required": true,
+      "path": "articles/quick-images.md"
+    },
+    {
+      "id": "quick-video-frame",
+      "title": "选择视频首帧并生成方案",
+      "status": "draft",
+      "implementation_status": "implemented",
+      "applicable_routes": [
+        "/workspace/quick/:runId?"
+      ],
+      "source_refs": [
+        {
+          "path": "frontend/src/features/quick-generation/QuickGenerationView.vue",
+          "line_start": 169,
+          "line_end": 171
+        },
+        {
+          "path": "frontend/src/features/quick-generation/useQuickGeneration.ts",
+          "line_start": 94,
+          "line_end": 119
+        },
+        {
+          "path": "backend/app/quick_generation/service.py",
+          "line_start": 215,
+          "line_end": 255
+        },
+        {
+          "path": "backend/app/quick_generation/service.py",
+          "line_start": 289,
+          "line_end": 292
+        },
+        {
+          "path": "frontend/src/features/quick-generation/QuickGenerationView.vue",
+          "line_start": 195,
+          "line_end": 203
+        },
+        {
+          "path": "backend/app/quick_generation/service.py",
+          "line_start": 477,
+          "line_end": 515
+        }
+      ],
+      "deployment_status": "not_verified",
+      "review_required": true,
+      "path": "articles/quick-video-frame.md"
+    },
+    {
+      "id": "quick-video-plan",
+      "title": "查看并确认视频方案",
+      "status": "draft",
+      "implementation_status": "implemented",
+      "applicable_routes": [
+        "/workspace/quick/:runId?"
+      ],
+      "source_refs": [
+        {
+          "path": "frontend/src/features/workspace/VideoTaskPanel.vue",
+          "line_start": 145,
+          "line_end": 177
+        },
+        {
+          "path": "backend/app/tasks/media_routes.py",
+          "line_start": 1,
+          "line_end": 30
+        }
+      ],
+      "deployment_status": "not_verified",
+      "review_required": true,
+      "path": "articles/quick-video-plan.md"
+    },
+    {
+      "id": "quick-video-edit",
+      "title": "编辑或重新规划视频方案",
+      "status": "draft",
+      "implementation_status": "implemented",
+      "applicable_routes": [
+        "/workspace/quick/:runId?"
+      ],
+      "source_refs": [
+        {
+          "path": "frontend/src/features/workspace/VideoTaskPanel.vue",
+          "line_start": 52,
+          "line_end": 116
+        },
+        {
+          "path": "frontend/src/features/workspace/VideoTaskPanel.vue",
+          "line_start": 169,
+          "line_end": 177
+        }
+      ],
+      "deployment_status": "not_verified",
+      "review_required": true,
+      "path": "articles/quick-video-edit.md"
+    },
+    {
+      "id": "quick-video-supplement",
+      "title": "补充视频所需资料",
+      "status": "draft",
+      "implementation_status": "implemented",
+      "applicable_routes": [
+        "/workspace/quick/:runId?"
+      ],
+      "source_refs": [
+        {
+          "path": "frontend/src/features/workspace/VideoTaskPanel.vue",
+          "line_start": 145,
+          "line_end": 177
+        },
+        {
+          "path": "backend/app/tasks/media_routes.py",
+          "line_start": 1,
+          "line_end": 30
+        },
+        {
+          "path": "frontend/src/features/workspace/VideoTaskPanel.vue",
+          "line_start": 52,
+          "line_end": 116
+        },
+        {
+          "path": "frontend/src/features/workspace/VideoTaskPanel.vue",
+          "line_start": 169,
+          "line_end": 177
+        }
+      ],
+      "deployment_status": "not_verified",
+      "review_required": true,
+      "path": "articles/quick-video-supplement.md"
+    },
+    {
+      "id": "quick-fees",
+      "title": "快速生成如何确认费用",
+      "status": "draft",
+      "implementation_status": "implemented",
+      "applicable_routes": [
+        "/workspace/quick/:runId?"
+      ],
+      "source_refs": [
+        {
+          "path": "backend/app/catalog/service.py",
+          "line_start": 464,
+          "line_end": 542
+        },
+        {
+          "path": "backend/app/tasks/admission.py",
+          "line_start": 106,
+          "line_end": 126
+        },
+        {
+          "path": "backend/app/tasks/admission.py",
+          "line_start": 250,
+          "line_end": 251
+        },
+        {
+          "path": "backend/app/quick_generation/service.py",
+          "line_start": 406,
+          "line_end": 438
+        },
+        {
+          "path": "frontend/src/features/quick-generation/useQuickGeneration.ts",
+          "line_start": 87,
+          "line_end": 89
+        },
+        {
+          "path": "frontend/src/features/quick-generation/useQuickGeneration.ts",
+          "line_start": 284,
+          "line_end": 307
+        },
+        {
+          "path": "frontend/src/features/quick-generation/QuickGenerationView.vue",
+          "line_start": 138,
+          "line_end": 138
+        },
+        {
+          "path": "backend/app/quick_generation/service.py",
+          "line_start": 406,
+          "line_end": 417
+        },
+        {
+          "path": "backend/app/quick_generation/service.py",
+          "line_start": 466,
+          "line_end": 475
+        },
+        {
+          "path": "frontend/src/features/account/RechargeInfoView.vue",
+          "line_start": 11,
+          "line_end": 18
+        },
+        {
+          "path": "docs/电商AI创作平台-首版需求终稿-2026-10-09.md",
+          "line_start": 209,
+          "line_end": 224
+        }
+      ],
+      "deployment_status": "not_verified",
+      "review_required": true,
+      "path": "articles/quick-fees.md"
+    },
+    {
+      "id": "quick-regeneration",
+      "title": "文案与图片的单项重新生成",
+      "status": "draft",
+      "implementation_status": "implemented",
+      "applicable_routes": [
+        "/workspace/quick/:runId?"
+      ],
+      "source_refs": [
+        {
+          "path": "backend/app/quick_generation/service.py",
+          "line_start": 299,
+          "line_end": 325
+        },
+        {
+          "path": "backend/app/quick_generation/service.py",
+          "line_start": 425,
+          "line_end": 432
+        },
+        {
+          "path": "frontend/src/features/quick-generation/QuickGenerationView.vue",
+          "line_start": 85,
+          "line_end": 85
+        },
+        {
+          "path": "frontend/src/features/quick-generation/QuickGenerationView.vue",
+          "line_start": 123,
+          "line_end": 130
+        },
+        {
+          "path": "frontend/src/features/quick-generation/QuickGenerationView.vue",
+          "line_start": 164,
+          "line_end": 171
+        },
+        {
+          "path": "backend/app/catalog/service.py",
+          "line_start": 464,
+          "line_end": 542
+        },
+        {
+          "path": "backend/app/tasks/admission.py",
+          "line_start": 106,
+          "line_end": 126
+        },
+        {
+          "path": "backend/app/tasks/admission.py",
+          "line_start": 250,
+          "line_end": 251
+        },
+        {
+          "path": "backend/app/quick_generation/service.py",
+          "line_start": 406,
+          "line_end": 438
+        },
+        {
+          "path": "frontend/src/features/quick-generation/useQuickGeneration.ts",
+          "line_start": 87,
+          "line_end": 89
+        }
+      ],
+      "deployment_status": "not_verified",
+      "review_required": true,
+      "path": "articles/quick-regeneration.md"
+    },
+    {
+      "id": "quick-failure",
+      "title": "任务失败时重试或释放积分",
+      "status": "draft",
+      "implementation_status": "implemented",
+      "applicable_routes": [
+        "/workspace/quick/:runId?"
+      ],
+      "source_refs": [
+        {
+          "path": "frontend/src/components/TaskCard.vue",
+          "line_start": 36,
+          "line_end": 66
+        },
+        {
+          "path": "frontend/src/components/TaskCard.vue",
+          "line_start": 98,
+          "line_end": 120
+        },
+        {
+          "path": "backend/app/tasks/failed_actions.py",
+          "line_start": 28,
+          "line_end": 69
+        },
+        {
+          "path": "backend/app/tasks/failed_actions.py",
+          "line_start": 97,
+          "line_end": 130
+        },
+        {
+          "path": "backend/app/tasks/state_machine.py",
+          "line_start": 166,
+          "line_end": 168
+        },
+        {
+          "path": "frontend/src/features/quick-generation/QuickGenerationView.vue",
+          "line_start": 160,
+          "line_end": 165
+        },
+        {
+          "path": "frontend/src/features/quick-generation/QuickGenerationView.vue",
+          "line_start": 211,
+          "line_end": 217
+        },
+        {
+          "path": "frontend/src/features/quick-generation/useQuickGeneration.ts",
+          "line_start": 14,
+          "line_end": 19
+        },
+        {
+          "path": "frontend/src/features/quick-generation/useQuickGeneration.ts",
+          "line_start": 239,
+          "line_end": 250
+        },
+        {
+          "path": "backend/app/quick_generation/service.py",
+          "line_start": 340,
+          "line_end": 347
+        },
+        {
+          "path": "backend/app/quick_generation/service.py",
+          "line_start": 505,
+          "line_end": 510
+        }
+      ],
+      "deployment_status": "not_verified",
+      "review_required": true,
+      "path": "articles/quick-failure.md"
+    },
+    {
+      "id": "quick-stopped-image",
+      "title": "图片等待补充资料时能否重试",
+      "status": "draft",
+      "implementation_status": "implemented",
+      "applicable_routes": [
+        "/workspace/quick/:runId?"
+      ],
+      "source_refs": [
+        {
+          "path": "frontend/src/components/TaskCard.vue",
+          "line_start": 36,
+          "line_end": 37
+        },
+        {
+          "path": "frontend/src/components/TaskCard.vue",
+          "line_start": 99,
+          "line_end": 120
+        },
+        {
+          "path": "backend/app/tasks/stopped_image_retry.py",
+          "line_start": 38,
+          "line_end": 89
+        },
+        {
+          "path": "docs/product-design.md",
+          "line_start": 53,
+          "line_end": 53
+        }
+      ],
+      "deployment_status": "not_verified",
+      "review_required": true,
+      "path": "articles/quick-stopped-image.md"
+    },
+    {
+      "id": "quick-uncertain",
+      "title": "提交超时或结果尚未确认",
+      "status": "draft",
+      "implementation_status": "implemented",
+      "applicable_routes": [
+        "/workspace/quick/:runId?"
+      ],
+      "source_refs": [
+        {
+          "path": "frontend/src/features/quick-generation/useQuickGeneration.ts",
+          "line_start": 284,
+          "line_end": 307
+        },
+        {
+          "path": "frontend/src/features/quick-generation/QuickGenerationView.vue",
+          "line_start": 138,
+          "line_end": 138
+        },
+        {
+          "path": "backend/app/quick_generation/service.py",
+          "line_start": 406,
+          "line_end": 417
+        },
+        {
+          "path": "backend/app/quick_generation/service.py",
+          "line_start": 466,
+          "line_end": 475
+        },
+        {
+          "path": "frontend/src/features/quick-generation/QuickGenerationView.vue",
+          "line_start": 24,
+          "line_end": 46
+        },
+        {
+          "path": "frontend/src/features/quick-generation/useQuickGeneration.ts",
+          "line_start": 318,
+          "line_end": 344
+        },
+        {
+          "path": "frontend/src/features/quick-generation/useQuickGeneration.ts",
+          "line_start": 412,
+          "line_end": 438
+        }
+      ],
+      "deployment_status": "not_verified",
+      "review_required": true,
+      "path": "articles/quick-uncertain.md"
+    },
+    {
+      "id": "quick-next-step",
+      "title": "下一步按钮不可用时怎么判断",
+      "status": "draft",
+      "implementation_status": "implemented",
+      "applicable_routes": [
+        "/workspace/quick/:runId?"
+      ],
+      "source_refs": [
+        {
+          "path": "frontend/src/features/quick-generation/QuickGenerationView.vue",
+          "line_start": 195,
+          "line_end": 203
+        },
+        {
+          "path": "backend/app/quick_generation/service.py",
+          "line_start": 477,
+          "line_end": 515
+        },
+        {
+          "path": "frontend/src/features/quick-generation/QuickGenerationView.vue",
+          "line_start": 147,
+          "line_end": 158
+        },
+        {
+          "path": "frontend/src/features/quick-generation/QuickGenerationView.vue",
+          "line_start": 198,
+          "line_end": 198
+        },
+        {
+          "path": "frontend/src/features/quick-generation/useQuickGeneration.ts",
+          "line_start": 61,
+          "line_end": 85
+        },
+        {
+          "path": "backend/app/quick_generation/service.py",
+          "line_start": 483,
+          "line_end": 504
+        },
+        {
+          "path": "frontend/src/features/quick-generation/QuickGenerationView.vue",
+          "line_start": 24,
+          "line_end": 46
+        },
+        {
+          "path": "frontend/src/features/quick-generation/useQuickGeneration.ts",
+          "line_start": 318,
+          "line_end": 344
+        },
+        {
+          "path": "frontend/src/features/quick-generation/useQuickGeneration.ts",
+          "line_start": 412,
+          "line_end": 438
+        },
+        {
+          "path": "frontend/src/features/quick-generation/useQuickGeneration.ts",
+          "line_start": 284,
+          "line_end": 307
+        },
+        {
+          "path": "frontend/src/features/quick-generation/QuickGenerationView.vue",
+          "line_start": 138,
+          "line_end": 138
+        },
+        {
+          "path": "backend/app/quick_generation/service.py",
+          "line_start": 406,
+          "line_end": 417
+        },
+        {
+          "path": "backend/app/quick_generation/service.py",
+          "line_start": 466,
+          "line_end": 475
+        }
+      ],
+      "deployment_status": "not_verified",
+      "review_required": true,
+      "path": "articles/quick-next-step.md"
+    },
+    {
+      "id": "quick-save-exit",
+      "title": "保存退出与返回已到达步骤",
+      "status": "draft",
+      "implementation_status": "implemented",
+      "applicable_routes": [
+        "/workspace/quick/:runId?"
+      ],
+      "source_refs": [
+        {
+          "path": "frontend/src/features/quick-generation/QuickGenerationView.vue",
+          "line_start": 24,
+          "line_end": 46
+        },
+        {
+          "path": "frontend/src/features/quick-generation/useQuickGeneration.ts",
+          "line_start": 318,
+          "line_end": 344
+        },
+        {
+          "path": "frontend/src/features/quick-generation/useQuickGeneration.ts",
+          "line_start": 412,
+          "line_end": 438
+        },
+        {
+          "path": "frontend/src/features/quick-generation/useQuickGeneration.ts",
+          "line_start": 134,
+          "line_end": 156
+        },
+        {
+          "path": "frontend/src/features/quick-generation/QuickGenerationView.vue",
+          "line_start": 138,
+          "line_end": 138
+        },
+        {
+          "path": "backend/app/quick_generation/service.py",
+          "line_start": 75,
+          "line_end": 100
+        },
+        {
+          "path": "backend/app/quick_generation/service.py",
+          "line_start": 257,
+          "line_end": 280
+        },
+        {
+          "path": "frontend/src/router.ts",
+          "line_start": 22,
+          "line_end": 29
+        },
+        {
+          "path": "frontend/src/features/workspace/ConversationList.vue",
+          "line_start": 176,
+          "line_end": 192
+        },
+        {
+          "path": "frontend/src/features/quick-generation/useQuickGeneration.ts",
+          "line_start": 205,
+          "line_end": 230
+        }
+      ],
+      "deployment_status": "not_verified",
+      "review_required": true,
+      "path": "articles/quick-save-exit.md"
+    },
+    {
+      "id": "quick-conflict",
+      "title": "进度冲突与修改后的重新确认",
+      "status": "draft",
+      "implementation_status": "implemented",
+      "applicable_routes": [
+        "/workspace/quick/:runId?"
+      ],
+      "source_refs": [
+        {
+          "path": "frontend/src/features/quick-generation/useQuickGeneration.ts",
+          "line_start": 134,
+          "line_end": 156
+        },
+        {
+          "path": "frontend/src/features/quick-generation/QuickGenerationView.vue",
+          "line_start": 138,
+          "line_end": 138
+        },
+        {
+          "path": "backend/app/quick_generation/service.py",
+          "line_start": 75,
+          "line_end": 100
+        },
+        {
+          "path": "backend/app/quick_generation/service.py",
+          "line_start": 257,
+          "line_end": 280
+        }
+      ],
+      "deployment_status": "not_verified",
+      "review_required": true,
+      "path": "articles/quick-conflict.md"
+    },
+    {
+      "id": "quick-complete",
+      "title": "完成汇总与只读查看",
+      "status": "draft",
+      "implementation_status": "implemented",
+      "applicable_routes": [
+        "/workspace/quick/:runId?"
+      ],
+      "source_refs": [
+        {
+          "path": "frontend/src/features/quick-generation/QuickGenerationView.vue",
+          "line_start": 173,
+          "line_end": 203
+        },
+        {
+          "path": "frontend/src/features/quick-generation/useQuickGeneration.ts",
+          "line_start": 51,
+          "line_end": 54
+        },
+        {
+          "path": "backend/app/quick_generation/service.py",
+          "line_start": 165,
+          "line_end": 167
+        },
+        {
+          "path": "backend/app/quick_generation/service.py",
+          "line_start": 511,
+          "line_end": 515
+        },
+        {
+          "path": "frontend/src/router.ts",
+          "line_start": 22,
+          "line_end": 29
+        },
+        {
+          "path": "frontend/src/features/workspace/ConversationList.vue",
+          "line_start": 176,
+          "line_end": 192
+        },
+        {
+          "path": "frontend/src/features/quick-generation/useQuickGeneration.ts",
+          "line_start": 205,
+          "line_end": 230
+        }
+      ],
+      "deployment_status": "not_verified",
+      "review_required": true,
+      "path": "articles/quick-complete.md"
+    },
+    {
+      "id": "quick-history",
+      "title": "查看图片和文案历史版本",
+      "status": "draft",
+      "implementation_status": "implemented",
+      "applicable_routes": [
+        "/workspace/quick/:runId?"
+      ],
+      "source_refs": [
+        {
+          "path": "frontend/src/features/quick-generation/QuickImageHistory.vue",
+          "line_start": 12,
+          "line_end": 43
+        },
+        {
+          "path": "frontend/src/features/quick-generation/QuickCopyHistory.vue",
+          "line_start": 14,
+          "line_end": 43
+        },
+        {
+          "path": "backend/app/quick_generation/service.py",
+          "line_start": 191,
+          "line_end": 205
+        }
+      ],
+      "deployment_status": "not_verified",
+      "review_required": true,
+      "path": "articles/quick-history.md"
+    },
+    {
+      "id": "quick-recovery",
+      "title": "任务核查、保存恢复与成果读取失败",
+      "status": "draft",
+      "implementation_status": "implemented",
+      "applicable_routes": [
+        "/workspace/quick/:runId?"
+      ],
+      "source_refs": [
+        {
+          "path": "frontend/src/components/TaskCard.vue",
+          "line_start": 70,
+          "line_end": 83
+        },
+        {
+          "path": "frontend/src/components/TaskCard.vue",
+          "line_start": 108,
+          "line_end": 113
+        },
+        {
+          "path": "frontend/src/features/quick-generation/useQuickGeneration.ts",
+          "line_start": 367,
+          "line_end": 369
+        },
+        {
+          "path": "frontend/src/features/quick-generation/useQuickGeneration.ts",
+          "line_start": 412,
+          "line_end": 429
+        },
+        {
+          "path": "frontend/src/features/quick-generation/QuickGenerationView.vue",
+          "line_start": 24,
+          "line_end": 46
+        },
+        {
+          "path": "frontend/src/features/quick-generation/useQuickGeneration.ts",
+          "line_start": 318,
+          "line_end": 344
+        },
+        {
+          "path": "frontend/src/features/quick-generation/useQuickGeneration.ts",
+          "line_start": 412,
+          "line_end": 438
+        },
+        {
+          "path": "docs/电商AI创作平台-首版需求终稿-2026-10-09.md",
+          "line_start": 201,
+          "line_end": 207
+        },
+        {
+          "path": "docs/电商AI创作平台-首版需求终稿-2026-10-09.md",
+          "line_start": 382,
+          "line_end": 384
+        },
+        {
+          "path": "frontend/src/features/quick-generation/useQuickGeneration.ts",
+          "line_start": 78,
+          "line_end": 83
+        }
+      ],
+      "deployment_status": "not_verified",
+      "review_required": true,
+      "path": "articles/quick-recovery.md"
+    },
+    {
+      "id": "account-login",
+      "title": "账号注册与登录",
+      "status": "draft",
+      "implementation_status": "implemented",
+      "applicable_routes": [
+        "/login",
+        "/register"
+      ],
+      "source_refs": [
+        {
+          "path": "frontend/src/features/auth/AuthForm.vue",
+          "line_start": 20,
+          "line_end": 55
+        },
+        {
+          "path": "backend/app/auth/schemas.py",
+          "line_start": 10,
+          "line_end": 17
+        },
+        {
+          "path": "backend/app/auth/service.py",
+          "line_start": 73,
+          "line_end": 123
+        },
+        {
+          "path": "frontend/src/router.ts",
+          "line_start": 44,
+          "line_end": 48
+        }
+      ],
+      "deployment_status": "not_verified",
+      "review_required": true,
+      "path": "articles/account-login.md"
+    },
+    {
+      "id": "account-password",
+      "title": "修改密码与无法登录时的处理",
+      "status": "draft",
+      "implementation_status": "implemented",
+      "applicable_routes": [
+        "/account",
+        "/login"
+      ],
+      "source_refs": [
+        {
+          "path": "frontend/src/features/account/ChangePasswordDrawer.vue",
+          "line_start": 19,
+          "line_end": 48
+        },
+        {
+          "path": "backend/app/admin/user_management.py",
+          "line_start": 237,
+          "line_end": 250
+        },
+        {
+          "path": "docs/电商AI创作平台-首版需求终稿-2026-10-09.md",
+          "line_start": 382,
+          "line_end": 382
+        }
+      ],
+      "deployment_status": "not_verified",
+      "review_required": true,
+      "path": "articles/account-password.md"
+    },
+    {
+      "id": "account-credits",
+      "title": "查看可用积分、冻结积分和流水",
+      "status": "draft",
+      "implementation_status": "implemented",
+      "applicable_routes": [
+        "/account",
+        "/workspace/quick/:runId?"
+      ],
+      "source_refs": [
+        {
+          "path": "frontend/src/features/account/AccountView.vue",
+          "line_start": 179,
+          "line_end": 193
+        },
+        {
+          "path": "frontend/src/features/account/AccountView.vue",
+          "line_start": 210,
+          "line_end": 210
+        },
+        {
+          "path": "backend/app/ledger/routes.py",
+          "line_start": 1,
+          "line_end": 37
+        },
+        {
+          "path": "frontend/src/components/TaskCard.vue",
+          "line_start": 36,
+          "line_end": 66
+        },
+        {
+          "path": "frontend/src/components/TaskCard.vue",
+          "line_start": 98,
+          "line_end": 120
+        },
+        {
+          "path": "backend/app/tasks/failed_actions.py",
+          "line_start": 28,
+          "line_end": 69
+        },
+        {
+          "path": "backend/app/tasks/failed_actions.py",
+          "line_start": 97,
+          "line_end": 130
+        },
+        {
+          "path": "backend/app/tasks/state_machine.py",
+          "line_start": 166,
+          "line_end": 168
+        },
+        {
+          "path": "backend/app/catalog/service.py",
+          "line_start": 464,
+          "line_end": 542
+        },
+        {
+          "path": "backend/app/tasks/admission.py",
+          "line_start": 106,
+          "line_end": 126
+        },
+        {
+          "path": "backend/app/tasks/admission.py",
+          "line_start": 250,
+          "line_end": 251
+        },
+        {
+          "path": "backend/app/quick_generation/service.py",
+          "line_start": 406,
+          "line_end": 438
+        },
+        {
+          "path": "frontend/src/features/quick-generation/useQuickGeneration.ts",
+          "line_start": 87,
+          "line_end": 89
+        }
+      ],
+      "deployment_status": "not_verified",
+      "review_required": true,
+      "path": "articles/account-credits.md"
+    },
+    {
+      "id": "account-recharge",
+      "title": "充值入口当前能做什么",
+      "status": "draft",
+      "implementation_status": "implemented",
+      "applicable_routes": [
+        "/recharge",
+        "/account"
+      ],
+      "source_refs": [
+        {
+          "path": "frontend/src/features/account/RechargeInfoView.vue",
+          "line_start": 11,
+          "line_end": 18
+        },
+        {
+          "path": "docs/电商AI创作平台-首版需求终稿-2026-10-09.md",
+          "line_start": 209,
+          "line_end": 224
+        }
+      ],
+      "deployment_status": "not_verified",
+      "review_required": true,
+      "path": "articles/account-recharge.md"
+    },
+    {
+      "id": "works-find",
+      "title": "查询和查看我的作品",
+      "status": "draft",
+      "implementation_status": "implemented",
+      "applicable_routes": [
+        "/works"
+      ],
+      "source_refs": [
+        {
+          "path": "frontend/src/features/works/WorksView.vue",
+          "line_start": 15,
+          "line_end": 40
+        },
+        {
+          "path": "frontend/src/features/works/WorksView.vue",
+          "line_start": 58,
+          "line_end": 74
+        },
+        {
+          "path": "backend/app/works/service.py",
+          "line_start": 46,
+          "line_end": 80
+        }
+      ],
+      "deployment_status": "not_verified",
+      "review_required": true,
+      "path": "articles/works-find.md"
+    },
+    {
+      "id": "works-download",
+      "title": "预览、复制和下载作品",
+      "status": "draft",
+      "implementation_status": "implemented",
+      "applicable_routes": [
+        "/works",
+        "/workspace/quick/:runId?"
+      ],
+      "source_refs": [
+        {
+          "path": "frontend/src/components/ResultViewer.vue",
+          "line_start": 14,
+          "line_end": 29
+        },
+        {
+          "path": "frontend/src/components/ResultViewer.vue",
+          "line_start": 45,
+          "line_end": 69
+        },
+        {
+          "path": "frontend/src/features/works/WorksView.vue",
+          "line_start": 65,
+          "line_end": 65
+        }
+      ],
+      "deployment_status": "not_verified",
+      "review_required": true,
+      "path": "articles/works-download.md"
+    },
+    {
+      "id": "works-delete",
+      "title": "删除作品的后果",
+      "status": "draft",
+      "implementation_status": "implemented",
+      "applicable_routes": [
+        "/works"
+      ],
+      "source_refs": [
+        {
+          "path": "frontend/src/features/works/WorksView.vue",
+          "line_start": 77,
+          "line_end": 77
+        },
+        {
+          "path": "backend/app/works/lifecycle.py",
+          "line_start": 28,
+          "line_end": 34
+        },
+        {
+          "path": "backend/app/works/lifecycle.py",
+          "line_start": 94,
+          "line_end": 159
+        }
+      ],
+      "deployment_status": "not_verified",
+      "review_required": true,
+      "path": "articles/works-delete.md"
+    },
+    {
+      "id": "support-demo",
+      "title": "玲玲客服展示页的能力边界",
+      "status": "draft",
+      "implementation_status": "implemented",
+      "applicable_routes": [
+        "/ai-customer-service"
+      ],
+      "source_refs": [
+        {
+          "path": "frontend/src/features/site/customer-service/CustomerServiceView.vue",
+          "line_start": 15,
+          "line_end": 31
+        },
+        {
+          "path": "frontend/src/features/site/customer-service/CustomerServiceView.vue",
+          "line_start": 80,
+          "line_end": 96
+        },
+        {
+          "path": "docs/product-design.md",
+          "line_start": 13,
+          "line_end": 13
+        }
+      ],
+      "deployment_status": "not_verified",
+      "review_required": true,
+      "path": "articles/support-demo.md"
+    },
+    {
+      "id": "support-human",
+      "title": "哪些问题需要工作人员核查",
+      "status": "draft",
+      "implementation_status": "implemented",
+      "applicable_routes": [
+        "/workspace/quick/:runId?",
+        "/login",
+        "/account",
+        "/works"
+      ],
+      "source_refs": [
+        {
+          "path": "docs/电商AI创作平台-首版需求终稿-2026-10-09.md",
+          "line_start": 201,
+          "line_end": 207
+        },
+        {
+          "path": "docs/电商AI创作平台-首版需求终稿-2026-10-09.md",
+          "line_start": 382,
+          "line_end": 384
+        },
+        {
+          "path": "frontend/src/features/quick-generation/useQuickGeneration.ts",
+          "line_start": 78,
+          "line_end": 83
+        },
+        {
+          "path": "frontend/src/features/account/ChangePasswordDrawer.vue",
+          "line_start": 19,
+          "line_end": 48
+        },
+        {
+          "path": "backend/app/admin/user_management.py",
+          "line_start": 237,
+          "line_end": 250
+        },
+        {
+          "path": "docs/电商AI创作平台-首版需求终稿-2026-10-09.md",
+          "line_start": 382,
+          "line_end": 382
+        },
+        {
+          "path": "frontend/src/components/TaskCard.vue",
+          "line_start": 36,
+          "line_end": 66
+        },
+        {
+          "path": "frontend/src/components/TaskCard.vue",
+          "line_start": 98,
+          "line_end": 120
+        },
+        {
+          "path": "backend/app/tasks/failed_actions.py",
+          "line_start": 28,
+          "line_end": 69
+        },
+        {
+          "path": "backend/app/tasks/failed_actions.py",
+          "line_start": 97,
+          "line_end": 130
+        },
+        {
+          "path": "backend/app/tasks/state_machine.py",
+          "line_start": 166,
+          "line_end": 168
+        }
+      ],
+      "deployment_status": "not_verified",
+      "review_required": true,
+      "path": "articles/support-human.md"
+    },
+    {
+      "id": "planned-context-service",
+      "title": "规划中的页面感知客服",
+      "status": "draft",
+      "implementation_status": "planned",
+      "applicable_routes": [
+        "/ai-customer-service",
+        "/workspace/quick/:runId?"
+      ],
+      "source_refs": [
+        {
+          "path": "frontend/src/features/site/customer-service/CustomerServiceView.vue",
+          "line_start": 15,
+          "line_end": 31
+        },
+        {
+          "path": "frontend/src/features/site/customer-service/CustomerServiceView.vue",
+          "line_start": 80,
+          "line_end": 96
+        },
+        {
+          "path": "docs/product-design.md",
+          "line_start": 13,
+          "line_end": 13
+        }
+      ],
+      "deployment_status": "not_verified",
+      "review_required": true,
+      "path": "planned/planned-context-service.md"
+    },
+    {
+      "id": "planned-payments",
+      "title": "后续在线支付与退款规则",
+      "status": "draft",
+      "implementation_status": "planned",
+      "applicable_routes": [
+        "/recharge"
+      ],
+      "source_refs": [
+        {
+          "path": "frontend/src/features/account/RechargeInfoView.vue",
+          "line_start": 11,
+          "line_end": 18
+        },
+        {
+          "path": "docs/电商AI创作平台-首版需求终稿-2026-10-09.md",
+          "line_start": 209,
+          "line_end": 224
+        }
+      ],
+      "deployment_status": "not_verified",
+      "review_required": true,
+      "path": "planned/planned-payments.md"
+    },
+    {
+      "id": "unknown-self-recovery",
+      "title": "待确认的自助找回与人工身份核验",
+      "status": "draft",
+      "implementation_status": "unknown",
+      "applicable_routes": [
+        "/login"
+      ],
+      "source_refs": [
+        {
+          "path": "frontend/src/features/account/ChangePasswordDrawer.vue",
+          "line_start": 19,
+          "line_end": 48
+        },
+        {
+          "path": "backend/app/admin/user_management.py",
+          "line_start": 237,
+          "line_end": 250
+        },
+        {
+          "path": "docs/电商AI创作平台-首版需求终稿-2026-10-09.md",
+          "line_start": 382,
+          "line_end": 382
+        },
+        {
+          "path": "frontend/src/features/auth/AuthForm.vue",
+          "line_start": 20,
+          "line_end": 55
+        },
+        {
+          "path": "backend/app/auth/schemas.py",
+          "line_start": 10,
+          "line_end": 17
+        },
+        {
+          "path": "backend/app/auth/service.py",
+          "line_start": 73,
+          "line_end": 123
+        },
+        {
+          "path": "frontend/src/router.ts",
+          "line_start": 44,
+          "line_end": 48
+        }
+      ],
+      "deployment_status": "not_verified",
+      "review_required": true,
+      "path": "planned/unknown-self-recovery.md"
+    }
+  ]
+}
