@@ -1,5 +1,7 @@
 # 项目设计资料入口
 
+- 整理工作区或涉及首页版本选择时，先读 `docs/workspace-map.md`。当前独立首页为 `standalone/feima-home-v4/`（已有 805 端口发布记录），业务首页仍为 `frontend/src/features/site/HomeView.vue`（光场布局＋摄影 V3）；两者并存。旧独立 V3 与 ZIP 在 `standalone/archive/`，不能将待确认设计稿或历史截图当作当前采用稿。
+
 涉及本项目原型、界面、组件、导航或用户操作流程时，先读取 `docs/product-design.md` 和本次适用需求/计划。路径相对于本 AGENTS.md 所在目录。
 
 - 已确认需求以 `docs/电商AI创作平台-首版需求终稿-2026-10-09.md` 为依据。

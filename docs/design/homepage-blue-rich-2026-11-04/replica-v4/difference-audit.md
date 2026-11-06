@@ -2,7 +2,7 @@
 
 分析角色：`/root/replica_difference_audit`。2026-11-04。
 
-本报告实际查看了 `revision-v3/upper-v3.png`、`middle-v3.png`、`lower-v3.png` 及旧页面 `desktop-full-1440.png`，并读取旧 `standalone/feima-home-v3/index.html` 与 `styles.css`。仅分析，没有改页面或素材。
+本报告实际查看了 `revision-v3/upper-v3.png`、`middle-v3.png`、`lower-v3.png` 及旧页面 `desktop-full-1440.png`，并读取旧 `standalone/feima-home-v3/index.html` 与 `styles.css`。仅分析，没有改页面或素材。2026-11-06 整理补注：旧 V3 现归档至 [standalone/archive/feima-home-v3](../../../../standalone/archive/feima-home-v3/README.md)，上述路径为当时读取位置。
 
 ## 结论
 

@@ -1,5 +1,8 @@
 # 飞马首页 V3 · 独立预览
 
+> 状态核对（2026-11-06）：**已被 V4 替代，历史独立预览。** 完整源码归档供对照，未找到本 V3 的独立发布记录。当前入口为 [V4](../../feima-home-v4/README.md)；本目录仍可直接打开 index.html。 [全部版本台账](../../../docs/workspace-map.md)。下文保留原交付时点的记录。
+
+
 直接双击 `index.html`，或用浏览器打开该文件。页面使用原生 HTML、CSS、JavaScript 和本地图片，无需安装、构建、网络或业务系统。
 
 - 对应设计：`docs/design/homepage-blue-rich-2026-11-04/revision-v3/` 三张稿。

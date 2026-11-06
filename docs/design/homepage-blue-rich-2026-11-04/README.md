@@ -1,5 +1,8 @@
 # 飞马首页 · 蓝色图文深化 V2
 
+> 状态核对（2026-11-06）：**V2 为迭代基础，已由 V3 修订稿替代；V3 已被独立首页 V4 采用并发布。** 当前对照稿见 [revision-v3](revision-v3/README.md)，实现与后续调整见 [replica-v4](replica-v4/README.md)。下方“待确认／尚未修改”保留本轮当时状态。 [全部版本台账](../../workspace-map.md)。下文保留原交付时点的记录。
+
+
 > 2026-11-04 新增 [V3 定向修订](revision-v3/brief.md)：七个对外标题居中去编号、品牌融入透明导航、首屏5s轮播状态与提示文案。另开设计agent完成，[上段](revision-v3/upper-v3.png)／[中段](revision-v3/middle-v3.png)／[下段](revision-v3/lower-v3.png)待用户确认。V2保留供对照，正式页面尚未修改。
 
 日期：2026-11-04。状态：平面高保真设计待用户确认。尚未修改或接入正式首页。

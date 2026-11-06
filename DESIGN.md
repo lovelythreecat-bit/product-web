@@ -42,6 +42,8 @@ components:
 
 ## Overview
 
+首页版本请先查 [工作区台账](docs/workspace-map.md)：本文 Layout / Components 中的首页指业务系统 `HomeView.vue`。当前独立宣传首页在 `standalone/feima-home-v4/`，采用蓝色图文 V3 的固定视觉，已有 805 端口发布记录；它没有替换业务首页或非首页共享主题。
+
 用户于 2026-10-30 确认的飞马蓝色双主题。以清楚的阅读层级、冷白或墨蓝画布、克制的蓝色操作和自然商品摄影组成界面。Logo 按用户 2026-11-03 的替换要求使用透明背景版 `frontend/src/assets/feima-logo-transparent.png`，保留飞马与完整文字，通过 `BrandMark.vue` 与浏览器图标共同引用；品牌名称仍由后台设置。
 
 本文记录共享设计系统；运行时数值由 `frontend/src/styles/tokens.css`、`themes.css` 和 `element-theme.css` 实现，修改时同步维护。

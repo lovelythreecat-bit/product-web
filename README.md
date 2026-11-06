@@ -4,12 +4,14 @@
 
 [界面预览](#界面预览) · [核心能力](#核心能力) · [本地启动](#本地启动) · [技术结构](#技术结构) · [项目文档](#项目文档)
 
+**工作区入口（2026-11-06）：** [目录导航与首页版本台账](docs/workspace-map.md) · [当前独立首页 V4](standalone/feima-home-v4/README.md) · [业务系统首页](frontend/src/features/site/HomeView.vue) · [设计资料导航](docs/design/README.md)。独立 V4 已有 805 端口发布记录；业务系统 `/` 仍使用光场布局＋摄影 V3，两者独立维护。下方首页截图保留的是 2026-10-30 历史样式。
+
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="assets/readme/feima-home-dark.png">
   <img src="assets/readme/feima-home-light.png" width="100%" alt="飞马蓝色首页：让好商品，亮眼登场；围绕鞋服、美妆、数码商品展示文案、图片和视频创作入口">
 </picture>
 
-本分支采用 2026-10-30 确认的**飞马蓝色浅色／深色 UI**，覆盖首页、创作工作台、账户与后台。平台名称可由管理员设置；截图使用“飞马”作为展示名称。[设计规范](DESIGN.md) · [浅色首页原图](assets/readme/feima-home-light.png) · [深色首页原图](assets/readme/feima-home-dark.png)
+业务系统沿用 2026-10-30 确认的**飞马蓝色浅色／深色 UI**；首页布局与配图此后已迭代，独立首页采用自己的固定视觉。平台名称可由管理员设置；下方历史截图使用“飞马”作为展示名称。[设计规范](DESIGN.md) · [历史浅色首页原图](assets/readme/feima-home-light.png) · [历史深色首页原图](assets/readme/feima-home-dark.png)
 
 ## 界面预览
 
@@ -155,11 +157,14 @@ Vue 3 / TypeScript / Element Plus
 | [`contracts/`](contracts) | [OpenAPI](contracts/openapi.json)、[Agent 协议](contracts/agents)与[政策边界](contracts/policies/README.md) |
 | [`infra/`](infra) | [开发 Compose](infra/compose.dev.yaml)、[环境示例](infra/env.example)、[运维手册](infra/runbooks) |
 | [`docs/`](docs) | 需求、设计、实施计划与专项验证记录 |
+| [`standalone/`](standalone/README.md) | 当前独立首页 V4；旧 V3 与交付包归入 archive |
+| [`output/`](output/README.md) | 原始交付素材、历史验证截图与导出包 |
 
 ## 项目文档
 
 | 想了解什么 | 从这里开始 |
 | --- | --- |
+| 当前工作区与首页采用状态 | [工作区导航及版本台账](docs/workspace-map.md) · [独立首页模块](standalone/README.md) · [设计导航](docs/design/README.md) |
 | 产品范围与已确认设计 | [需求终稿](docs/电商AI创作平台-首版需求终稿-2026-10-09.md) · [产品设计入口及后续变更](docs/product-design.md) · [飞马设计规范](DESIGN.md) · [双主题设计稿](docs/design/feima-ui-2026-10-29/README.md) |
 | 页面开发与共享组件 | [前端说明](frontend/README.md) · [公共控件约定](docs/development/frontend-ui.md) |
 | 文案、图片、视频接入证据 | [文案真实链路](docs/verification/local-text-generation-2026-10-16.md) · [图片配置与受理核查](docs/verification/local-image-generation-2026-10-16.md) · [视频真实链路](docs/verification/local-video-generation-2026-10-17.md) |
