@@ -1,0 +1,52 @@
+[
+  {
+    "label": "desktop-light",
+    "width": 1440,
+    "clientWidth": 1425,
+    "scrollWidth": 1425,
+    "images": true,
+    "sourceCount": 1,
+    "sourceLabel": "上传的商品原图",
+    "workspaceSource": false
+  },
+  {
+    "label": "mobile-light",
+    "width": 390,
+    "clientWidth": 375,
+    "scrollWidth": 375,
+    "images": true,
+    "sourceCount": 1,
+    "sourceLabel": "上传的商品原图",
+    "workspaceSource": false
+  },
+  {
+    "label": "narrow-dark",
+    "width": 320,
+    "clientWidth": 305,
+    "scrollWidth": 305,
+    "images": true,
+    "sourceCount": 1,
+    "sourceLabel": "上传的商品原图",
+    "workspaceSource": false
+  },
+  {
+    "label": "overview",
+    "images": 7,
+    "allDecoded": true,
+    "clientWidth": 1440,
+    "scrollWidth": 1440
+  },
+  {
+    "label": "final-mobile-after-fit",
+    "width": 390,
+    "clientWidth": 375,
+    "scrollWidth": 375,
+    "images": true,
+    "captionMargin": "330px"
+  },
+  {
+    "label": "final-overview",
+    "images": 7,
+    "allDecoded": true
+  }
+]

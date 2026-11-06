@@ -1,0 +1,202 @@
+{
+  "status": "draft",
+  "reviewed_on": "2026-11-03",
+  "validation_type": "static_files_only",
+  "result": "passed",
+  "counts": {
+    "files": 42,
+    "articles": 30,
+    "planned_or_unknown": 3,
+    "nodes": 88,
+    "edges": 106,
+    "evaluation_cases": 30,
+    "source_files": 39
+  },
+  "checks": {
+    "jsonl_format": true,
+    "frontmatter_metadata": true,
+    "ids_unique": true,
+    "edge_references": true,
+    "source_paths_and_line_ranges": true,
+    "evaluation_source_articles": true,
+    "conditional_edge_fields": true,
+    "synthetic_contexts": true,
+    "planned_separate": true,
+    "local_document_links": true,
+    "all_draft": true
+  },
+  "errors": [],
+  "not_executed": [
+    "business_application",
+    "database_access",
+    "paid_models",
+    "model_answer_evaluation",
+    "browser_locator_validation",
+    "Chroma_import",
+    "Neo4j_import",
+    "production_verification"
+  ],
+  "limitations": [
+    "Source existence and ranges do not establish semantic correctness; human review required.",
+    "NEXT_STEP and REQUIRES are descriptive constraints, not an implemented rule engine.",
+    "Working tree source hashes identify the local evidence snapshot, not a deployed release."
+  ],
+  "source_files": {
+    "frontend/src/router.ts": {
+      "line_count": 58,
+      "sha256": "b3cc0e356263bec088856e744330274409785eed4ca8a11e72a56f2f14869913"
+    },
+    "frontend/src/features/workspace/ConversationList.vue": {
+      "line_count": 256,
+      "sha256": "9cdee7f55307689b7e738bfa68c0e4896fec4edc63575760df7f44a21d98c482"
+    },
+    "frontend/src/features/quick-generation/useQuickGeneration.ts": {
+      "line_count": 440,
+      "sha256": "8a2b98d222cfebc47cc1681f85128835132407db23d7d5bf590e6006eac9d128"
+    },
+    "frontend/src/features/quick-generation/QuickGenerationView.vue": {
+      "line_count": 221,
+      "sha256": "16c69f3b3855f1dc1fd76b95696a4238904cfc6ddf8308d05ecfa9ad6ed53b48"
+    },
+    "backend/app/quick_generation/service.py": {
+      "line_count": 517,
+      "sha256": "f83c8d2649f49d0b0cdd1a746250476b2a69728c9f36be88ee9f02b652c5772d"
+    },
+    "frontend/src/features/quick-generation/QuickProductEditor.vue": {
+      "line_count": 75,
+      "sha256": "2a0e10cdfe1388a22877e5a9202e5250de6aa6b76c1334fb148a4d0b1bc7f47f"
+    },
+    "frontend/src/features/workspace/productTypes.ts": {
+      "line_count": 34,
+      "sha256": "d31a8e0800449097d3b24655fe208580b50249c72113315fb259fcde7f223adb"
+    },
+    "frontend/src/features/workspace/display.ts": {
+      "line_count": 47,
+      "sha256": "8ee6a59d3eeb3acb7f43efc1c8c19e1b8a4d0502a1ffad6999a684c29f35e61d"
+    },
+    "backend/app/catalog/service.py": {
+      "line_count": 657,
+      "sha256": "cdfdeb96742e703c7e7d618e2bc4bda3d4ceb3009fb2b7e5170b80f86182f952"
+    },
+    "frontend/src/features/workspace/materialLimits.ts": {
+      "line_count": 2,
+      "sha256": "b4b169183aff31ce618972b38852db101828897f74f6c14540220df676ca7371"
+    },
+    "backend/app/common/types.py": {
+      "line_count": 134,
+      "sha256": "121596062119a7ea5c5bc994ea4d881eacb739457455f54f5573a350bb253aba"
+    },
+    "backend/app/storage/service.py": {
+      "line_count": 79,
+      "sha256": "08cfedd99d95ffd6b6e9e127ab0a4fe7e87a6ea367e6205c1483791e3b4b61e1"
+    },
+    "backend/app/quick_generation/schemas.py": {
+      "line_count": 93,
+      "sha256": "ffaa94d8a055233b02f46d33c632659c82cda80265378e25b3138f6ab85333f0"
+    },
+    "frontend/src/features/quick-generation/QuickCopyRequirements.vue": {
+      "line_count": 53,
+      "sha256": "f6169fbdb70b81b475bed4abb5c1c9b6ca78012777816378aa72cf1b861b9048"
+    },
+    "frontend/src/features/workspace/TextChoices.vue": {
+      "line_count": 58,
+      "sha256": "f002d0cab5cfdce65171aaaa975c7de0b1de6aaf54c4ddae0f0ba5bcdc6c5064"
+    },
+    "backend/app/tasks/admission.py": {
+      "line_count": 417,
+      "sha256": "c64cbe29640146ab282dda7bd50e2d68578635aac530dbeb66065b7771fcdc82"
+    },
+    "frontend/src/features/workspace/VideoTaskPanel.vue": {
+      "line_count": 194,
+      "sha256": "2595ac5fcd7a2c93e7482bc41516fbf4282260843d78bde24d9a407139852f47"
+    },
+    "backend/app/tasks/media_routes.py": {
+      "line_count": 254,
+      "sha256": "9f61d1f8eb121db6ff5937678da386a48b7190310d91d0684e5a6afbffc37cc2"
+    },
+    "frontend/src/features/account/RechargeInfoView.vue": {
+      "line_count": 35,
+      "sha256": "4252c00b39450621ff098ea0301cd0df7ee65a95c7aee6eef8154ad182d70384"
+    },
+    "docs/电商AI创作平台-首版需求终稿-2026-10-09.md": {
+      "line_count": 420,
+      "sha256": "d9f6160207ba89f4b00f1cd6ea87d7cb01108af9e4fb480a84a32df4753600ce"
+    },
+    "frontend/src/components/TaskCard.vue": {
+      "line_count": 161,
+      "sha256": "c08dc2d70339f0746cb9ff54b51dd8878039e40667d6ffbe23f1d0d304e07772"
+    },
+    "backend/app/tasks/failed_actions.py": {
+      "line_count": 130,
+      "sha256": "8c51e58ff8e09b3d16f0d1594064fc69028fc2bf1d120401be4ce1f020d02193"
+    },
+    "backend/app/tasks/state_machine.py": {
+      "line_count": 274,
+      "sha256": "1a4b3a807df52c1edf231e029718037d934455e93664f9f6cfc50645b90ff171"
+    },
+    "backend/app/tasks/stopped_image_retry.py": {
+      "line_count": 89,
+      "sha256": "f0c565fbd69d9882f9855c4582ffb8058ac757706f0d0697d1dcf1aae3b0fc4f"
+    },
+    "docs/product-design.md": {
+      "line_count": 172,
+      "sha256": "331963f1a2ea30add18034bf2fa84c3714b12fb3c0da218f3bbd5863f51537ac"
+    },
+    "frontend/src/features/quick-generation/QuickImageHistory.vue": {
+      "line_count": 54,
+      "sha256": "c69a723afb651cb776a749b9c3b81130986394ce642a43f4e6e9b3c1638e9368"
+    },
+    "frontend/src/features/quick-generation/QuickCopyHistory.vue": {
+      "line_count": 55,
+      "sha256": "a59f1c67e54ef78bf2e045d9d2fd327ebd0b805c60a853194e621527a3edfb8f"
+    },
+    "frontend/src/features/auth/AuthForm.vue": {
+      "line_count": 90,
+      "sha256": "d5bbdff11735f172699ab359f847f479d67ba583e0126be8ba036aae1c96de5f"
+    },
+    "backend/app/auth/schemas.py": {
+      "line_count": 84,
+      "sha256": "9da4526e26700765004de5a47b53167e6ecf8ca82129e92ca1d56e6a6a3429b4"
+    },
+    "backend/app/auth/service.py": {
+      "line_count": 333,
+      "sha256": "c5655ea0140aad19a1b7c9012e0271b385d38dc420adca267763b95bbeae3dce"
+    },
+    "frontend/src/features/account/ChangePasswordDrawer.vue": {
+      "line_count": 52,
+      "sha256": "0bd100991cd5ad3d07031272c7a53587d4e3c6c0005e6dbe5c2ba8627eb27e1f"
+    },
+    "backend/app/admin/user_management.py": {
+      "line_count": 471,
+      "sha256": "dccd338472bd2fb41598634d328d871c100e8f63e8422431e4383ce5f6835b44"
+    },
+    "frontend/src/features/account/AccountView.vue": {
+      "line_count": 326,
+      "sha256": "f81fe1c5f862f59281c7ba1cb699f5a7eb115d4f6211d92f46be0d43e619ac4f"
+    },
+    "backend/app/ledger/routes.py": {
+      "line_count": 34,
+      "sha256": "4d0d58b786290c0fcf6c80ce5a01d5500b7b278fe14c01c72cfde26d6bc31e5a"
+    },
+    "frontend/src/features/works/WorksView.vue": {
+      "line_count": 130,
+      "sha256": "c3ab264aadaddafba5101fb8504cb868f8a932d2d8727a06c74e88af0bc430d4"
+    },
+    "backend/app/works/service.py": {
+      "line_count": 241,
+      "sha256": "805004b77db6a989c6f4c64fa8ba43e6da5e2e75545f672d7ecca7b6e9a86342"
+    },
+    "frontend/src/components/ResultViewer.vue": {
+      "line_count": 114,
+      "sha256": "357e4f0eb0c662717dae62f7e4f40e7c5badee0f3f86b34a2e738a6eee72ec24"
+    },
+    "backend/app/works/lifecycle.py": {
+      "line_count": 296,
+      "sha256": "5a017cebb07d9d5bd1bbcad6fa25e89ecb1ab60a4338a3298672c7ae9b2af684"
+    },
+    "frontend/src/features/site/customer-service/CustomerServiceView.vue": {
+      "line_count": 103,
+      "sha256": "0e46181fdb7e0478acdcb01a626a9a4f927c422b1095a679c4f670d3a382eb44"
+    }
+  }
+}

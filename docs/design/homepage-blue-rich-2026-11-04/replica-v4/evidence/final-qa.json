@@ -1,0 +1,72 @@
+{
+  "timer": {
+    "elapsedMs": 5021,
+    "selected": "tab-1"
+  },
+  "manual": {
+    "selected": "tab-2",
+    "visible": [
+      "pane-2"
+    ]
+  },
+  "keyboard": "tab-0",
+  "demo": {
+    "open": true,
+    "step": "2"
+  },
+  "focus": "trial",
+  "desktop1440": {
+    "width": 1440,
+    "scrollWidth": 1440,
+    "height": 6480,
+    "errors": []
+  },
+  "mobilePanes": [
+    {
+      "selected": "tab-0",
+      "width": 390,
+      "scrollWidth": 390
+    },
+    {
+      "selected": "tab-1",
+      "width": 390,
+      "scrollWidth": 390
+    },
+    {
+      "selected": "tab-2",
+      "width": 390,
+      "scrollWidth": 390
+    }
+  ],
+  "final1024": {
+    "height": 4608,
+    "scrollWidth": 1024,
+    "broken": 0,
+    "cases": [
+      {
+        "chipsBottom": 241.03125,
+        "statTop": 259
+      },
+      {
+        "chipsBottom": 224.484375,
+        "statTop": 259
+      },
+      {
+        "chipsBottom": 224.484375,
+        "statTop": 259
+      },
+      {
+        "chipsBottom": 204.484375,
+        "statTop": 208
+      },
+      {
+        "chipsBottom": 204.484375,
+        "statTop": 208
+      },
+      {
+        "chipsBottom": 204.484375,
+        "statTop": 208
+      }
+    ]
+  }
+}

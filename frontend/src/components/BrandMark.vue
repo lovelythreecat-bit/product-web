@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import brandMark from '../assets/feima-logo-blue.png'
+import brandMark from '../assets/feima-logo-transparent.png'
 </script>
 <template><img class="brand-symbol" :src="brandMark" alt="" aria-hidden="true" width="40" height="40" /></template>
 <style scoped>

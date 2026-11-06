@@ -1,0 +1,11 @@
+const task=await taskSpace(36),page=task.page('p1');
+const win=await task.cdp('Browser.getWindowForTarget',{targetId:page.targetId});
+console.log('window',win);
+if(win.bounds.windowState==='minimized')await task.cdp('Browser.setWindowBounds',{windowId:win.windowId,bounds:{windowState:'normal'}});
+await page.reload();
+await page.waitForSelector('.folder-panel');
+await page.cdp('Emulation.setDeviceMetricsOverride',{width:1440,height:1000,deviceScaleFactor:1,mobile:false});
+await page.waitForFunction(()=>document.querySelector('.folder-results img').complete&&getComputedStyle(document.querySelector('.folders')).opacity==='1');
+await page.evaluate(()=>window.scrollTo({top:0,behavior:'instant'}));
+console.log(await page.screenshot({path:'F:/Work/电商/web/docs/design/homepage-folder-2026-11-03/shots/desktop-hero.png'}));
+console.log(await page.evaluate(()=>({width:innerWidth,height:innerHeight})));

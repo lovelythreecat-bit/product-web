@@ -1,0 +1,4 @@
+工具：内置 imagegen，透明背景模式。
+原图：frontend/src/assets/feima-logo-blue.png。
+交付：feima-logo-transparent.png。保留白色飞马及文字，蓝色背景已透明化；边缘仍有可见杂点，作为抠图初稿，未替换网站资产。
+提示词：Remove ONLY the entire blue gradient background and produce a genuinely transparent RGBA PNG. Preserve the original white/silver Pegasus silhouette, wing feathers, mane, pose, all original text precisely: 飞马, FEIMA, 电商助手, and the small horizontal decorative lines. Preserve original composition, proportions and positions. Clean anti-aliased edges, no blue rectangular background, no blue fringes, no additional objects, no redesign, no new lettering, no shadow, no fake checkerboard. Keep the original white/silver foreground colors.

@@ -1,0 +1,16 @@
+const task=await taskSpace(36),page=task.page('p1');
+await page.reload();await page.waitForSelector('.folders');
+await page.cdp('Emulation.setEmulatedMedia',{features:[{name:'prefers-reduced-motion',value:'reduce'}]});
+console.log('motion emulation',await page.evaluate(()=>({matches:matchMedia('(prefers-reduced-motion: reduce)').matches,className:document.documentElement.className,scroll:getComputedStyle(document.documentElement).scrollBehavior})));
+await page.cdp('Emulation.setDeviceMetricsOverride',{width:720,height:500,deviceScaleFactor:2,mobile:false});
+await page.evaluate(()=>window.scrollTo({top:0,behavior:'instant'}));
+console.log('200 percent equivalent',await page.evaluate(()=>({width:innerWidth,height:innerHeight,dpr:devicePixelRatio,scroll:document.documentElement.scrollWidth})));
+await page.screenshot({path:'F:/Work/电商/web/docs/design/homepage-folder-2026-11-03/shots/zoom-200-equivalent.png',raw:true});
+await page.cdp('Emulation.setDeviceMetricsOverride',{width:720,height:500,deviceScaleFactor:2,mobile:false});
+await page.evaluate(()=>document.querySelector('#workspace').scrollIntoView({behavior:'instant',block:'start'}));
+await page.screenshot({path:'F:/Work/电商/web/docs/design/homepage-folder-2026-11-03/shots/zoom-200-workspace.png',raw:true});
+await page.cdp('Emulation.setEmulatedMedia',{features:[{name:'prefers-reduced-motion',value:'no-preference'}]});
+await page.cdp('Emulation.setDeviceMetricsOverride',{width:390,height:844,deviceScaleFactor:1,mobile:true});
+await page.evaluate(()=>document.querySelector('#images').scrollIntoView({behavior:'instant',block:'center'}));
+await page.screenshot({path:'F:/Work/电商/web/docs/design/homepage-folder-2026-11-03/shots/mobile-images.png'});
+console.log('complete');

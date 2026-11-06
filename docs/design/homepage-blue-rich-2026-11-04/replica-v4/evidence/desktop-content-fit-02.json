@@ -1,0 +1,62 @@
+{
+  "height": 4608,
+  "width": 1024,
+  "scrollWidth": 1024,
+  "sceneText": [
+    {
+      "height": 110,
+      "bodyHeight": 86,
+      "bodyBottom": 93
+    },
+    {
+      "height": 86,
+      "bodyHeight": 64,
+      "bodyBottom": 71.25
+    },
+    {
+      "height": 97,
+      "bodyHeight": 82,
+      "bodyBottom": 88.875
+    }
+  ],
+  "plans": [
+    {
+      "listBottom": 147.796875,
+      "buttonTop": 172
+    },
+    {
+      "listBottom": 162.796875,
+      "buttonTop": 172
+    },
+    {
+      "listBottom": 147.796875,
+      "buttonTop": 172
+    }
+  ],
+  "cases": [
+    {
+      "chipsBottom": 241.03125,
+      "statTop": 259
+    },
+    {
+      "chipsBottom": 224.484375,
+      "statTop": 259
+    },
+    {
+      "chipsBottom": 224.484375,
+      "statTop": 259
+    },
+    {
+      "chipsBottom": 209.484375,
+      "statTop": 208
+    },
+    {
+      "chipsBottom": 209.484375,
+      "statTop": 208
+    },
+    {
+      "chipsBottom": 209.484375,
+      "statTop": 208
+    }
+  ]
+}

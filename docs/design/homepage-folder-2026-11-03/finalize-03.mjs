@@ -1,0 +1,11 @@
+const task=await taskSpace(36),page=task.page('p1');
+await page.goto('file:///F:/Work/电商/web/docs/design/homepage-folder-2026-11-03/index.html');await page.waitForSelector('.folders');
+await page.evaluate(()=>document.querySelectorAll('img').forEach(i=>i.loading='eager'));
+await page.waitForFunction(()=>[...document.images].every(i=>i.complete&&i.naturalWidth>0)&&getComputedStyle(document.querySelector('.folders')).opacity==='1');
+console.log('Final local preview',await page.url());
+console.log('resources',await page.evaluate(()=>({images:document.images.length,broken:[...document.images].filter(i=>!i.naturalWidth).length,missingAnchors:[...document.querySelectorAll('a[href^="#"]')].filter(a=>!document.querySelector(a.getAttribute('href'))).length,themeControls:document.querySelectorAll('[data-theme],.theme,button[aria-label*="主题"]').length})));
+await page.cdp('Emulation.setDeviceMetricsOverride',{width:1440,height:1000,deviceScaleFactor:1,mobile:false});
+await page.evaluate(()=>window.scrollTo({top:0,behavior:'instant'}));
+await page.screenshot({path:'F:/Work/电商/web/docs/design/homepage-folder-2026-11-03/shots/desktop-hero.png'});
+await page.cdp('Emulation.clearDeviceMetricsOverride');await page.cdp('Emulation.setEmulatedMedia',{features:[]});
+await task.finish({keep:['p1']});

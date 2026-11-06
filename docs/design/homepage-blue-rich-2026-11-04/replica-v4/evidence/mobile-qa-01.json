@@ -1,0 +1,21 @@
+{
+  "mobile": {
+    "width": 390,
+    "scrollWidth": 390,
+    "height": 10521,
+    "broken": 0,
+    "errors": []
+  },
+  "menuOpen": "true",
+  "dialog": {
+    "open": true,
+    "left": 19,
+    "right": 371,
+    "focusInside": true,
+    "title": "保温杯 · 电商主图"
+  },
+  "closed": {
+    "open": false,
+    "focus": "image-main"
+  }
+}

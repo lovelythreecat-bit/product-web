@@ -1,0 +1,14 @@
+const task=await taskSpace(35);const p=task.page('p1');
+await p.cdp('Emulation.clearDeviceMetricsOverride');
+await p.cdp('Emulation.setEmulatedMedia',{features:[{name:'prefers-reduced-motion',value:'reduce'}]});
+await p.evaluate(()=>{document.documentElement.style.zoom='';window.scrollTo({top:0,behavior:'instant'});document.documentElement.dataset.theme='light'});
+await p.keyboard.press('Control+0');
+const before=await p.evaluate(()=>({width:innerWidth,dpr:devicePixelRatio}));
+for(let i=0;i<5;i++)await p.keyboard.press('Control+Equal');
+const after=await p.evaluate(()=>({width:innerWidth,dpr:devicePixelRatio,scroll:document.documentElement.scrollWidth}));
+console.log({before,after});
+await p.screenshot({path:'F:/Work/电商/web/docs/design/homepage-oil-2026-11-03/shots/browser-200.png'});
+await p.keyboard.press('Control+0');
+await p.cdp('Emulation.setDeviceMetricsOverride',{width:720,height:450,deviceScaleFactor:2,mobile:false});
+await p.screenshot({path:'F:/Work/电商/web/docs/design/homepage-oil-2026-11-03/shots/equivalent-200.png'});
+console.log(await p.evaluate(()=>({equivalentZoom:2,cssWidth:innerWidth,scrollWidth:document.documentElement.scrollWidth})));

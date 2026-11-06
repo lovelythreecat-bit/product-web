@@ -1,0 +1,58 @@
+[
+  {
+    "tab": 0,
+    "passed": true
+  },
+  {
+    "tab": 1,
+    "passed": true
+  },
+  {
+    "tab": 2,
+    "passed": true
+  },
+  {
+    "tab": 3,
+    "passed": true
+  },
+  {
+    "tab": 4,
+    "passed": true
+  },
+  {
+    "keyboardHome": "true"
+  },
+  {
+    "keyboardEnd": "true"
+  },
+  {
+    "modifierPreservesSelection": "true"
+  },
+  {
+    "browserZoom": {
+      "base": {
+        "width": 1908,
+        "dpr": 1
+      },
+      "zoom": {
+        "width": 1908,
+        "dpr": 1,
+        "scroll": 1893,
+        "nav": 80
+      }
+    }
+  },
+  {
+    "reducedMotion": {
+      "matches": true,
+      "scrollBehavior": "smooth",
+      "headingOpacity": "1"
+    }
+  },
+  {
+    "narrow320": {
+      "width": 320,
+      "scroll": 320
+    }
+  }
+]

@@ -1,0 +1,110 @@
+[
+  {
+    "width": 1440,
+    "steps": [
+      {
+        "state": "below",
+        "opacity": 0,
+        "top": 1010.21875,
+        "navTop": 0,
+        "scrollWidth": 1440,
+        "errors": []
+      },
+      {
+        "state": "enter",
+        "opacity": 0.497,
+        "top": 940.21875,
+        "navTop": 0,
+        "scrollWidth": 1440,
+        "errors": []
+      },
+      {
+        "state": "reading",
+        "opacity": 1,
+        "top": 233.21875,
+        "navTop": 0,
+        "scrollWidth": 1440,
+        "errors": []
+      },
+      {
+        "state": "exit",
+        "opacity": 0.506,
+        "top": -254.78125,
+        "navTop": 0,
+        "scrollWidth": 1440,
+        "errors": []
+      },
+      {
+        "state": "above",
+        "opacity": 0,
+        "top": -324.78125,
+        "navTop": 0,
+        "scrollWidth": 1440,
+        "errors": []
+      },
+      {
+        "state": "return",
+        "opacity": 1,
+        "top": 233.21875,
+        "navTop": 0,
+        "scrollWidth": 1440,
+        "errors": []
+      }
+    ],
+    "reducedAllVisible": true
+  },
+  {
+    "width": 390,
+    "steps": [
+      {
+        "state": "below",
+        "opacity": 0,
+        "top": 854.25,
+        "navTop": 0,
+        "scrollWidth": 390,
+        "errors": []
+      },
+      {
+        "state": "enter",
+        "opacity": 0.497,
+        "top": 784.25,
+        "navTop": 0,
+        "scrollWidth": 390,
+        "errors": []
+      },
+      {
+        "state": "reading",
+        "opacity": 1,
+        "top": 222.25,
+        "navTop": 0,
+        "scrollWidth": 390,
+        "errors": []
+      },
+      {
+        "state": "exit",
+        "opacity": 0.505,
+        "top": -211.75,
+        "navTop": 0,
+        "scrollWidth": 390,
+        "errors": []
+      },
+      {
+        "state": "above",
+        "opacity": 0,
+        "top": -281.75,
+        "navTop": 0,
+        "scrollWidth": 390,
+        "errors": []
+      },
+      {
+        "state": "return",
+        "opacity": 1,
+        "top": 222.25,
+        "navTop": 0,
+        "scrollWidth": 390,
+        "errors": []
+      }
+    ],
+    "reducedAllVisible": true
+  }
+]

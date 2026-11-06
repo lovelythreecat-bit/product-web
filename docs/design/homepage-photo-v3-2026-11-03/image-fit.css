@@ -1,0 +1,8 @@
+.scene-zero>img{object-fit:contain;background:#fff}
+.scene-one img{width:min(42%,308px);height:auto;aspect-ratio:1;object-fit:contain}
+.workspace-images img{object-fit:contain;background:var(--panel)}
+.scene-two>img,.film-visual>img{object-position:65% center}
+.showcase-side img{object-fit:contain}
+.showcase-side figure:first-child{background:#eac8c3}
+.showcase-side figure:last-child{background:#eeece6}
+@media(max-width:760px){.scene-one img{top:50px}.film-visual>img{object-position:65% center}.film-copy .film-ending{margin-top:330px}}

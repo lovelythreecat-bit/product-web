@@ -1,0 +1,94 @@
+{
+  "autoplay": {
+    "elapsed": 5009.5,
+    "active": "tab-1"
+  },
+  "transition": [
+    {
+      "ms": 4,
+      "opacity": 0,
+      "visible": 2
+    },
+    {
+      "ms": 54,
+      "opacity": 0,
+      "visible": 2
+    },
+    {
+      "ms": 104,
+      "opacity": 0.525005,
+      "visible": 2
+    },
+    {
+      "ms": 154,
+      "opacity": 0.780474,
+      "visible": 2
+    },
+    {
+      "ms": 187,
+      "opacity": 0.867888,
+      "visible": 2
+    },
+    {
+      "ms": 237,
+      "opacity": 0.939104,
+      "visible": 2
+    },
+    {
+      "ms": 287,
+      "opacity": 0.973315,
+      "visible": 2
+    },
+    {
+      "ms": 337,
+      "opacity": 0.989607,
+      "visible": 1
+    },
+    {
+      "ms": 370,
+      "opacity": 0.995053,
+      "visible": 1
+    },
+    {
+      "ms": 403,
+      "opacity": 0.997988,
+      "visible": 1
+    },
+    {
+      "ms": 453,
+      "opacity": 0.999717,
+      "visible": 1
+    },
+    {
+      "ms": 503,
+      "opacity": 0.999999,
+      "visible": 1
+    },
+    {
+      "ms": 537,
+      "opacity": 1,
+      "visible": 1
+    },
+    {
+      "ms": 587,
+      "opacity": 1,
+      "visible": 1
+    }
+  ],
+  "keyboard": {
+    "active": "tab-1",
+    "focus": "tab-1"
+  },
+  "dialog": {
+    "closed": true,
+    "inert": false,
+    "focus": "trial"
+  },
+  "reduced": {
+    "animations": 0,
+    "paused": "true",
+    "visible": [
+      "pane-0"
+    ]
+  }
+}

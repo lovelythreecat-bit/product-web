@@ -4,7 +4,7 @@ title: "编辑或重新规划视频方案"
 status: "draft"
 implementation_status: "implemented"
 applicable_routes: ["/workspace/quick/:runId?"]
-source_refs: [{"path":"frontend/src/features/workspace/VideoTaskPanel.vue","line_start":52,"line_end":116},{"path":"frontend/src/features/workspace/VideoTaskPanel.vue","line_start":169,"line_end":177}]
+source_refs: [{"path":"frontend/src/features/workspace/VideoTaskPanel.vue","line_start":52,"line_end":116},{"path":"frontend/src/features/workspace/VideoTaskPanel.vue","line_start":169,"line_end":177},{"path":"backend/app/tasks/media_routes.py","line_start":39,"line_end":84}]
 deployment_status: "not_verified"
 review_required: true
 ---

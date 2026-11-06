@@ -1,0 +1,33 @@
+const fs=await import('node:fs/promises');const task=await taskSpace(36),page=task.page('p1');
+await page.reload();await page.waitForSelector('.folders');
+await page.evaluate(()=>window.scrollTo({top:0,behavior:'instant'}));
+const checks=[];
+for(let i=0;i<5;i++){
+  await page.evaluate(index=>document.querySelector(`#folder-tab-${index}`).scrollIntoView({behavior:'instant',block:'center'}),i);
+  await page.click(`#folder-tab-${i}`);
+  await page.waitForFunction(index=>document.querySelector('#folder-panel').getAttribute('aria-labelledby')===`folder-tab-${index}`&&[...document.querySelectorAll('.folder-results img')].every(img=>img.complete&&img.naturalWidth),i);
+  checks.push({tab:i,passed:true});
+}
+await page.press('#folder-tab-4','Home');checks.push({keyboardHome:await page.evaluate(()=>document.querySelector('#folder-tab-0').getAttribute('aria-selected'))});
+await page.press('#folder-tab-0','End');checks.push({keyboardEnd:await page.evaluate(()=>document.querySelector('#folder-tab-4').getAttribute('aria-selected'))});
+await page.press('#folder-tab-4','Control+Home');checks.push({modifierPreservesSelection:await page.evaluate(()=>document.querySelector('#folder-tab-4').getAttribute('aria-selected'))});
+await page.evaluate(()=>{document.activeElement.blur();window.scrollTo({top:0,behavior:'instant'})});
+await page.cdp('Emulation.clearDeviceMetricsOverride');
+await page.keyboard.press('Control+0');
+const base=await page.evaluate(()=>({width:innerWidth,dpr:devicePixelRatio}));
+for(let i=0;i<4;i++)await page.keyboard.press('Control+=');
+const zoom=await page.evaluate(()=>({width:innerWidth,dpr:devicePixelRatio,scroll:document.documentElement.scrollWidth,nav:document.querySelector('.nav').getBoundingClientRect().height}));
+console.log('browser zoom',base,zoom);checks.push({browserZoom:{base,zoom}});
+await page.screenshot({path:'F:/Work/电商/web/docs/design/homepage-folder-2026-11-03/shots/zoom-200.png'});
+await page.keyboard.press('Control+0');
+await page.cdp('Emulation.setEmulatedMedia',{features:[{name:'prefers-reduced-motion',value:'reduce'}]});
+await page.cdp('Emulation.setDeviceMetricsOverride',{width:390,height:844,deviceScaleFactor:1,mobile:true});
+await page.evaluate(()=>document.querySelector('#images').scrollIntoView({behavior:'instant',block:'center'}));
+checks.push({reducedMotion:await page.evaluate(()=>({matches:matchMedia('(prefers-reduced-motion: reduce)').matches,scrollBehavior:getComputedStyle(document.documentElement).scrollBehavior,headingOpacity:getComputedStyle(document.querySelector('#images h2')).opacity}))});
+await page.screenshot({path:'F:/Work/电商/web/docs/design/homepage-folder-2026-11-03/shots/mobile-images-reduced.png'});
+await page.cdp('Emulation.setEmulatedMedia',{features:[{name:'prefers-reduced-motion',value:'no-preference'}]});
+await page.cdp('Emulation.setDeviceMetricsOverride',{width:320,height:780,deviceScaleFactor:1,mobile:true});
+await page.evaluate(()=>window.scrollTo({top:0,behavior:'instant'}));
+checks.push({narrow320:await page.evaluate(()=>({width:innerWidth,scroll:document.documentElement.scrollWidth}))});
+await fs.writeFile('F:/Work/电商/web/docs/design/homepage-folder-2026-11-03/verification.json',JSON.stringify(checks,null,2));
+console.log(JSON.stringify(checks));

@@ -1,0 +1,167 @@
+[
+  {
+    "before": {
+      "width": 1440,
+      "scrollWidth": 1440,
+      "hero": {
+        "x": 0,
+        "y": 0,
+        "width": 1440,
+        "height": 694.6875,
+        "top": 0,
+        "right": 1440,
+        "bottom": 694.6875,
+        "left": 0
+      },
+      "nav": {
+        "x": 0,
+        "y": 0,
+        "width": 1440,
+        "height": 82.96875,
+        "top": 0,
+        "right": 1440,
+        "bottom": 82.96875,
+        "left": 0
+      },
+      "broken": 0
+    },
+    "carousel": [
+      {
+        "id": "pane-0",
+        "hidden": false,
+        "inert": false,
+        "aria": "false"
+      },
+      {
+        "id": "pane-1",
+        "hidden": true,
+        "inert": true,
+        "aria": "true"
+      },
+      {
+        "id": "pane-2",
+        "hidden": true,
+        "inert": true,
+        "aria": "true"
+      }
+    ],
+    "scrolled": {
+      "navTop": 0,
+      "navBottom": 82.96875,
+      "targetTop": 98.71875,
+      "solid": true,
+      "menuClosed": true,
+      "errors": []
+    }
+  },
+  {
+    "before": {
+      "width": 1920,
+      "scrollWidth": 1920,
+      "hero": {
+        "x": 0,
+        "y": 0,
+        "width": 1920,
+        "height": 694.6875,
+        "top": 0,
+        "right": 1920,
+        "bottom": 694.6875,
+        "left": 0
+      },
+      "nav": {
+        "x": 0,
+        "y": 0,
+        "width": 1920,
+        "height": 82.96875,
+        "top": 0,
+        "right": 1920,
+        "bottom": 82.96875,
+        "left": 0
+      },
+      "broken": 0
+    },
+    "carousel": [
+      {
+        "id": "pane-0",
+        "hidden": false,
+        "inert": false,
+        "aria": "false"
+      },
+      {
+        "id": "pane-1",
+        "hidden": true,
+        "inert": true,
+        "aria": "true"
+      },
+      {
+        "id": "pane-2",
+        "hidden": true,
+        "inert": true,
+        "aria": "true"
+      }
+    ],
+    "scrolled": {
+      "navTop": 0,
+      "navBottom": 82.96875,
+      "targetTop": 99.296875,
+      "solid": true,
+      "menuClosed": true,
+      "errors": []
+    }
+  },
+  {
+    "before": {
+      "width": 390,
+      "scrollWidth": 390,
+      "hero": {
+        "x": 0,
+        "y": 0,
+        "width": 390,
+        "height": 877,
+        "top": 0,
+        "right": 390,
+        "bottom": 877,
+        "left": 0
+      },
+      "nav": {
+        "x": 0,
+        "y": 0,
+        "width": 390,
+        "height": 72,
+        "top": 0,
+        "right": 390,
+        "bottom": 72,
+        "left": 0
+      },
+      "broken": 0
+    },
+    "carousel": [
+      {
+        "id": "pane-0",
+        "hidden": false,
+        "inert": false,
+        "aria": "false"
+      },
+      {
+        "id": "pane-1",
+        "hidden": true,
+        "inert": true,
+        "aria": "true"
+      },
+      {
+        "id": "pane-2",
+        "hidden": true,
+        "inert": true,
+        "aria": "true"
+      }
+    ],
+    "scrolled": {
+      "navTop": 0,
+      "navBottom": 72,
+      "targetTop": 88.453125,
+      "solid": true,
+      "menuClosed": true,
+      "errors": []
+    }
+  }
+]

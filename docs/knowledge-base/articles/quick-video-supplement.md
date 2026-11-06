@@ -4,7 +4,7 @@ title: "补充视频所需资料"
 status: "draft"
 implementation_status: "implemented"
 applicable_routes: ["/workspace/quick/:runId?"]
-source_refs: [{"path":"frontend/src/features/workspace/VideoTaskPanel.vue","line_start":145,"line_end":177},{"path":"backend/app/tasks/media_routes.py","line_start":1,"line_end":30},{"path":"frontend/src/features/workspace/VideoTaskPanel.vue","line_start":52,"line_end":116},{"path":"frontend/src/features/workspace/VideoTaskPanel.vue","line_start":169,"line_end":177}]
+source_refs: [{"path":"frontend/src/features/workspace/VideoTaskPanel.vue","line_start":145,"line_end":177},{"path":"frontend/src/features/workspace/VideoTaskPanel.vue","line_start":52,"line_end":116},{"path":"frontend/src/features/workspace/VideoTaskPanel.vue","line_start":169,"line_end":177},{"path":"backend/app/tasks/media_routes.py","line_start":31,"line_end":84},{"path":"backend/app/tasks/media_routes.py","line_start":117,"line_end":160},{"path":"backend/app/tasks/media_routes.py","line_start":229,"line_end":254}]
 deployment_status: "not_verified"
 review_required: true
 ---

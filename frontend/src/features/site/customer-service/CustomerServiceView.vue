@@ -60,13 +60,15 @@ function handleEnter(event: KeyboardEvent) {
 
 <template>
   <div id="fairy-top" class="fairy-page">
-    <div class="fairy-opening">
-      <img class="fairy-hero-background" :src="heroArtwork" alt="银发少女玲玲与白色独角飞马，在彩虹与云端城堡间迎接你" width="1536" height="1024" fetchpriority="high" />
+    <div class="fairy-navigation">
       <header class="fairy-header fairy-wrap">
         <a class="fairy-brand" href="#fairy-top" aria-label="玲玲 AI 客服，返回顶部"><FairyIcon name="wing" /><span>玲玲 AI 客服</span></a>
         <nav aria-label="客服特色"><a href="#companionship">梦幻陪伴</a><a href="#guidance">智能引导</a><a href="#interface">童话界面</a><a href="#memory">专属记忆</a></nav>
         <button class="fairy-button fairy-button--small" type="button" @click="focusConversation">开始对话</button>
       </header>
+    </div>
+    <div class="fairy-opening">
+      <img class="fairy-hero-background" :src="heroArtwork" alt="银发少女玲玲与白色独角飞马，在彩虹与云端城堡间迎接你" width="1536" height="1024" fetchpriority="high" />
       <section class="fairy-hero fairy-wrap" aria-labelledby="fairy-title">
         <div class="fairy-hero-copy"><h1 id="fairy-title">玲玲的<br />童话 AI 客服</h1><p class="fairy-hero-subtitle">让智能服务像童话一样温暖</p><p class="fairy-hero-description">温柔回应每一个问题，陪你找到下一步。</p><div class="fairy-hero-actions"><button class="fairy-button" type="button" @click="focusConversation">立即体验</button><a class="fairy-text-link" href="#companionship">探索客服特色 <span aria-hidden="true">↓</span></a></div></div>
         <span class="fairy-greeting">你好呀，我是玲玲<span aria-hidden="true" /></span>

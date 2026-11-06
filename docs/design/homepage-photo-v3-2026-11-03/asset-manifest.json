@@ -1,0 +1,58 @@
+[
+  {
+    "path": "digital/phone-campaign.png",
+    "width": 1254,
+    "height": 1254,
+    "bytes": 2328226,
+    "sha256": "c49d645dc1c465d168359be47a577a4a38db8b6a167eb72b284790613f1cd1f2",
+    "reused": false
+  },
+  {
+    "path": "digital/phone-detail.png",
+    "width": 1254,
+    "height": 1254,
+    "bytes": 2099356,
+    "sha256": "247c9b90290285e595d5ea18bd46ec8b4660f59c7602323af1860dd96a5eb6b0",
+    "reused": false
+  },
+  {
+    "path": "digital/phone-source.png",
+    "width": 1254,
+    "height": 1254,
+    "bytes": 1304389,
+    "sha256": "1ed8a7e5f179552ae8b55103600004a1229e24815134582ce4db8d40e3c64150",
+    "reused": true
+  },
+  {
+    "path": "categories/shoe-campaign.png",
+    "width": 1122,
+    "height": 1402,
+    "bytes": 2516352,
+    "sha256": "5432dc5c733fdbcca55ab37d10447fb7c210a67f5de9d2c22cb508ae952ff1c1",
+    "reused": false
+  },
+  {
+    "path": "categories/beauty-campaign.png",
+    "width": 1536,
+    "height": 1024,
+    "bytes": 1917834,
+    "sha256": "689f905aede9c4f2d1226f3f2f8818dd8a8b2b422c6aece60519bd1b8534a8e1",
+    "reused": false
+  },
+  {
+    "path": "categories/audio-campaign.png",
+    "width": 1536,
+    "height": 1024,
+    "bytes": 2306286,
+    "sha256": "4b24466d399c85fd1f9a8c932e1cf2bc995bb2c3b07aebb9edb708aa5c59ec89",
+    "reused": false
+  },
+  {
+    "path": "story/phone-creator.png",
+    "width": 1536,
+    "height": 1024,
+    "bytes": 1957187,
+    "sha256": "3fa06059eb5d217fa52b132fba6028708395a70bd106e9e6a2bd067af26b2d6d",
+    "reused": false
+  }
+]

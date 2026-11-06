@@ -1,0 +1,17 @@
+const fs=await import('node:fs/promises');const task=await taskSpace(36),page=task.page('p1');
+await page.cdp('Emulation.setEmulatedMedia',{features:[{name:'prefers-reduced-motion',value:'reduce'}]});
+await page.waitForFunction(()=>matchMedia('(prefers-reduced-motion: reduce)').matches&&getComputedStyle(document.documentElement).scrollBehavior==='auto');
+console.log('reduced motion styles applied',await page.evaluate(()=>({media:matchMedia('(prefers-reduced-motion: reduce)').matches,scrollBehavior:getComputedStyle(document.documentElement).scrollBehavior,hiddenHeadings:[...document.querySelectorAll('h2')].filter(x=>getComputedStyle(x).opacity==='0').length})));
+await page.cdp('Emulation.setDeviceMetricsOverride',{width:720,height:500,deviceScaleFactor:2,mobile:false});
+await page.evaluate(()=>window.scrollTo({top:0,behavior:'instant'}));
+console.log('200 percent equivalent',await page.evaluate(()=>({cssWidth:innerWidth,cssHeight:innerHeight,dpr:devicePixelRatio,scrollWidth:document.documentElement.scrollWidth})));
+await page.screenshot({path:'F:/Work/电商/web/docs/design/homepage-folder-2026-11-03/shots/zoom-200-equivalent.png',raw:true});
+await page.cdp('Emulation.setDeviceMetricsOverride',{width:720,height:500,deviceScaleFactor:2,mobile:false});
+await page.evaluate(()=>document.querySelector('#workspace').scrollIntoView({behavior:'instant',block:'start'}));
+await page.screenshot({path:'F:/Work/电商/web/docs/design/homepage-folder-2026-11-03/shots/zoom-200-workspace.png',raw:true});
+await page.cdp('Emulation.setEmulatedMedia',{features:[{name:'prefers-reduced-motion',value:'no-preference'}]});
+await page.cdp('Emulation.setDeviceMetricsOverride',{width:1440,height:1000,deviceScaleFactor:1,mobile:false});
+await page.evaluate(()=>document.querySelector('#images').scrollIntoView({behavior:'instant',block:'center'}));
+await page.waitForFunction(()=>getComputedStyle(document.querySelector('#images h2')).opacity==='1');
+await page.screenshot({path:'F:/Work/电商/web/docs/design/homepage-folder-2026-11-03/shots/desktop-images.png'});
+console.log(await page.snapshot());

@@ -1,0 +1,705 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>飞马电商工作台 · Banner（左文右卡）</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Jost:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --cobalt:#1236a8; --cobalt-deep:#071a52; --cobalt-soft:#2a4fd0;
+  --sand:#e9dfc7; --sand-2:#f1e9d6; --surface:#fbf6ea;
+  --ink:#0b2a7a; --muted:#56618f; --gold:#c2922f; --gold-soft:#d8ab4e;
+  --line:rgba(11,42,122,.12);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:"Jost","PingFang SC","Microsoft YaHei","Hiragino Sans GB",sans-serif;
+  background:#cdbf9e;color:var(--ink);-webkit-font-smoothing:antialiased;line-height:1.6;padding:40px 18px}
+
+/* ===== Banner: 左文 右卡 ===== */
+.banner{position:relative;max-width:1180px;margin:0 auto;display:grid;grid-template-columns:0.82fr 1.18fr;
+  background:linear-gradient(120deg,var(--cobalt-deep) 0%,var(--cobalt) 58%,#0d2a86 100%); /* taste-skill-ignore */
+  clip-path:polygon(0 0,calc(100% - 34px) 0,100% 34px,100% 100%,0 100%);
+  overflow:hidden;box-shadow:0 30px 70px rgba(7,26,82,.35)} /* taste-skill-ignore */
+.banner:before{content:"";position:absolute;top:0;right:0;width:34px;height:34px;background:var(--gold);
+  clip-path:polygon(calc(100% - 34px) 0,100% 0,100% 34px)}
+.banner:after{content:"";position:absolute;left:0;bottom:0;width:240px;height:240px;
+  background:radial-gradient(circle at 0 100%,rgba(194,146,47,.22),transparent 70%)} /* taste-skill-ignore */
+
+/* 左：原文案 */
+.left{position:relative;z-index:2;padding:48px 44px;color:#fff;display:flex;flex-direction:column;justify-content:center;min-height:100%}
+.brand{display:flex;align-items:center;gap:12px;margin-bottom:22px}
+.brand .mark{width:38px;height:38px;flex:none;background:var(--gold);
+  clip-path:polygon(0 0,calc(100% - 9px) 0,100% 9px,100% 100%,0 100%);
+  display:grid;place-items:center;color:var(--cobalt-deep);font-weight:700;font-size:1.2rem}
+.brand .name{font-weight:700;font-size:1.18rem;letter-spacing:.02em}
+.slogan{font-size:clamp(1.7rem,1.1rem+2.4vw,2.7rem);font-weight:700;line-height:1.18;max-width:12ch}
+.slogan b{color:var(--gold-soft)}
+.cta-row{display:flex;gap:12px;margin-top:30px}
+.btn{font-weight:600;font-size:.95rem;padding:13px 24px;cursor:pointer;border:0;
+  clip-path:polygon(0 0,calc(100% - 11px) 0,100% 11px,100% 100%,0 100%);transition:.16s}
+.btn-gold{background:var(--gold);color:#2a1d05}
+.btn-gold:hover{background:var(--gold-soft)}
+.btn-ghost{background:transparent;color:#fff;border:1.5px solid rgba(255,255,255,.4)}
+.btn-ghost:hover{border-color:var(--gold-soft);color:var(--gold-soft)}
+
+/* 右：亮点区（上=详情，下=三卡） */
+.right{position:relative;z-index:2;background:var(--sand);display:flex;flex-direction:column;padding:30px 30px 26px}
+/* 详情面板（上方） */
+.detail{background:var(--surface);padding:26px 28px;display:grid;grid-template-columns:1.05fr 1fr;gap:28px;align-items:center;
+  clip-path:polygon(0 0,calc(100% - 18px) 0,100% 18px,100% 100%,0 100%);box-shadow:0 14px 34px rgba(7,26,82,.1)} /* taste-skill-ignore */
+.dpane{display:none}
+.dpane.show{display:block;animation:fade .3s ease}
+@keyframes fade{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+.dpane h3{font-size:clamp(1.25rem,1rem+1.1vw,1.6rem);font-weight:700;line-height:1.18;margin-bottom:10px}
+.dpane p{color:var(--muted);font-size:.94rem;max-width:34ch}
+.dpane ul{margin-top:13px;display:flex;flex-direction:column;gap:8px}
+.dpane li{list-style:none;display:flex;gap:9px;align-items:flex-start;font-size:.88rem;color:var(--ink)}
+.dpane li .dot{width:16px;height:16px;flex:none;margin-top:3px;background:var(--gold);
+  clip-path:polygon(0 0,100% 0,100% 62%,62% 100%,0 100%)}
+.viz{background:var(--sand-2);padding:18px;min-height:150px;display:flex;align-items:center;justify-content:center;
+  clip-path:polygon(0 0,calc(100% - 11px) 0,100% 11px,100% 100%,0 100%)}
+.dual{display:flex;gap:10px;width:100%}
+.dual .seg{flex:1;text-align:center;padding:18px 10px;background:#fff;font-weight:600;font-size:.88rem;color:var(--muted);
+  clip-path:polygon(0 0,calc(100% - 9px) 0,100% 9px,100% 100%,0 100%)}
+.dual .seg.on{background:var(--cobalt);color:#fff}
+.dual .seg span{display:block;font-weight:400;font-size:.72rem;margin-top:3px}
+.ling{display:flex;flex-direction:column;align-items:center;gap:12px;text-align:center}
+.ling .bub{background:#fff;padding:11px 15px;font-weight:600;font-size:.86rem;color:var(--ink);
+  clip-path:polygon(0 0,calc(100% - 10px) 0,100% 10px,100% 100%,0 100%)}
+.stores{display:grid;grid-template-columns:1fr 1fr;gap:8px;width:100%}
+.stores .st{display:flex;align-items:center;gap:8px;background:#fff;padding:10px 12px;font-weight:600;font-size:.82rem;
+  clip-path:polygon(0 0,calc(100% - 8px) 0,100% 8px,100% 100%,0 100%)}
+.stores .st .ok{width:15px;height:15px;flex:none;background:var(--gold);clip-path:polygon(0 0,100% 0,100% 60%,60% 100%,0 100%)}
+
+/* 三张可切换卡片（下方并列） */
+.tabs{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:16px}
+.tcard{position:relative;text-align:left;background:var(--surface);border:0;cursor:pointer;color:var(--ink);
+  padding:16px 17px;clip-path:polygon(0 0,calc(100% - 12px) 0,100% 12px,100% 100%,0 100%);
+  transition:transform .16s,background .16s,box-shadow .16s;display:flex;gap:11px;align-items:flex-start}
+.tcard:before{content:"";position:absolute;left:0;top:0;bottom:0;width:4px;background:transparent;transition:background .16s}
+.tcard:hover{transform:translateY(-3px);box-shadow:0 10px 22px rgba(7,26,82,.1)} /* taste-skill-ignore */
+.tcard .ic{width:36px;height:36px;flex:none;display:grid;place-items:center;background:var(--cobalt);color:#fff;
+  clip-path:polygon(0 0,calc(100% - 8px) 0,100% 8px,100% 100%,0 100%)}
+.tcard h4{font-size:1rem;font-weight:700;line-height:1.2}
+.tcard .one{font-size:.78rem;color:var(--muted);margin-top:2px}
+.tcard.active{background:#fff;box-shadow:0 14px 30px rgba(7,26,82,.16)} /* taste-skill-ignore */
+.tcard.active:before{background:var(--gold)}
+.tcard.active .ic{background:var(--gold);color:#2a1d05}
+.tcard.active h4{color:var(--cobalt)}
+
+.hint{text-align:center;color:#5c5340;font-size:.78rem;margin-top:14px}
+@media(max-width:880px){
+  .banner{grid-template-columns:1fr}
+  .detail{grid-template-columns:1fr;gap:22px}
+  .tabs{grid-template-columns:1fr}
+}
+
+/* ===== 第二版面：品牌定位 ===== */
+.section{max-width:1180px;margin:26px auto 0;background:var(--surface);position:relative;overflow:hidden;
+  clip-path:polygon(0 0,calc(100% - 34px) 0,100% 34px,100% 100%,0 100%);
+  box-shadow:0 24px 60px rgba(7,26,82,.18);padding:40px 42px 44px} /* taste-skill-ignore */
+.section:before{content:"";position:absolute;top:0;right:0;width:34px;height:34px;background:var(--gold);
+  clip-path:polygon(calc(100% - 34px) 0,100% 0,100% 34px)}
+.sec-head{display:flex;align-items:baseline;gap:16px;margin-bottom:22px}
+.sec-no{font-family:"Jost",sans-serif;font-weight:700;font-size:1.6rem;color:var(--gold);letter-spacing:.04em}
+.sec-title{font-size:1.55rem;font-weight:700;color:var(--cobalt)}
+.triad{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+.tria{background:var(--sand-2);padding:24px 24px 26px;position:relative;
+  clip-path:polygon(0 0,calc(100% - 12px) 0,100% 12px,100% 100%,0 100%)}
+.tria:before{content:"";position:absolute;left:0;top:0;bottom:0;width:4px;background:var(--gold)}
+.tria .big{font-size:2.5rem;font-weight:700;color:var(--cobalt);line-height:1}
+.tria .map{margin-top:12px;font-size:1.02rem;font-weight:600;color:var(--ink)}
+.tria .desc{margin-top:7px;font-size:.85rem;color:var(--muted);max-width:22ch}
+.defs{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:14px}
+.defcard{background:#fff;padding:24px 26px;
+  clip-path:polygon(0 0,calc(100% - 14px) 0,100% 14px,100% 100%,0 100%);box-shadow:0 10px 26px rgba(7,26,82,.07)} /* taste-skill-ignore */
+.defcard h4{font-size:1.14rem;font-weight:700;color:var(--cobalt);line-height:1.35;margin-bottom:9px}
+.defcard p{font-size:.88rem;color:var(--muted);max-width:40ch;line-height:1.7}
+
+/* 第三屏：分场景文案 */
+.scenes{display:flex;flex-direction:column;gap:14px}
+.scene{position:relative;display:flex;gap:18px;align-items:flex-start;background:var(--sand-2);padding:22px 24px;
+  clip-path:polygon(0 0,calc(100% - 12px) 0,100% 12px,100% 100%,0 100%)}
+.scene:before{content:"";position:absolute;left:0;top:0;bottom:0;width:4px;background:var(--gold)}
+.scene .ic{width:44px;height:44px;flex:none;display:grid;place-items:center;background:var(--cobalt);color:#fff;
+  clip-path:polygon(0 0,calc(100% - 9px) 0,100% 9px,100% 100%,0 100%)}
+.scene h4{font-size:1.05rem;font-weight:700;color:var(--cobalt);margin-bottom:7px}
+.scene p{font-size:.9rem;color:var(--muted);line-height:1.85;max-width:62ch}
+.scene p b{color:var(--ink)}
+.scene ul{margin:9px 0 7px;display:flex;flex-direction:column;gap:5px;list-style:none}
+.scene li{position:relative;padding-left:16px;font-size:.88rem;color:var(--muted);line-height:1.6}
+.scene li:before{content:"·";position:absolute;left:4px;top:0;color:var(--gold);font-weight:700}
+
+/* 行业案例 */
+.cases{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.case{background:#fff;position:relative;padding:22px 22px 18px;
+  clip-path:polygon(0 0,calc(100% - 14px) 0,100% 14px,100% 100%,0 100%);
+  box-shadow:0 10px 26px rgba(7,26,82,.07)} /* taste-skill-ignore */
+.case:before{content:"";position:absolute;left:0;top:0;width:4px;height:100%;background:var(--gold)}
+.cic{width:42px;height:42px;display:grid;place-items:center;background:var(--sand-2);color:var(--cobalt);
+  clip-path:polygon(0 0,calc(100% - 8px) 0,100% 8px,100% 100%,0 100%);margin-bottom:12px}
+.ct{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap;margin-bottom:9px}
+.cname{font-size:1.05rem;font-weight:700;color:var(--cobalt)}
+.ctag{font-size:.76rem;color:var(--muted)}
+.cdesc{font-size:.87rem;color:var(--muted);line-height:1.7;margin-bottom:12px}
+.cmeta{display:flex;gap:7px;flex-wrap:wrap;margin-bottom:14px}
+.chip{font-size:.73rem;font-weight:600;color:var(--cobalt);background:var(--sand-2);padding:4px 10px;
+  clip-path:polygon(0 0,calc(100% - 6px) 0,100% 6px,100% 100%,0 100%)}
+.cstat{font-size:.82rem;color:var(--muted);border-top:1px solid var(--sand-2);padding-top:11px} /* taste-skill-ignore */
+.cstat b{font-family:"Jost",sans-serif;font-size:1.5rem;font-weight:700;color:var(--gold);letter-spacing:.02em;margin-right:6px}
+.sec-note{font-size:.8rem;color:var(--muted);margin-top:18px}
+
+/* 功能能力矩阵 */
+.feats{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
+.feat{background:#fff;position:relative;padding:20px 18px;
+  clip-path:polygon(0 0,calc(100% - 12px) 0,100% 12px,100% 100%,0 100%);
+  box-shadow:0 8px 22px rgba(7,26,82,.06)} /* taste-skill-ignore */
+.feat:before{content:"";position:absolute;left:0;top:0;width:4px;height:100%;background:var(--gold)}
+.feat .fic{width:38px;height:38px;display:grid;place-items:center;background:var(--cobalt);color:#fff;
+  clip-path:polygon(0 0,calc(100% - 7px) 0,100% 7px,100% 100%,0 100%);margin-bottom:11px}
+.feat h4{font-size:.98rem;font-weight:700;color:var(--cobalt);margin-bottom:5px}
+.feat p{font-size:.82rem;color:var(--muted);line-height:1.6}
+
+/* 出片作品墙 */
+.show{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.shot{background:#fff;position:relative;overflow:hidden;
+  clip-path:polygon(0 0,calc(100% - 14px) 0,100% 14px,100% 100%,0 100%);
+  box-shadow:0 10px 26px rgba(7,26,82,.08)} /* taste-skill-ignore */
+.shot img{display:block;width:100%;height:200px;object-fit:cover;background:var(--sand-2)}
+.shot .cap{padding:14px 16px 16px}
+.shot .cap h4{font-size:.95rem;font-weight:700;color:var(--cobalt);margin-bottom:7px}
+.shot .cap .row{display:flex;gap:7px;flex-wrap:wrap}
+.out{font-size:.72rem;font-weight:600;color:var(--cobalt);background:var(--sand-2);padding:3px 9px;
+  clip-path:polygon(0 0,calc(100% - 5px) 0,100% 5px,100% 100%,0 100%)}
+.types{display:flex;flex-wrap:wrap;gap:8px;margin-top:18px}
+.types span{font-size:.78rem;color:var(--muted);border:1px solid var(--sand-2);padding:5px 12px; /* taste-skill-ignore */
+  clip-path:polygon(0 0,calc(100% - 6px) 0,100% 6px,100% 100%,0 100%)}
+
+/* 定价套餐 */
+.plans{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;align-items:stretch}
+.plan{background:#fff;position:relative;padding:26px 24px;
+  clip-path:polygon(0 0,calc(100% - 16px) 0,100% 16px,100% 100%,0 100%);
+  box-shadow:0 10px 26px rgba(7,26,82,.07);display:flex;flex-direction:column} /* taste-skill-ignore */
+.plan.hot{background:var(--cobalt);color:#fff;transform:translateY(-8px)}
+.plan.hot:before{content:"推荐";position:absolute;top:14px;right:14px;background:var(--gold);color:#2a1d05;
+  font-size:.7rem;font-weight:700;padding:3px 9px;clip-path:polygon(0 0,calc(100% - 5px) 0,100% 5px,100% 100%,0 100%)}
+.plan .pname{font-size:1.1rem;font-weight:700}
+.plan .price{font-family:"Jost",sans-serif;font-size:2.1rem;font-weight:700;margin:8px 0 2px;letter-spacing:.01em}
+.plan .price small{font-size:.85rem;font-weight:500;color:inherit;opacity:.8}
+.plan .pdesc{font-size:.82rem;color:var(--muted);margin-bottom:16px}
+.plan.hot .pdesc{color:#cdd6ef}
+.plan ul{list-style:none;display:flex;flex-direction:column;gap:9px;margin-bottom:20px;flex:1}
+.plan li{position:relative;padding-left:22px;font-size:.85rem;line-height:1.5}
+.plan li:before{content:"";position:absolute;left:2px;top:6px;width:10px;height:5px;
+  border-left:2px solid var(--gold);border-bottom:2px solid var(--gold);transform:rotate(-45deg)}
+.plan.hot li:before{border-color:#fff}
+.pbtn{display:block;text-align:center;text-decoration:none;font-weight:700;font-size:.9rem;padding:12px;
+  clip-path:polygon(0 0,calc(100% - 9px) 0,100% 9px,100% 100%,0 100%);transition:transform .15s}
+.pbtn.fill{background:var(--gold);color:#2a1d05}
+.pbtn.ghost{background:var(--cobalt);color:#fff}
+.pbtn.ghost2{background:#fff;color:var(--cobalt);border:1px solid var(--cobalt)} /* taste-skill-ignore */
+.plan.hot .pbtn.fill{background:#fff;color:var(--cobalt)}
+
+/* 收尾 CTA + 信任 + 页脚 */
+.trust{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:34px}
+.tnum{text-align:center;padding:18px 10px;background:var(--sand-2);
+  clip-path:polygon(0 0,calc(100% - 12px) 0,100% 12px,100% 100%,0 100%)}
+.tnum b{display:block;font-family:"Jost",sans-serif;font-size:1.9rem;font-weight:700;color:var(--cobalt);letter-spacing:.02em}
+.tnum span{font-size:.8rem;color:var(--muted)}
+.final{background:var(--cobalt-deep);position:relative;color:#fff;text-align:center;padding:54px 30px;
+  clip-path:polygon(0 0,calc(100% - 30px) 0,100% 30px,100% 100%,0 100%);
+  box-shadow:0 24px 60px rgba(7,26,82,.25)} /* taste-skill-ignore */
+.final:before{content:"";position:absolute;right:0;top:0;width:130px;height:130px;
+  background:radial-gradient(circle at 100% 0,rgba(194,146,47,.32),transparent 70%)} /* taste-skill-ignore */
+.final h2{font-size:clamp(1.4rem,1rem+2vw,2.2rem);font-weight:700;margin-bottom:14px}
+.final p{color:#cdd6ef;max-width:46ch;margin:0 auto 26px;font-size:.98rem}
+.final .btns{display:flex;gap:14px;justify-content:center;flex-wrap:wrap}
+.fbtn{text-decoration:none;font-weight:700;font-size:.95rem;padding:14px 30px;
+  clip-path:polygon(0 0,calc(100% - 11px) 0,100% 11px,100% 100%,0 100%)}
+.fbtn.g{background:var(--gold);color:#2a1d05}
+.fbtn.w{background:#fff;color:var(--cobalt)}
+.foot{background:var(--ink);color:#aab4d4;padding:34px 30px 26px}
+.foot .top{display:flex;justify-content:space-between;gap:30px;flex-wrap:wrap;max-width:1080px;margin:0 auto 22px}
+.foot .brand{font-weight:700;color:#fff;font-size:1.05rem;margin-bottom:8px}
+.foot .brand span{color:var(--gold)}
+.foot .cols{display:flex;gap:46px;flex-wrap:wrap}
+.foot .col h5{color:#fff;font-size:.85rem;font-weight:700;margin-bottom:10px}
+.foot .col a{display:block;color:#aab4d4;text-decoration:none;font-size:.82rem;margin-bottom:7px}
+.foot .col a:hover{color:#fff}
+.foot .copy{max-width:1080px;margin:0 auto;border-top:1px solid #2a3556;padding-top:16px; /* taste-skill-ignore */
+  font-size:.76rem;display:flex;justify-content:space-between;gap:14px;flex-wrap:wrap}
+@media(max-width:880px){.triad{grid-template-columns:1fr}.defs{grid-template-columns:1fr}.cases{grid-template-columns:1fr}
+  .feats{grid-template-columns:repeat(2,1fr)}.show{grid-template-columns:1fr}.plans{grid-template-columns:1fr}
+  .trust{grid-template-columns:repeat(2,1fr)}.plan.hot{transform:none}
+  .adbar-wrap{max-width:1180px;margin:26px auto 0;position:relative}
+  .adbar{display:flex;align-items:center;gap:26px;background:var(--cobalt-deep);position:relative;overflow:hidden;
+    padding:28px 40px;clip-path:polygon(0 0,calc(100% - 26px) 0,100% 26px,100% 100%,0 100%);
+    box-shadow:0 20px 50px rgba(7,26,82,.2)} /* taste-skill-ignore */
+  .adbar:before{content:"";position:absolute;right:0;top:0;width:170px;height:170px;
+    background:radial-gradient(circle at 100% 0,rgba(194,146,47,.34),transparent 70%)} /* taste-skill-ignore */
+  .adbar .ling{width:82px;height:82px;flex:none;background:#fff;border-radius:50%;display:grid;place-items:center;
+    box-shadow:0 8px 20px rgba(0,0,0,.22)} /* taste-skill-ignore */
+  .adbar .copy{flex:1;color:#fff;position:relative;z-index:2}
+  .adbar .copy h3{font-size:clamp(1.15rem,1rem+1vw,1.5rem);font-weight:700;margin-bottom:6px}
+  .adbar .copy p{color:#cdd6ef;font-size:.92rem}
+  .adbar .act{flex:none;position:relative;z-index:2}
+  .adbar .act a{display:inline-block;text-decoration:none;font-weight:700;font-size:.92rem;padding:13px 26px;
+    background:var(--gold);color:#2a1d05;clip-path:polygon(0 0,calc(100% - 10px) 0,100% 10px,100% 100%,0 100%);
+    transition:transform .15s} /* taste-skill-ignore */
+  .adbar .act a:hover{transform:translateY(-2px)}
+}
+@media(max-width:880px){.adbar{flex-direction:column;text-align:center;gap:16px;padding:26px 22px}.adbar .act{width:100%}.adbar .act a{display:block}}
+</style>
+</head>
+<body>
+<div class="banner">
+  <!-- 左：原文案 -->
+  <div class="left">
+    <div class="brand">
+      <span class="mark">飞</span>
+      <span class="name">飞马电商工作台</span>
+    </div>
+    <h1 class="slogan">一站式电商内容工具，<b>小白十分钟高效出片</b></h1>
+    <div class="cta-row">
+      <button class="btn btn-gold">免费试用</button>
+      <button class="btn btn-ghost">看演示</button>
+    </div>
+  </div>
+
+  <!-- 右：亮点区（上详情 下三卡） -->
+  <div class="right">
+    <div class="detail">
+      <!-- 0 双工作台 -->
+      <div class="dpane show" data-p="0">
+        <div>
+          <h3>双工作台：专业与小白，各得其所</h3>
+          <p>老手要参数，小白要对话——同一套能力，切一下就换一种打开方式。</p>
+          <ul>
+            <li><span class="dot"></span>专业模式：图层、批量与模板，完整控制权交给老手</li>
+            <li><span class="dot"></span>小白模式：把全流程收进一句对话，零基础也出专业片</li>
+          </ul>
+        </div>
+        <div class="viz"><div class="dual">
+          <div class="seg on">小白工作台<span>对话即出片</span></div>
+          <div class="seg">专业工作台<span>图层/参数/批量</span></div>
+        </div></div>
+      </div>
+      <!-- 1 玲玲 -->
+      <div class="dpane" data-p="1">
+        <div>
+          <h3>玲玲：卡哪步，教哪步</h3>
+          <p>AI 数字人玲玲全程在线，你做到哪步她跟到哪步。不用看长篇教程，不用怕中途卡壳。</p>
+          <ul>
+            <li><span class="dot"></span>开口问就有人接，每一步都陪你走完</li>
+            <li><span class="dot"></span>选风格、出图、微调、发布，玲玲逐步指路</li>
+          </ul>
+        </div>
+        <div class="viz"><div class="ling">
+          <span id="lingAva" style="width:64px;height:64px"></span>
+          <div class="bub">卡哪步，教哪步～我陪你出片</div>
+        </div></div>
+      </div>
+      <!-- 2 一键多发 -->
+      <div class="dpane" data-p="2">
+        <div>
+          <h3>一键多发：国内海外，一键即发</h3>
+          <p>一套素材，一次点击，同步到抖店、淘宝、拼多多、京东、亚马逊、TikTok Shop。</p>
+          <ul>
+            <li><span class="dot"></span>不用重复上传，不用挨个改尺寸</li>
+            <li><span class="dot"></span>出片与上新同频，素材即生产力</li>
+          </ul>
+        </div>
+        <div class="viz"><div class="stores">
+          <div class="st"><span class="ok"></span>抖店</div><div class="st"><span class="ok"></span>淘宝</div>
+          <div class="st"><span class="ok"></span>拼多多</div><div class="st"><span class="ok"></span>京东</div>
+          <div class="st"><span class="ok"></span>亚马逊</div><div class="st"><span class="ok"></span>TikTok Shop</div>
+        </div></div>
+      </div>
+    </div>
+
+    <!-- 下方：三张并列可切换卡片 -->
+    <div class="tabs" id="tabs">
+      <button class="tcard active" data-i="0">
+        <span class="ic"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 3h7v7H3zM14 3h7v7h-7zM3 14h7v7H3zM14 14h7v7h-7z"/></svg></span>
+        <span><h4>双工作台</h4><div class="one">专业与小白，各得其所</div></span>
+      </button>
+      <button class="tcard" data-i="1">
+        <span class="ic"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="8" r="4"/><path d="M5 21c0-4 3-6 7-6s7 2 7 6"/></svg></span>
+        <span><h4>玲玲数字人</h4><div class="one">卡哪步，教哪步</div></span>
+      </button>
+      <button class="tcard" data-i="2">
+        <span class="ic"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 7h11l5 5v5H4z"/><circle cx="8" cy="19" r="1.6"/><circle cx="16" cy="19" r="1.6"/></svg></span>
+        <span><h4>一键多发</h4><div class="one">国内海外，一键即发</div></span>
+      </button>
+    </div>
+    <div class="hint">点击下方卡片切换 · 也可用键盘 ← → 切换</div>
+  </div>
+</div>
+
+<!-- ===== 第二版面：品牌定位 ===== -->
+<section class="section">
+  <div class="sec-head">
+    <span class="sec-no">01</span><!-- taste-skill-ignore -->
+    <span class="sec-title">品牌定位</span>
+  </div>
+  <div class="triad">
+    <div class="tria">
+      <div class="big">快</div>
+      <div class="map">速度感，对应「十分钟出片」</div>
+      <div class="desc">从想法到成片，快得不像在做内容。</div>
+    </div>
+    <div class="tria">
+      <div class="big">高</div>
+      <div class="map">腾空感，对应「专业级出品」</div>
+      <div class="desc">小白对话，也能出专业水准的片子。</div>
+    </div>
+    <div class="tria">
+      <div class="big">神</div>
+      <div class="map">神驹感，对应「AI 替你想好」</div>
+      <div class="desc">你只管说，飞马把活儿接走。</div>
+    </div>
+  </div>
+  <div class="defs">
+    <div class="defcard">
+      <h4>一句话定位：电商人的 AI 内容工厂——从想法到出片，只隔一次对话。</h4>
+      <p>面向传统电商卖家与抖音带货玩家，把图文生图、图文视频、智能体引导、数字人陪练、多店分发，收进同一个工作台。</p>
+    </div>
+    <div class="defcard">
+      <h4>品牌主张：让每个电商人，都拥有自己的内容工厂。</h4>
+      <p>不用养设计团队，不用学复杂软件——对话即生产，出片即上架。</p>
+    </div>
+  </div>
+</section>
+
+<!-- ===== 第三屏：分场景文案 ===== -->
+<section class="section">
+  <div class="sec-head">
+    <span class="sec-no">02</span><!-- taste-skill-ignore -->
+    <span class="sec-title">分场景文案</span>
+  </div>
+  <div class="scenes">
+    <div class="scene">
+      <span class="ic"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 5h16v10H8l-4 4V5z"/></svg></span>
+      <div class="body">
+        <h4>小白工作台 · 首屏引导（用户视角）</h4>
+        <p>你不需要会设计，只需要会说话。<br>告诉飞马：「我要卖一款保温杯，主打上班通勤」，剩下的交给小白工作台。<br>玲玲会陪你：选风格 → 出图 / 出视频 → 微调 → 发布。<br><b>十分钟，你的第一个爆款素材就上线了。</b></p>
+      </div>
+    </div>
+    <div class="scene">
+      <span class="ic"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 7h9M17 7h3M4 17h3M11 17h9"/><circle cx="14" cy="7" r="2.4"/><circle cx="8" cy="17" r="2.4"/></svg></span>
+      <div class="body">
+        <h4>专业工作台 · 面向老手</h4>
+        <p>想要完全掌控？专业工作台给你图层、参数、批量与模板。<br>飞马不替你决定，只让你更快。</p>
+      </div>
+    </div>
+    <div class="scene">
+      <span class="ic"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M7 5l12 7-12 7V5z"/></svg></span>
+      <div class="body">
+        <h4>视频带货专项 · 抖店主视角</h4>
+        <p>抖店缺素材？飞马文生视频来补位。<br>输入卖点 → 生成多条带货视频 → 玲玲帮你挑最顺的一条 → 一键发店。<br>流量窗口不等人，飞马让你每天都有新片子。</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== 第四屏：短视频 / 社群 / 商店文案 ===== -->
+<section class="section">
+  <div class="sec-head">
+    <span class="sec-no">03</span><!-- taste-skill-ignore -->
+    <span class="sec-title">短视频 / 社群 / 商店文案</span>
+  </div>
+  <div class="scenes">
+    <div class="scene">
+      <span class="ic"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3M8 21h8"/></svg></span>
+      <div class="body">
+        <h4>30 秒短视频口播脚本</h4>
+        <p>做电商最累的是什么？出图、拍视频、上架、再上架……<br>试试飞马电商工作台。<br>文生图，主图详情一键出；文生视频，抖店带货片十分钟搞定。<br>怕不会用？有玲玲，AI 数字人客服一步一步带你走，卡哪步教哪步。<br>最后还能一键发到你所有店铺。<br>小白十分钟，也能出专业片。飞马，电商人的内容工厂。</p>
+      </div>
+    </div>
+    <div class="scene">
+      <span class="ic"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="9" cy="8" r="3"/><path d="M3 20c0-3 2.5-5 6-5s6 2 6 5"/><circle cx="17" cy="9" r="2.4"/><path d="M16 15c2.6.3 5 2 5 5"/></svg></span>
+      <div class="body">
+        <h4>朋友圈 / 社群文案</h4>
+        <p>不会 PS、不会剪视频，也能做电商内容了？<br>飞马电商工作台，小白工作台 + 玲玲数字人陪练，文生图文生视频全包，十分钟出片，一键发多店。这就是我最近在用的出片神器。</p>
+      </div>
+    </div>
+    <div class="scene">
+      <span class="ic"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg></span>
+      <div class="body">
+        <h4>应用商店描述</h4>
+        <p>飞马电商工作台——一站式电商内容创作工具。</p>
+        <ul>
+          <li>文生图：为传统电商生成主图、详情、海报</li>
+          <li>文生视频：为抖店等视频带货场景生成短视频</li>
+          <li>小白工作台：智能体对话式创作，零基础友好</li>
+          <li>玲玲 AI 数字人：分步指引，操作零卡点</li>
+          <li>一键多店铺发布：素材生成即分发</li>
+        </ul>
+        <p>无论你是电商老手还是刚入行的小白，飞马都能让你十分钟产出专业级电商素材。</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== 第五屏：行业案例 ===== -->
+<section class="section">
+  <div class="sec-head">
+    <span class="sec-no">04</span><!-- taste-skill-ignore -->
+    <span class="sec-title">行业案例</span>
+  </div>
+  <div class="cases">
+
+    <div class="case">
+      <span class="cic"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M9 3v4M15 3v4M7 7h10v4a5 5 0 0 1-10 0V7zM12 16v5M9 21h6"/></svg></span>
+      <div class="ct"><div class="cname">3C 数码配件</div><div class="ctag">数据线 · 耳机 · 充电宝</div></div>
+      <p class="cdesc">义乌国际商贸城档口靠低价走量，主图千篇一律。用飞马文生图批量生成差异化主图，玲玲指导小白一键上架多店。</p>
+      <div class="cmeta"><span class="chip">文生图</span><span class="chip">玲玲陪练</span><span class="chip">一键多发</span></div>
+      <div class="cstat"><b>+58%</b>主图点击率（示意）</div>
+    </div>
+
+    <div class="case">
+      <span class="cic"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M9 4l3 3 3-3M12 7l-3 5 3 9 3-9-3-5z"/></svg></span>
+      <div class="ct"><div class="cname">女装</div><div class="ctag">连衣裙 · 通勤装 · 汉服</div></div>
+      <p class="cdesc">女装季季换款、拍照成本高。飞马文生图按风格出主图与详情，文生视频做穿搭种草，抖店同步投放。</p>
+      <div class="cmeta"><span class="chip">文生图</span><span class="chip">文生视频</span><span class="chip">一键多发</span></div>
+      <div class="cstat"><b>7天→10分钟</b>上新周期（示意）</div>
+    </div>
+
+    <div class="case">
+      <span class="cic"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M8 4l-4 3 2 3 2-1v10h8V9l2 1 2-3-4-3-4 2-4-2z"/></svg></span>
+      <div class="ct"><div class="cname">男装</div><div class="ctag">潮牌 · 休闲 · 工装</div></div>
+      <p class="cdesc">男装客单价高、买手挑剔，详情页要够质感。专业工作台调参数出高级感大片，小白也能对话出基础款。</p>
+      <div class="cmeta"><span class="chip">文生图</span><span class="chip">双工作台</span></div>
+      <div class="cstat"><b>-31%</b>详情页跳出率（示意）</div>
+    </div>
+
+    <div class="case">
+      <span class="cic"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M6 8h12l-1 12H7L6 8zM9 8V6a3 3 0 0 1 6 0v2"/></svg></span>
+      <div class="ct"><div class="cname">食品零食</div><div class="ctag">坚果 · 辣条 · 冲调</div></div>
+      <p class="cdesc">食品靠视觉勾食欲，直播切片需求大。飞马文生视频批量生成香辣带货片，玲玲挑最顺的一条发店。</p>
+      <div class="cmeta"><span class="chip">文生视频</span><span class="chip">玲玲陪练</span></div>
+      <div class="cstat"><b>1→20条/天</b>短视频产出（示意）</div>
+    </div>
+
+    <div class="case">
+      <span class="cic"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M12 3l3 5-3 4-3-4 3-5zM9 8l-5 3 5 3M15 8l5 3-5 3"/></svg></span>
+      <div class="ct"><div class="cname">饰品配件</div><div class="ctag">耳环 · 发饰 · 胸针</div></div>
+      <p class="cdesc">小商品客单低、SKU 巨多，每张图都要精致但不值当请摄影。飞马文生图按 SKU 批量出图，成本趋零。</p>
+      <div class="cmeta"><span class="chip">文生图</span><span class="chip">一键多发</span></div>
+      <div class="cstat"><b>-90%</b>出图成本（示意）</div>
+    </div>
+
+    <div class="case">
+      <span class="cic"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M7 4h10l-1 16H8L7 4zM17 8h3a3 3 0 0 1 0 6h-3"/></svg></span>
+      <div class="ct"><div class="cname">家居日用</div><div class="ctag">收纳 · 清洁 · 厨具</div></div>
+      <p class="cdesc">家居用品功能卖点要多图讲解。飞马文生图出场景图与卖点图，文生视频演示用法，全店一键分发。</p>
+      <div class="cmeta"><span class="chip">文生图</span><span class="chip">文生视频</span><span class="chip">一键多发</span></div>
+      <div class="cstat"><b>+42%</b>动销率（示意）</div>
+    </div>
+
+  </div>
+  <p class="sec-note">以上为基于义乌产业带常见门类的示意场景，数据均为演示用，非真实经营结果。</p>
+</section>
+
+<!-- 玲玲广告条 -->
+<div class="adbar-wrap">
+  <div class="adbar">
+    <span class="ling" id="adLing"></span>
+    <div class="copy">
+      <h3>卡在哪一步，玲玲就在哪一步</h3>
+      <p>AI 数字人客服全程陪练，小白也能十分钟出片。有问题，开口就有人接。</p>
+    </div>
+    <div class="act"><a href="#">让玲玲带你出片</a></div>
+  </div>
+</div>
+
+<!-- ===== 第六屏：功能能力矩阵 ===== -->
+<section class="section">
+  <div class="sec-head">
+    <span class="sec-no">05</span><!-- taste-skill-ignore -->
+    <span class="sec-title">功能能力矩阵</span>
+  </div>
+  <div class="feats">
+    <div class="feat">
+      <span class="fic"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><rect x="3" y="5" width="18" height="14" rx="2"/><circle cx="8.5" cy="10" r="1.5"/><path d="M21 16l-5-5-4 4-3-3-6 6"/></svg></span>
+      <h4>文生图</h4>
+      <p>主图、详情、海报，一句话出，零设计基础也能出专业片。</p>
+    </div>
+    <div class="feat">
+      <span class="fic"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M10 9l5 3-5 3V9z"/></svg></span>
+      <h4>文生视频</h4>
+      <p>抖店带货短片，输入卖点即出，短视频补位不求人。</p>
+    </div>
+    <div class="feat">
+      <span class="fic"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><rect x="4" y="4" width="7" height="7"/><rect x="13" y="4" width="7" height="7"/><rect x="4" y="13" width="7" height="7"/><rect x="13" y="13" width="7" height="7"/></svg></span>
+      <h4>风格库</h4>
+      <p>数十种电商风格模板，白底、场景、种草一键切换。</p>
+    </div>
+    <div class="feat">
+      <span class="fic"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M4 4h7v7H4zM14 4h6v4h-6zM14 11h6v9h-6zM4 14h7v6H4z"/></svg></span>
+      <h4>多尺寸自适应</h4>
+      <p>主图、方图、竖版、横版，一次生成多比例适配。</p>
+    </div>
+    <div class="feat">
+      <span class="fic"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><rect x="8" y="8" width="12" height="12" rx="2"/><path d="M4 16V4h12"/></svg></span>
+      <h4>批量出片</h4>
+      <p>一次生成多个版本，挑最顺眼的那张直接上架。</p>
+    </div>
+    <div class="feat">
+      <span class="fic"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M4 5h16v10H9l-5 4V5z"/></svg></span>
+      <h4>智能提示词</h4>
+      <p>玲玲替你把大白话翻译成专业 prompt，不用学参数。</p>
+    </div>
+    <div class="feat">
+      <span class="fic"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M3 6h6l2 2h10v10H3z"/></svg></span>
+      <h4>素材库</h4>
+      <p>生成即入库，随时复用、微调、二次编辑，越用越顺。</p>
+    </div>
+    <div class="feat">
+      <span class="fic"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a14 14 0 0 1 0 18M12 3a14 14 0 0 0 0 18"/></svg></span>
+      <h4>一键多店</h4>
+      <p>国内海外店铺一次发齐，出片与上新同频。</p>
+    </div>
+  </div>
+</section>
+
+<!-- ===== 第七屏：出片作品墙 ===== -->
+<section class="section">
+  <div class="sec-head">
+    <span class="sec-no">06</span><!-- taste-skill-ignore -->
+    <span class="sec-title">飞马出片 · 作品墙</span>
+  </div>
+  <div class="show">
+    <div class="shot">
+      <img src="assets/thermos-hero.png" alt="保温杯电商主图">
+      <div class="cap"><h4>保温杯 · 电商主图</h4><div class="row"><span class="out">文生图</span><span class="out">白底主图</span></div></div>
+    </div>
+    <div class="shot">
+      <img src="assets/thermos-poster.png" alt="保温杯种草海报">
+      <div class="cap"><h4>保温杯 · 种草海报</h4><div class="row"><span class="out">文生图</span><span class="out">场景海报</span></div></div>
+    </div>
+    <div class="shot">
+      <img src="assets/video-cover.png" alt="保温杯通勤种草视频封面">
+      <div class="cap"><h4>保温杯 · 通勤种草视频</h4><div class="row"><span class="out">文生视频</span><span class="out">竖版封面</span></div></div>
+    </div>
+  </div>
+  <div class="types">
+    <span>主图</span><span>详情页</span><span>海报</span><span>短视频</span><span>直播切片</span><span>种草图</span><span>包装图</span><span>活动 Banner</span>
+  </div>
+</section>
+
+<!-- ===== 第八屏：套餐与定价 ===== -->
+<section class="section">
+  <div class="sec-head">
+    <span class="sec-no">07</span><!-- taste-skill-ignore -->
+    <span class="sec-title">套餐与定价</span>
+  </div>
+  <div class="plans">
+    <div class="plan">
+      <div class="pname">免费体验版</div>
+      <div class="price">¥0<small> / 月</small></div>
+      <div class="pdesc">先用起来，十分钟感受出片速度。</div>
+      <ul>
+        <li>每日 5 次 AI 生成</li>
+        <li>基础电商风格</li>
+        <li>单店发布</li>
+        <li>玲玲基础引导</li>
+      </ul>
+      <a class="pbtn ghost2" href="#">免费试用</a>
+    </div>
+    <div class="plan hot">
+      <div class="pname">标准版</div>
+      <div class="price">¥99<small> / 月</small></div>
+      <div class="pdesc">个人卖家的主力工作台。</div>
+      <ul>
+        <li>无限次 AI 生成</li>
+        <li>全风格库 + 多尺寸</li>
+        <li>一键多发 6 大平台</li>
+        <li>玲玲全程陪练</li>
+        <li>素材库无限存储</li>
+      </ul>
+      <a class="pbtn fill" href="#">立即开通</a>
+    </div>
+    <div class="plan">
+      <div class="pname">旗舰版</div>
+      <div class="price">¥299<small> / 月</small></div>
+      <div class="pdesc">团队与品牌卖家的进阶之选。</div>
+      <ul>
+        <li>含标准版全部能力</li>
+        <li>批量出片 + 优先队列</li>
+        <li>品牌资产固化（Logo / 色板）</li>
+        <li>专属客户成功顾问</li>
+      </ul>
+      <a class="pbtn ghost" href="#">联系顾问</a>
+    </div>
+  </div>
+</section>
+
+<!-- ===== 第九屏：收尾 CTA + 信任数据 ===== -->
+<section class="section">
+  <div class="trust">
+    <div class="tnum"><b>10万+</b><span>卖家在用（示意）</span></div>
+    <div class="tnum"><b>10 分钟</b><span>平均出片（示意）</span></div>
+    <div class="tnum"><b>6 大平台</b><span>一键即发</span></div>
+    <div class="tnum"><b>95%</b><span>小白首单成功（示意）</span></div>
+  </div>
+  <div class="final">
+    <h2>现在就让飞马替你出片</h2>
+    <p>不会设计？玲玲陪你走完每一步。十分钟，你的第一组专业素材就上线。</p>
+    <div class="btns">
+      <a class="fbtn g" href="#">免费试用</a>
+      <a class="fbtn w" href="#">看演示</a>
+    </div>
+  </div>
+</section>
+
+<footer class="foot">
+  <div class="top">
+    <div>
+      <div class="brand">飞马<span>电商工作台</span></div>
+      <div style="font-size:.82rem;max-width:30ch;line-height:1.6">电商人的 AI 内容工厂——从想法到出片，只隔一次对话。</div>
+    </div>
+    <div class="cols">
+      <div class="col"><h5>产品</h5><a href="#">功能矩阵</a><a href="#">小白工作台</a><a href="#">作品墙</a><a href="#">套餐定价</a></div>
+      <div class="col"><h5>资源</h5><a href="#">帮助中心</a><a href="#">新手教程</a><a href="#">更新日志</a></div>
+      <div class="col"><h5>公司</h5><a href="#">关于飞马</a><a href="#">联系我们</a><a href="#">商务合作</a></div>
+    </div>
+  </div>
+  <div class="copy">
+    <span>© 2026 飞马电商工作台 · 本页为演示页，数据均为示意</span>
+    <span>占位备案号：浙ICP备00000000号</span>
+  </div>
+</footer>
+
+<script>
+function lingAvatar(size){
+  return `<svg width="${size}" height="${size}" viewBox="0 0 92 92" aria-label="玲玲">
+    <circle cx="46" cy="46" r="46" fill="#1236a8"/>
+    <path d="M46 16c13 0 21 8 21 20 0 6-2 10-4 14 4 3 6 7 6 13H23c0-6 2-10 6-13-2-4-4-8-4-14 0-12 8-20 21-20z" fill="#e9dfc7"/>
+    <circle cx="39" cy="39" r="3.2" fill="#1236a8"/><circle cx="53" cy="39" r="3.2" fill="#1236a8"/>
+    <path d="M39 52c4 4 10 4 14 0" stroke="#1236a8" stroke-width="3" fill="none" stroke-linecap="round"/>
+    <path d="M68 30c9-3 15 2 15 2s-2 9-11 11" fill="#c2922f"/>
+  </svg>`;
+}
+document.getElementById('lingAva').innerHTML=lingAvatar(64);
+document.getElementById('adLing').innerHTML=lingAvatar(82);
+
+const cards=Array.from(document.querySelectorAll('.tcard'));
+const panes=Array.from(document.querySelectorAll('.dpane'));
+let cur=0;
+function go(i){
+  cur=(i+panes.length)%panes.length;
+  cards.forEach((c,k)=>c.classList.toggle('active',k===cur));
+  panes.forEach((p,k)=>p.classList.toggle('show',k===cur));
+}
+cards.forEach((c,k)=>c.addEventListener('click',()=>go(k)));
+document.addEventListener('keydown',e=>{
+  if(e.key==='ArrowRight')go(cur+1);
+  if(e.key==='ArrowLeft')go(cur-1);
+});
+</script>
+</body>
+</html>

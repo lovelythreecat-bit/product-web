@@ -1,0 +1,33 @@
+{
+  "version": "V3-photo",
+  "date": "2026-11-03",
+  "status": "按已审阅提示词授权生成，独立素材待整页评审",
+  "run_id": "8db9f600-81f9-4a69-afc6-a8dae1261b9b",
+  "attempt_id": "c3cb5aa2-e4ae-4e11-8e2b-bf3424792a2c",
+  "mode": "built-in image_gen",
+  "requested_model": "gpt-image-2.5",
+  "actual_model_verified": false,
+  "model_note": "User preference included in prompt; built-in tool exposes no model selector and returns no actual model ID.",
+  "review_source": "docs/design/homepage-art-direction-2026-11-03/prompts-v3-review.json",
+  "shared_direction": "像一组由摄影师与平面设计师合作完成的品牌广告。大胆构图、明显的大小对比、不同材质和少量高纯度色块；产品清晰，环境有实际尺度。物体的支撑、接触阴影和反射方向成立。保留纸张纤维、金属细纹、织物毛边和自然肤质，不做脏污或廉价复古。每张图只保留一个主创意，色彩按品类分别设计，避免整组统一蓝橙光效。图片中的留白用于后续可编辑标题；文案由网页排版，不烘焙进位图。",
+  "shared_avoid": "不要悬浮产品、液态镀铬、巨型棱镜、霓虹激光、发光轮廓、粒子云、未来城市、无限镜面空间、无来源彩虹反光。不要把所有材料都做得透明发亮。不要过度锐化、HDR、蜡感皮肤或刻意制造胶片噪点。不要随机添加无关道具。不要品牌标识、水印、乱码、UI或宣传数据。",
+  "assets": [
+    {
+      "id": "shoe-campaign",
+      "prompt": "使用用户配置的 gpt-image-2.5。生成单张独立位图，4:5竖版，建议1024×1280。\n共同方向：像一组由摄影师与平面设计师合作完成的品牌广告。大胆构图、明显的大小对比、不同材质和少量高纯度色块；产品清晰，环境有实际尺度。物体的支撑、接触阴影和反射方向成立。保留纸张纤维、金属细纹、织物毛边和自然肤质，不做脏污或廉价复古。每张图只保留一个主创意，色彩按品类分别设计，避免整组统一蓝橙光效。图片中的留白用于后续可编辑标题；文案由网页排版，不烘焙进位图。\n具体已审阅提示词：拍摄一张运动品牌风格的跑鞋广告。低机位靠近真实的砖红色橡胶跑道，只拍成年跑者的小腿与鞋。一只蓝白跑鞋落在白色起跑线前，完整鞋形占画面宽度约60%；后方另一只脚刚抬起，略有自然运动模糊。跑道白线斜穿画面，左上方留出红色跑道面积，作为后续标题空间。午后斜射阳光带出织物纹理、鞋底橡胶与小腿的真实阴影。鞋带有自然弯曲，袜子有轻微褶皱。前景一小段虚化跑道、清晰前脚、后方运动中的腿构成层次。画面紧张、有力量，但没有速度光线、爆炸碎片、悬浮跑道和不可能的动作。\n共同约束：不要悬浮产品、液态镀铬、巨型棱镜、霓虹激光、发光轮廓、粒子云、未来城市、无限镜面空间、无来源彩虹反光。不要把所有材料都做得透明发亮。不要过度锐化、HDR、蜡感皮肤或刻意制造胶片噪点。不要随机添加无关道具。不要品牌标识、水印、乱码、UI或宣传数据。\n技术构图：只拍成年跑者膝盖以下，两条腿和两只鞋的解剖关系自然。前脚蓝白主鞋完整，不裁鞋尖或鞋跟；完整主鞋居于画面中间约60%宽，确实踩在跑道上，接触点和阴影清楚。保留已指定左上方红色跑道留白。",
+      "output_hint": "Generated images are saved to C:\\Users\\呜啦啦\\.codex\\generated_images\\01a1a0d0-ba13-7a72-9cae-77e479b193e7 as C:\\Users\\呜啦啦\\.codex\\generated_images\\01a1a0d0-ba13-7a72-9cae-77e479b193e7\\exec-f5cfc96a-10ac-4ad2-bea5-b7b17125cead.png by default.\nIf you need to use a generated image at another path, copy it and leave the original in place unless the user explicitly asks you to delete it.\nThe generated image is already displayed to the user. There is no need to render it in the final response as a Markdown image or file link."
+    },
+    {
+      "id": "beauty-campaign",
+      "prompt": "使用用户配置的 gpt-image-2.5。生成单张独立位图，3:2横版，建议1536×1024。\n共同方向：像一组由摄影师与平面设计师合作完成的品牌广告。大胆构图、明显的大小对比、不同材质和少量高纯度色块；产品清晰，环境有实际尺度。物体的支撑、接触阴影和反射方向成立。保留纸张纤维、金属细纹、织物毛边和自然肤质，不做脏污或廉价复古。每张图只保留一个主创意，色彩按品类分别设计，避免整组统一蓝橙光效。图片中的留白用于后续可编辑标题；文案由网页排版，不烘焙进位图。\n具体已审阅提示词：拍摄一张有平面设计感的护肤精华广告。冰蓝玻璃精华瓶置于浅珊瑚色不透明亚克力板上，后方是一块有轻微水痕的竖向压纹玻璃，玻璃与产品保持距离。前景只出现一片大花瓣的局部，形成柔软边缘；瓶身留少量大小不均的真实水珠，不能像均匀贴满的装饰。用窗边硬光透过玻璃，在台面产生有来源的折射影纹，瓶子仍清晰。珊瑚色、奶油白与冰蓝形成鲜明而不过饱和的配色。低视角，瓶子偏右，完整泵头和瓶底位于画面中间高度范围，左侧留给标题。画面丰富来自玻璃纹理、色块和花瓣尺度，不要水雕塑、珍珠、贝壳、漂浮花海或钻石般闪光。\n共同约束：不要悬浮产品、液态镀铬、巨型棱镜、霓虹激光、发光轮廓、粒子云、未来城市、无限镜面空间、无来源彩虹反光。不要把所有材料都做得透明发亮。不要过度锐化、HDR、蜡感皮肤或刻意制造胶片噪点。不要随机添加无关道具。不要品牌标识、水印、乱码、UI或宣传数据。\n技术构图：此图同时用于3:2横向侧图与近正方卡片，完整精华瓶稍偏右但处于画面中间55%宽区域内，泵头到瓶底完整，瓶子高度约画面60%，上下留余量。产品确实放置在亚克力板上，接触阴影真实，玻璃为实体压纹板与产品有距离；道具可以在画面边缘裁切，主体不得裁切。",
+      "output_hint": "Generated images are saved to C:\\Users\\呜啦啦\\.codex\\generated_images\\01a1a0d0-ba13-7a72-9cae-77e479b193e7 as C:\\Users\\呜啦啦\\.codex\\generated_images\\01a1a0d0-ba13-7a72-9cae-77e479b193e7\\exec-0301b533-0773-49d5-bd48-f7487c77ab08.png by default.\nIf you need to use a generated image at another path, copy it and leave the original in place unless the user explicitly asks you to delete it.\nThe generated image is already displayed to the user. There is no need to render it in the final response as a Markdown image or file link."
+    },
+    {
+      "id": "audio-campaign",
+      "prompt": "使用用户配置的 gpt-image-2.5。生成单张独立位图，3:2横版，建议1536×1024。\n共同方向：像一组由摄影师与平面设计师合作完成的品牌广告。大胆构图、明显的大小对比、不同材质和少量高纯度色块；产品清晰，环境有实际尺度。物体的支撑、接触阴影和反射方向成立。保留纸张纤维、金属细纹、织物毛边和自然肤质，不做脏污或廉价复古。每张图只保留一个主创意，色彩按品类分别设计，避免整组统一蓝橙光效。图片中的留白用于后续可编辑标题；文案由网页排版，不烘焙进位图。\n具体已审阅提示词：拍摄一张深蓝头戴耳机的音乐广告。耳机自然侧放在暖白色桌面上，头梁和两只耳罩完整可见，占画面宽度约55%。右后方一张砖红色唱片内袋竖靠在深灰唱片封套上，前景露出黑胶唱片的一小段弧边；道具不带文字。耳机柔软皮革、阳极金属和黑胶沟槽各有不同的反光强度。用一盏大柔光箱配合黑色遮光板塑造轮廓，阴影厚实自然。俯拍略带侧角，红色方块与黑色圆弧形成清楚的平面构成，耳机是唯一焦点。呈现音乐杂志广告的真实触感，不加入金属声浪、玻璃刀片、均衡器图形或霓虹舞台。\n共同约束：不要悬浮产品、液态镀铬、巨型棱镜、霓虹激光、发光轮廓、粒子云、未来城市、无限镜面空间、无来源彩虹反光。不要把所有材料都做得透明发亮。不要过度锐化、HDR、蜡感皮肤或刻意制造胶片噪点。不要随机添加无关道具。不要品牌标识、水印、乱码、UI或宣传数据。\n技术构图：此图同时用于3:2横向侧图与近正方卡片，整副耳机放在画面中心约55%宽区域，头梁两端、转轴、两只耳罩都完整，主体不裁切。耳机自然侧放由耳罩与头梁实际接触桌面支撑，没有漂浮；道具边缘可以裁切。皮革纹理柔软自然有细褶，金属反光克制，暖白桌面真实哑光。",
+      "output_hint": "Generated images are saved to C:\\Users\\呜啦啦\\.codex\\generated_images\\01a1a0d0-ba13-7a72-9cae-77e479b193e7 as C:\\Users\\呜啦啦\\.codex\\generated_images\\01a1a0d0-ba13-7a72-9cae-77e479b193e7\\exec-7a354508-3a08-42f6-848a-c97aa6e20bd3.png by default.\nIf you need to use a generated image at another path, copy it and leave the original in place unless the user explicitly asks you to delete it.\nThe generated image is already displayed to the user. There is no need to render it in the final response as a Markdown image or file link.",
+      "revision_prompt": "使用用户配置的gpt-image-2.5。对此参考图只做构图取景修正：保持同一副深蓝耳机、皮革皱纹、金属转轴、暖白哑光桌面、右后方砖红唱片袋与深灰封套、前景黑胶弧边，保持相同自然摄影光线和阴影。将镜头拉远，耳机完整轮廓缩小，并移到画面正中央：最左端应在全图宽度25%处，最右端在75%处，最上端在高度22%处，最下端在80%处。整副耳机只占画面宽度约50%，四周有明显桌面余量；头梁和两个耳罩完整清楚，侧放并真实支撑于桌面。仍是3:2横版1536×1024。仅在边缘延续已存在的桌面与道具，禁止加新道具、新概念、文字、logo、光效或增强反光。保持自然产品摄影材质。此次修正是为将横图居中裁成近方卡时不截断耳机，务必让主体在中央55%宽区域内。",
+      "revision_output_hint": "Generated images are saved to C:\\Users\\呜啦啦\\.codex\\generated_images\\01a1a0d0-ba13-7a72-9cae-77e479b193e7 as C:\\Users\\呜啦啦\\.codex\\generated_images\\01a1a0d0-ba13-7a72-9cae-77e479b193e7\\exec-652c54d5-f2e8-48b4-91da-a00dda3a583a.png by default.\nIf you need to use a generated image at another path, copy it and leave the original in place unless the user explicitly asks you to delete it.\nThe generated image is already displayed to the user. There is no need to render it in the final response as a Markdown image or file link."
+    }
+  ]
+}

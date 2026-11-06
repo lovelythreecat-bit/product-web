@@ -1,0 +1,58 @@
+[
+  {
+    "path": "digital/phone-source.png",
+    "width": 1254,
+    "height": 1254,
+    "bytes": 1304389,
+    "sha256": "1ed8a7e5f179552ae8b55103600004a1229e24815134582ce4db8d40e3c64150"
+  },
+  {
+    "path": "digital/phone-campaign.png",
+    "width": 1254,
+    "height": 1254,
+    "bytes": 2005229,
+    "sha256": "12888acd6c5622ed9f64f58d1b061a291040caa6bcc8c0e898ff7090c5464b25"
+  },
+  {
+    "path": "digital/phone-detail.png",
+    "width": 1254,
+    "height": 1254,
+    "bytes": 2396095,
+    "sha256": "f80a38199e695168cfb01bc53a159c4128b25f918e78f4159d79af0af6db102c"
+  },
+  {
+    "path": "categories/shoe-campaign.png",
+    "width": 1254,
+    "height": 1254,
+    "bytes": 2882272,
+    "sha256": "7ba49f42b0a661d11eb65d36323991f5fd10ead80d4df805f0dae4d14182aa68"
+  },
+  {
+    "path": "categories/beauty-campaign.png",
+    "width": 1254,
+    "height": 1254,
+    "bytes": 2886716,
+    "sha256": "fce2e5a30f475d0d69ec6ab142170b8b634de514a4deb97df3aee5c97c5c51c6"
+  },
+  {
+    "path": "categories/audio-campaign.png",
+    "width": 1254,
+    "height": 1254,
+    "bytes": 2359906,
+    "sha256": "5a19057c087ef36d70c2c6a03bb71fc903cc55e619d9c3dc07c872f79390eb4b"
+  },
+  {
+    "path": "story/phone-lifestyle.png",
+    "width": 1536,
+    "height": 1024,
+    "bytes": 2569926,
+    "sha256": "d1a3dd12a8d48d21bba04b39cdc6d0cae4c7ca5333f5e26bddf2d3f029d1e533"
+  },
+  {
+    "path": "story/phone-creator.png",
+    "width": 1536,
+    "height": 1024,
+    "bytes": 2108847,
+    "sha256": "64abc55b3a04777c1170cda4744ae940a65acaedb1a3c040c5990b454e707bbf"
+  }
+]

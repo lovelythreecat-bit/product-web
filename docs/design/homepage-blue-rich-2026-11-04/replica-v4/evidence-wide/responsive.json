@@ -1,0 +1,101 @@
+[
+  {
+    "viewport": 1920,
+    "scrollWidth": 1920,
+    "page": {
+      "left": 0,
+      "width": 1920,
+      "right": 1920
+    },
+    "hero": {
+      "left": 0,
+      "width": 1920,
+      "right": 1920
+    },
+    "footer": {
+      "left": 0,
+      "width": 1920,
+      "right": 1920
+    },
+    "section": {
+      "left": 48,
+      "width": 1824,
+      "right": 1872
+    },
+    "h1": "42px",
+    "h2": "35px",
+    "progress": [
+      "none",
+      "none",
+      "none"
+    ],
+    "broken": 0,
+    "errors": []
+  },
+  {
+    "viewport": 1440,
+    "scrollWidth": 1440,
+    "page": {
+      "left": 0,
+      "width": 1440,
+      "right": 1440
+    },
+    "hero": {
+      "left": 0,
+      "width": 1440,
+      "right": 1440
+    },
+    "footer": {
+      "left": 0,
+      "width": 1440,
+      "right": 1440
+    },
+    "section": {
+      "left": 36,
+      "width": 1368,
+      "right": 1404
+    },
+    "h1": "42px",
+    "h2": "35px",
+    "progress": [
+      "none",
+      "none",
+      "none"
+    ],
+    "broken": 0,
+    "errors": []
+  },
+  {
+    "viewport": 390,
+    "scrollWidth": 390,
+    "page": {
+      "left": 0,
+      "width": 390,
+      "right": 390
+    },
+    "hero": {
+      "left": 0,
+      "width": 390,
+      "right": 390
+    },
+    "footer": {
+      "left": 0,
+      "width": 390,
+      "right": 390
+    },
+    "section": {
+      "left": 14,
+      "width": 362,
+      "right": 376
+    },
+    "h1": "27px",
+    "h2": "22px",
+    "progress": [
+      "none",
+      "none",
+      "none"
+    ],
+    "broken": 0,
+    "errors": []
+  }
+]

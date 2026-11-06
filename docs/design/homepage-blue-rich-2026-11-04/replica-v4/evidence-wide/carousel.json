@@ -1,0 +1,14 @@
+{
+  "timer": {
+    "elapsedMs": 5120,
+    "selected": "tab-1"
+  },
+  "manual": {
+    "selected": "tab-2",
+    "visible": [
+      "pane-2"
+    ],
+    "progressVisible": false,
+    "errors": []
+  }
+}

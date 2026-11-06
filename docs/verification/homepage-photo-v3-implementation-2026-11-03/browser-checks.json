@@ -1,0 +1,63 @@
+[
+  {
+    "name": "desktop-light",
+    "width": 1440,
+    "scrollWidth": 1430,
+    "theme": "light",
+    "broken": [],
+    "sourceCount": 1,
+    "sourceLabel": "上传的商品原图\n\n我要卖一款手机，\n做一组新品广告",
+    "workspace": [
+      "http://127.0.0.1:15173/src/assets/homepage/photo-v3/phone-campaign.webp",
+      "http://127.0.0.1:15173/src/assets/homepage/photo-v3/phone-detail.webp"
+    ],
+    "apiError": "请求暂时无法完成，请稍后查询。\n重新读取"
+  },
+  {
+    "name": "desktop-dark",
+    "width": 1440,
+    "scrollWidth": 1430,
+    "theme": "dark",
+    "broken": [],
+    "sourceCount": 1,
+    "sourceLabel": "上传的商品原图\n\n我要卖一款手机，\n做一组新品广告",
+    "workspace": [
+      "http://127.0.0.1:15173/src/assets/homepage/photo-v3/phone-campaign.webp",
+      "http://127.0.0.1:15173/src/assets/homepage/photo-v3/phone-detail.webp"
+    ],
+    "apiError": "请求暂时无法完成，请稍后查询。\n重新读取"
+  },
+  {
+    "name": "mobile-dark",
+    "width": 390,
+    "scrollWidth": 380,
+    "theme": "dark",
+    "broken": [],
+    "sourceCount": 1,
+    "sourceLabel": "上传的商品原图\n\n我要卖一款手机，\n做一组新品广告",
+    "workspace": [
+      "http://127.0.0.1:15173/src/assets/homepage/photo-v3/phone-campaign.webp",
+      "http://127.0.0.1:15173/src/assets/homepage/photo-v3/phone-detail.webp"
+    ],
+    "apiError": "请求暂时无法完成，请稍后查询。\n重新读取"
+  },
+  {
+    "name": "mobile-light",
+    "width": 390,
+    "scrollWidth": 380,
+    "theme": "light",
+    "broken": [],
+    "sourceCount": 1,
+    "sourceLabel": "上传的商品原图\n\n我要卖一款手机，\n做一组新品广告",
+    "workspace": [
+      "http://127.0.0.1:15173/src/assets/homepage/photo-v3/phone-campaign.webp",
+      "http://127.0.0.1:15173/src/assets/homepage/photo-v3/phone-detail.webp"
+    ],
+    "apiError": "请求暂时无法完成，请稍后查询。\n重新读取"
+  },
+  {
+    "name": "mobile-320",
+    "width": 320,
+    "scrollWidth": 310
+  }
+]

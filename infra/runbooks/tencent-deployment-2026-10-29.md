@@ -1,5 +1,11 @@
 # 腾讯云 IP 部署记录 · 2026-10-29
 
+> 2026-11-04 已按用户要求新增独立首页805端口：<http://43.142.150.158:805/>。目录`/srv/feima-home-805/current`，独立Nginx站点`feima-home-805`。9个公网文件哈希及桌面/手机检查通过，原80端口首页哈希与业务服务保持正常。见[发布与撤销记录](../../docs/verification/standalone-homepage-805-deployment-2026-11-04.md)。
+
+> 2026-11-03 20:03 已发布摄影配图 V3 首页。独立构建排除未发布的客服页导航改动；24 项单测、构建、公网 25 文件哈希及 ego 桌面／手机双主题检查通过，六个服务健康。备份 `/srv/yingzuo/backups/homepage-photo-v3-before-20261103-200343.tar.gz`。见[摄影 V3 首页发布与回滚记录](../../docs/verification/homepage-photo-v3-deployment-2026-11-03.md)。
+
+> 2026-11-03 17:28 已发布最新光场创作首页，仅更新前端。24 项单测、生产构建、24 个公网文件哈希和 ego 桌面／手机检查通过，六个服务健康。备份 `/srv/yingzuo/backups/homepage-before-20261103-172816.tar.gz`。见[光场首页发布与回滚记录](../../docs/verification/homepage-lightfield-deployment-2026-11-03.md)。
+
 > 2026-11-03 已发布当前工作区前端（动态首页、客服展示页、工作台及快速生成修复）和两个文案图片兼容后端文件。401 项单测、构建、公网 18 文件哈希与 ego 页面检查通过；六个服务健康。备份 `/srv/yingzuo/backups/web-before-20261103-114429.tar.gz`。入口仍为 <http://43.142.150.158/>，域名仍受备案限制。详见 [本次发布与回滚记录](../../docs/verification/web-deployment-2026-11-03.md)。
 
 > 2026-10-31 已发布飞马登录注册双主题界面。当前可用入口 http://43.142.150.158/login ，域名仍受备案限制。备份与回滚见 [本次部署验证](../../docs/verification/auth-deployment-2026-10-31.md)。仅更新前端，未变更数据库及业务配置。

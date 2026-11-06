@@ -1,0 +1,88 @@
+{
+  "width": 1024,
+  "clientWidth": 1024,
+  "scrollWidth": 1024,
+  "height": 4608,
+  "errors": [],
+  "broken": [],
+  "sections": [
+    {
+      "id": "top",
+      "cls": "hero",
+      "y": 0,
+      "h": 494
+    },
+    {
+      "id": "why-feima",
+      "cls": "section",
+      "y": 505,
+      "h": 605
+    },
+    {
+      "id": "scenes",
+      "cls": "section",
+      "y": 1120,
+      "h": 416
+    },
+    {
+      "id": "marketing",
+      "cls": "section",
+      "y": 1545,
+      "h": 752
+    },
+    {
+      "id": "industries",
+      "cls": "section",
+      "y": 2305,
+      "h": 654
+    },
+    {
+      "id": "",
+      "cls": "adbar-wrap",
+      "y": 2971,
+      "h": 97
+    },
+    {
+      "id": "features",
+      "cls": "section",
+      "y": 3076,
+      "h": 499
+    },
+    {
+      "id": "works",
+      "cls": "section",
+      "y": 3585,
+      "h": 362
+    },
+    {
+      "id": "pricing",
+      "cls": "section",
+      "y": 3957,
+      "h": 282
+    },
+    {
+      "id": "start-creating",
+      "cls": "section",
+      "y": 4251,
+      "h": 198
+    },
+    {
+      "id": "",
+      "cls": "trust",
+      "y": 4251,
+      "h": 62
+    },
+    {
+      "id": "",
+      "cls": "final",
+      "y": 4327,
+      "h": 122
+    },
+    {
+      "id": "",
+      "cls": "foot",
+      "y": 4462,
+      "h": 146
+    }
+  ]
+}

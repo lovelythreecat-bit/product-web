@@ -1,0 +1,22 @@
+[
+  {
+    "view": "desktop-light",
+    "width": 1440,
+    "clientWidth": 1425,
+    "scrollWidth": 1425,
+    "failedImages": []
+  },
+  {
+    "view": "mobile-dark",
+    "width": 390,
+    "clientWidth": 375,
+    "scrollWidth": 375,
+    "cupMentions": false
+  },
+  {
+    "view": "narrow",
+    "width": 320,
+    "clientWidth": 305,
+    "scrollWidth": 305
+  }
+]

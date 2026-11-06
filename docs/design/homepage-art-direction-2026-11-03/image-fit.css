@@ -1,0 +1,8 @@
+/* Image-only adjustments for this review; keep complete product silhouettes. */
+.scene-zero>img,.workspace-images img:first-child{object-fit:contain;background:#fff}
+.scene-one img{width:min(42%,308px);height:auto;aspect-ratio:1;max-width:none;object-fit:contain}
+.scene-two>img,.film-visual>img{object-position:65% center}
+.showcase-side img{object-fit:contain}
+.showcase-side figure:first-child{background:#c6d5d7}
+.showcase-side figure:last-child{background:#041b2b}
+@media(max-width:760px){.scene-one img{top:50px}.film-visual>img{object-position:65% center}}

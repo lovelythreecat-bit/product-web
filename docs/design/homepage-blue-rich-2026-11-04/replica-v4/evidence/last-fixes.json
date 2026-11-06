@@ -1,0 +1,11 @@
+{
+  "width": 390,
+  "scrollWidth": 390,
+  "heroHeight": 877,
+  "cardBottom": 475,
+  "heroBottom": 495,
+  "selected": "tab-1",
+  "character": "assets/lingling.png",
+  "logoIsSvg": true,
+  "errors": []
+}
